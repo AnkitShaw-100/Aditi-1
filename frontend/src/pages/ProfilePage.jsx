@@ -474,11 +474,16 @@ function ProfilePanel() {
                 : "Name, email, phone number, and date of birth are required before payment."}
           </p>
         </div>
-        <div className="mt-6 border-t border-steel/50 pt-4">
+        <div className="profile-download-panel mt-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-fog">
-              Bought Magazines
-            </p>
+            <div>
+              <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
+                Your PDF Library
+              </p>
+              <h2 className="mt-2 font-rajdhani text-2xl font-bold leading-none text-chalk">
+                Bought magazines
+              </h2>
+            </div>
             {hasPendingPurchase ? (
               <Button
                 type="button"
@@ -507,11 +512,11 @@ function ProfilePanel() {
                       <Button
                         type="button"
                         variant="ghost"
-                        className="h-12 rounded-none border border-steel/70 px-4 font-rajdhani text-base font-bold text-chalk hover:border-ember hover:bg-plate hover:text-chalk"
+                        className="download-action download-action--primary h-auto rounded-none px-4 py-4 font-rajdhani text-base font-bold"
                         onClick={() => downloadMagazine(magazine)}
                       >
+                        <span>Download PDF</span>
                         <Download className="size-4" />
-                        PDF
                       </Button>
                     </div>
                   ) : (

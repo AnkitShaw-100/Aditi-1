@@ -80,19 +80,19 @@ export default function HeroSection() {
         {isMuted ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
       </button>
       <div className="hero-panel absolute inset-x-0 bottom-0 z-20">
-        <div className="mx-auto max-w-7xl px-5 pb-8 pt-8 sm:px-6 lg:px-10 md:pb-14">
-          <div className="max-w-3xl">
-            <h1 className="mt-5 font-rajdhani text-[clamp(1.8rem,7vw,3.5rem)] font-bold leading-[1.1] text-chalk text-balance">
+        <div className="hero-panel__shell mx-auto flex min-h-full max-w-7xl items-end px-5 sm:px-6 lg:px-10">
+          <div className="hero-editorial-copy max-w-4xl">
+            <h1 className="hero-editorial-title font-rajdhani font-bold text-chalk text-balance">
               For a century,
               <br />
-              India was read by others.
+              <em className="hero-editorial-italic">India was read by others.</em>
             </h1>
-            <p className="mt-4 font-plex text-base font-light text-ash">
-              This is India,
+            <p className="hero-editorial-subline font-rajdhani font-bold text-chalk">
+              <span>This is India,</span>
               <br />
-              read by India.
+              <span>read by India.</span>
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-stretch">
+            <div className="hero-editorial-actions flex flex-col gap-3 sm:flex-row sm:items-stretch">
               <Button
                 asChild
                 className="h-12 rounded-full bg-ember px-6 font-rajdhani text-base font-bold text-void hover:bg-[#ddb255]"
@@ -114,7 +114,7 @@ export default function HeroSection() {
       </div>
       <a
         href="#mission"
-        className="blink absolute bottom-[8.5rem] left-1/2 z-20 -translate-x-1/2 font-plex text-sm text-ember sm:bottom-4"
+        className="hero-scroll-cue blink absolute left-1/2 z-20 -translate-x-1/2 font-plex text-sm text-ember"
         aria-label="Scroll to ADITI introduction"
       >
         &#9660;

@@ -39,12 +39,12 @@ export default function IssueContentsSection() {
               </h2>
               <p className="issue-contents-question">
                 How does a rising power hold many competing strategic truths at once
-                {" "}&mdash; and still move as one?
+                 and still move as one?
               </p>
               <p className="issue-contents-body">
                 As India's power grows, so does the complexity of its choices.
                 Different doctrines, different instincts, different timelines
-                {" "}&mdash; all alive inside the same state at the same moment. Issue I
+                 all alive inside the same state at the same moment. Issue I
                 reads that tension across capability, command, terrain and doctrine,
                 and asks the question every maturing power must answer: how do you
                 turn many truths into one clear strategy?

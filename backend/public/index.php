@@ -56,6 +56,56 @@ $admins = new AdminRepository($pdo);
 $users = new UserRepository($pdo);
 $mailer = new Mailer($config['mail']);
 
+if ($route === 'POST /api/issue-reservations') {
+    $body = $request->body();
+    $email = $body['email'] ?? '';
+    $issueSlug = $body['issue_slug'] ?? 'issue-ii-forging-the-republics-power';
+    $source = $body['source'] ?? 'landing';
+    $honeypot = $body['website'] ?? '';
+
+    if (is_string($honeypot) && trim($honeypot) !== '') {
+        Response::json(['message' => 'Reserved. You will hear first when Issue II opens.']);
+    }
+
+    if (!is_string($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        Response::json(['error' => 'A valid email address is required'], 422);
+    }
+
+    if (!is_string($issueSlug) || trim($issueSlug) === '') {
+        $issueSlug = 'issue-ii-forging-the-republics-power';
+    }
+
+    if (!is_string($source) || trim($source) === '') {
+        $source = 'landing';
+    }
+
+    $email = strtolower(trim($email));
+    $issueSlug = substr(trim($issueSlug), 0, 120);
+    $source = substr(trim($source), 0, 120);
+    $userAgent = substr((string) ($request->header('User-Agent') ?? ''), 0, 500);
+
+    $statement = $pdo->prepare(
+        'INSERT INTO issue_reservations (email, issue_slug, source, ip_address, user_agent)
+         VALUES (:email, :issue_slug, :source, :ip_address, :user_agent)
+         ON DUPLICATE KEY UPDATE
+            source = VALUES(source),
+            ip_address = VALUES(ip_address),
+            user_agent = VALUES(user_agent),
+            updated_at = CURRENT_TIMESTAMP'
+    );
+    $statement->execute([
+        'email' => $email,
+        'issue_slug' => $issueSlug,
+        'source' => $source,
+        'ip_address' => $request->ip(),
+        'user_agent' => $userAgent,
+    ]);
+
+    Response::json([
+        'message' => 'Reserved. You will hear first when Issue II opens.',
+    ], 201);
+}
+
 if ($route === 'POST /api/admin/login') {
     $body = $request->body();
     $email = $body['email'] ?? '';
@@ -93,6 +143,21 @@ if ($route === 'GET /api/admin/payments') {
     Response::json([
         'orders' => $admins->listPaymentOrders(),
         'events' => $admins->listPaymentEvents(),
+    ]);
+}
+
+if ($route === 'GET /api/admin/issue-reservations') {
+    requireAdmin($request, $admins);
+
+    $statement = $pdo->query(
+        'SELECT id, email, issue_slug, source, ip_address, user_agent, created_at, updated_at
+         FROM issue_reservations
+         ORDER BY created_at DESC
+         LIMIT 500'
+    );
+
+    Response::json([
+        'reservations' => $statement->fetchAll(),
     ]);
 }
 

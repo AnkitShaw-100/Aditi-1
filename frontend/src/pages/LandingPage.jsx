@@ -8,6 +8,7 @@ import FrameworkSection from "@/components/site/FrameworkSection";
 import DispatchesSection from "@/components/site/DispatchesSection";
 import IssueOfferSection from "@/components/site/IssueOfferSection";
 import FaqSection from "@/components/site/FaqSection";
+import IssueReserveSection from "@/components/site/IssueReserveSection";
 import ReaderFeedbackSection from "@/components/site/ReaderFeedbackSection";
 import PurchaseNudgePopup from "@/components/site/PurchaseNudgePopup";
 
@@ -26,6 +27,7 @@ export default function LandingPage() {
       <DispatchesSection />
       <IssueOfferSection />
       <FaqSection />
+      <IssueReserveSection />
       {/* <EditionsSection /> */}
       {/* <OjasSection /> */}
     </>

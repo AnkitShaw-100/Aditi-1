@@ -490,26 +490,23 @@
 .purchase-popup__footer {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 0.85rem;
   margin-top: 0.85rem;
   border-top: 1px solid rgba(242, 234, 218, 0.1);
   padding-top: 0.85rem;
+  width: 100%;
 }
 
 .purchase-popup__footer span {
   display: inline-flex;
-  min-height: 2.42rem;
   align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(201, 154, 74, 0.34);
-  border-radius: 0;
-  background: rgba(201, 154, 74, 0.11);
-  padding: 0.35rem 0.85rem;
+  justify-content: flex-start;
   font-family: "Rajdhani", sans-serif;
-  font-size: 1.12rem;
-  font-weight: 700;
-  color: #f2eada;
+  font-size: 1.22rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #ddb255;
 }
 
 .purchase-popup__cta {
@@ -588,25 +585,30 @@
   }
 
   .purchase-popup__footer {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(5.8rem, auto) minmax(8.4rem, 1fr);
     align-items: center;
-    justify-content: center;
+    justify-content: stretch;
+    gap: 0.7rem;
     width: 100%;
-    margin-top: 0.9rem;
-    text-align: center;
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    text-align: left;
   }
 
   .purchase-popup__footer span {
-    width: 100%;
-    font-size: 1.15rem;
+    width: auto;
+    font-size: 1.18rem;
   }
 
   .purchase-popup__cta {
+    justify-self: end;
     width: 100% !important;
-    min-height: 2.75rem;
-    padding-inline: 0.85rem;
+    min-width: 0 !important;
+    min-height: 2.72rem;
+    padding-inline: 0.8rem;
     font-size: 0.95rem;
-    margin-inline: auto;
+    margin-inline: 0;
   }
 }
 
@@ -710,11 +712,17 @@
 }
 
 .hero-media {
+  min-height: 100svh;
   background:
     radial-gradient(circle at 72% 20%, rgba(201, 154, 74, 0.22), transparent 18rem),
     linear-gradient(135deg, #4a5146 0%, #151a13 45%, #090b08 100%);
   background-position: center;
   background-size: cover;
+}
+
+.hero-media > video {
+  height: 100%;
+  min-height: 100svh;
 }
 
 .hero-media::after {
@@ -729,7 +737,111 @@
 }
 
 .hero-panel {
+  top: 0;
+  bottom: 0;
   background: transparent;
+  pointer-events: none;
+}
+
+.hero-panel__shell {
+  padding-top: clamp(5.5rem, 12vh, 7rem);
+  padding-bottom: clamp(2.1rem, 5vh, 3rem);
+}
+
+.hero-panel__shell,
+.hero-panel a,
+.hero-panel button {
+  pointer-events: auto;
+}
+
+.hero-editorial-copy {
+  margin-bottom: 0;
+}
+
+.hero-editorial-title {
+  max-width: 15ch;
+  font-size: 2.15rem;
+  line-height: 1.06;
+  letter-spacing: 0;
+  text-shadow: 0 1.2rem 3.5rem rgba(0, 0, 0, 0.35);
+}
+
+.hero-editorial-italic {
+  display: inline-block;
+  font-family: "Lora", serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.hero-editorial-subline {
+  margin-top: 1rem;
+  max-width: 15ch;
+  font-size: 1.58rem;
+  line-height: 1.08;
+  letter-spacing: 0;
+  text-wrap: balance;
+  text-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.32);
+}
+
+.hero-editorial-subline span:last-child {
+  color: #ddb255;
+}
+
+.hero-editorial-actions {
+  margin-top: 1.25rem;
+}
+
+.hero-scroll-cue {
+  bottom: max(0.85rem, env(safe-area-inset-bottom));
+}
+
+@media (min-width: 640px) {
+  .hero-panel__shell {
+    padding-bottom: clamp(4.75rem, 8vh, 6rem);
+  }
+
+  .hero-editorial-title {
+    font-size: 2.55rem;
+  }
+
+  .hero-editorial-subline {
+    margin-top: 1.1rem;
+    font-size: 1.95rem;
+  }
+
+  .hero-editorial-actions {
+    margin-top: 1.45rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-editorial-title {
+    font-size: 3rem;
+  }
+
+  .hero-editorial-subline {
+    margin-top: 1.25rem;
+    font-size: 2.25rem;
+  }
+
+  .mission-headline span {
+    white-space: nowrap;
+  }
+
+  .hero-editorial-actions {
+    margin-top: 1.6rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-editorial-title {
+    font-size: 3.25rem;
+  }
+
+  .hero-editorial-subline {
+    font-size: 2.45rem;
+  }
 }
 
 .hero-issue-button {
@@ -928,12 +1040,27 @@ body.menu-open {
 }
 
 .mission-headline {
-  max-width: 24ch;
+  max-width: 27ch;
   font-size: 3.35rem;
-  line-height: 1.05;
+  line-height: 1.08;
   letter-spacing: 0;
   text-align: center;
   text-wrap: balance;
+}
+
+.mission-headline span {
+  display: block;
+  margin-top: 0.2em;
+}
+
+.mission-audience {
+  color: #ddb255;
+  font-family: "Lora", serif;
+  font-size: clamp(1rem, 1.45vw, 1.18rem);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .mission-mesh {
@@ -1234,16 +1361,6 @@ body.menu-open {
   color: #c99a4a;
 }
 
-.issue-contents-kicker::before {
-  content: "";
-  display: inline-block;
-  width: 1.2rem;
-  height: 1px;
-  margin-right: 0.65rem;
-  transform: translateY(-0.22rem);
-  background: #c99a4a;
-}
-
 .issue-contents-title {
   max-width: 14ch;
   margin-top: 1.25rem;
@@ -1256,7 +1373,8 @@ body.menu-open {
 
 .issue-contents-title span {
   font-family: "Lora", serif;
-  font-weight: 600;
+  font-style: italic;
+  font-weight: 500;
   color: #d9bd79;
 }
 
@@ -2107,18 +2225,27 @@ body.menu-open {
 }
 
 .framework-title {
-  max-width: 12ch;
-  font-size: clamp(3rem, 8vw, 7.5rem);
-  line-height: 0.96;
+  max-width: 18ch;
+  font-size: clamp(2.65rem, 4.2vw, 4.25rem);
+  line-height: 1.04;
   letter-spacing: 0;
 }
 
 .framework-copy {
-  max-width: 44rem;
-  color: #d8d2c0;
-  font-size: clamp(0.95rem, 1.4vw, 1.08rem);
-  line-height: 1.75;
-  margin-top: clamp(1.25rem, 3vw, 2rem) !important;
+  max-width: 45rem;
+  color: #f2eada;
+  font-family: "Lora", serif;
+  font-size: clamp(1rem, 1.35vw, 1.18rem);
+  font-style: italic;
+  line-height: 1.72;
+  margin-top: clamp(1.2rem, 2.5vw, 1.8rem) !important;
+}
+
+.framework-copy span {
+  color: #ddb255;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .aditi-mark {
@@ -2251,14 +2378,16 @@ body.menu-open {
   }
 
   .framework-title {
-    max-width: none;
-    font-size: clamp(2.05rem, 10vw, 3.8rem);
+    max-width: 16ch;
+    font-size: clamp(2rem, 7.6vw, 2.75rem);
+    line-height: 1.03;
   }
 
   .framework-copy {
     max-width: 32rem;
     margin-top: 0.9rem !important;
-    font-size: 0.92rem;
+    font-size: clamp(0.96rem, 3.7vw, 1.05rem);
+    line-height: 1.65;
   }
 
   .aditi-mark {
@@ -3862,6 +3991,234 @@ body.menu-open {
   color: #d8d2c0;
 }
 
+.reserve-section {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(201, 154, 74, 0.12), transparent 24rem),
+    radial-gradient(circle at 82% 14%, rgba(128, 135, 83, 0.1), transparent 26rem),
+    linear-gradient(180deg, #090b08 0%, #0d110c 55%, #090b08 100%);
+}
+
+.reserve-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(21rem, 0.82fr);
+  gap: clamp(2rem, 7vw, 6.5rem);
+  align-items: center;
+}
+
+.reserve-copy {
+  max-width: 43rem;
+}
+
+.reserve-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.36em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: #a8aa9d;
+}
+
+.reserve-title {
+  max-width: 13ch;
+  margin-top: 1.6rem;
+  font-size: clamp(2.5rem, 5.5vw, 5rem);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.reserve-title span {
+  color: #ddb255;
+  font-family: "Lora", serif;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.reserve-body {
+  max-width: 38rem;
+  margin-top: clamp(1.3rem, 3vw, 2rem);
+  font-family: "Lora", serif;
+  font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+  line-height: 1.72;
+  color: rgba(216, 210, 192, 0.9);
+}
+
+.reserve-card {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.5rem, 3vw, 2.6rem);
+  border: 1px solid rgba(168, 170, 157, 0.22);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(201, 154, 74, 0.08), transparent 18rem),
+    rgba(14, 19, 13, 0.72);
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.32);
+}
+
+.reserve-card__eyebrow {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: #c99a4a;
+}
+
+.reserve-card h3 {
+  margin-top: 0.25rem;
+  font-family: "Rajdhani", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1;
+  color: #f2eada;
+}
+
+.reserve-card > p:not(.reserve-card__eyebrow, .reserve-note, .reserve-card__footer, .reserve-message) {
+  max-width: 30rem;
+  font-family: "Lora", serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(216, 210, 192, 0.82);
+}
+
+.reserve-input {
+  width: 100%;
+  height: 3.75rem;
+  margin-top: 0.75rem;
+  border: 1px solid rgba(168, 170, 157, 0.22);
+  border-radius: 0;
+  background: rgba(3, 5, 3, 0.5);
+  padding: 0 1rem;
+  font-family: "Lora", serif;
+  font-size: 1rem;
+  color: #f2eada;
+  outline: none;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.reserve-input::placeholder {
+  color: rgba(168, 170, 157, 0.66);
+}
+
+.reserve-input:focus {
+  border-color: rgba(201, 154, 74, 0.78);
+  background: rgba(3, 5, 3, 0.68);
+}
+
+.reserve-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.reserve-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: fit-content;
+  min-width: 14rem;
+  height: 3.4rem;
+  border: 0;
+  border-radius: 0;
+  background: #c99a4a;
+  color: #090b08;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.reserve-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #ddb255;
+}
+
+.reserve-button:disabled {
+  cursor: wait;
+  opacity: 0.76;
+}
+
+.reserve-message {
+  margin: 0;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.reserve-message--success {
+  color: #ddb255;
+}
+
+.reserve-message--error {
+  color: #f0a58e;
+}
+
+.reserve-note {
+  margin-top: 0.15rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: rgba(168, 170, 157, 0.56);
+}
+
+.reserve-card__footer {
+  margin-top: 1.1rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid rgba(168, 170, 157, 0.16);
+  font-family: "Lora", serif;
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.75;
+  color: rgba(168, 170, 157, 0.72);
+}
+
+@media (max-width: 767px) {
+  .reserve-section {
+    padding-top: 3.75rem;
+    padding-bottom: 4rem;
+  }
+
+  .reserve-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.2rem;
+  }
+
+  .reserve-title {
+    max-width: 11ch;
+    margin-top: 1.15rem;
+    font-size: clamp(2.55rem, 13vw, 4rem);
+  }
+
+  .reserve-body {
+    font-size: 1rem;
+    line-height: 1.68;
+  }
+
+  .reserve-card {
+    padding: 1.2rem;
+  }
+
+  .reserve-button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 .final-button {
   width: auto !important;
   min-width: min(100%, 260px);
@@ -4010,6 +4367,41 @@ body.menu-open {
 .payment-email-popup svg {
   margin-top: 0.15rem;
   color: #c99a4a;
+}
+
+.payment-download-panel,
+.profile-download-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(201, 154, 74, 0.5);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(201, 154, 74, 0.18), transparent 18rem),
+    linear-gradient(155deg, rgba(35, 41, 31, 0.94), rgba(9, 11, 8, 0.96));
+  box-shadow:
+    0 1.5rem 4rem rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(242, 234, 218, 0.08);
+}
+
+.profile-download-panel {
+  margin-inline: -0.25rem;
+  padding: 1rem;
+}
+
+.payment-download-panel::before,
+.profile-download-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0.25rem;
+  height: 100%;
+  background: linear-gradient(180deg, #ddb255, rgba(201, 154, 74, 0.2));
+}
+
+.payment-download-panel > *,
+.profile-download-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .auth-widget {
@@ -4292,6 +4684,10 @@ body.menu-open {
   align-items: stretch;
   justify-content: space-between;
   gap: 1.25rem;
+  border-color: rgba(201, 154, 74, 0.48);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(201, 154, 74, 0.16), transparent 14rem),
+    rgba(242, 234, 218, 0.045);
   padding: 1.15rem;
 }
 
@@ -4328,6 +4724,28 @@ body.menu-open {
   justify-content: space-between !important;
   gap: 1rem;
   white-space: normal !important;
+}
+
+.download-action--primary {
+  border: 1px solid rgba(201, 154, 74, 0.72) !important;
+  background:
+    linear-gradient(135deg, rgba(201, 154, 74, 0.98), rgba(138, 113, 63, 0.98)) !important;
+  color: #090b08 !important;
+  box-shadow: 0 1rem 2.2rem rgba(0, 0, 0, 0.26);
+  transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+}
+
+.download-action--primary:hover {
+  border-color: rgba(242, 234, 218, 0.4) !important;
+  background: #f2eada !important;
+  color: #090b08 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 1.25rem 2.6rem rgba(0, 0, 0, 0.32);
+}
+
+.download-action--primary svg,
+.download-action--primary span {
+  color: currentColor !important;
 }
 
 .download-action span {
@@ -4734,6 +5152,25 @@ body.menu-open {
   background: #c99a4a;
 }
 
+.issue-offer-title {
+  max-width: 18ch;
+  font-size: clamp(2rem, 4.8vw, 3.35rem);
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+
+.issue-offer-title__accent {
+  display: block;
+  margin-top: 0.12em;
+}
+
+.issue-offer-title__accent span {
+  color: #ddb255;
+  font-family: "Lora", serif;
+  font-style: italic;
+  font-weight: 500;
+}
+
 .issue-offer-card {
   position: relative;
   display: grid;
@@ -4845,6 +5282,12 @@ body.menu-open {
   color: rgba(168, 170, 157, 0.58);
 }
 
+@media (min-width: 768px) {
+  .issue-offer-title__accent {
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 767px) {
   .dispatch-carousel {
     margin-top: 1.7rem;
@@ -4855,8 +5298,9 @@ body.menu-open {
     padding-bottom: 3.5rem;
   }
 
-  .issue-offer-heading h2 {
-    max-width: 12ch;
+  .issue-offer-title {
+    max-width: 14ch;
+    font-size: clamp(2.15rem, 10vw, 3rem);
   }
 
   .issue-offer-card {

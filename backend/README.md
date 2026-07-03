@@ -35,7 +35,7 @@ Apply later migrations in order when updating an existing database:
 Get-Content backend\database\migrations\007_create_receipts.sql | mysql -u root -p aditi
 Get-Content backend\database\migrations\008_create_payment_events.sql | mysql -u root -p aditi
 Get-Content backend\database\migrations\009_add_receipt_snapshots.sql | mysql -u root -p aditi
-Get-Content backend\database\migrations\010_set_aditi_magazine_price_350.sql | mysql -u root -p aditi
+Get-Content backend\database\migrations\010_create_issue_reservations.sql | mysql -u root -p aditi
 ```
 
 For an existing database, replace the old dummy magazine catalogue with the real ADITI issue:
@@ -231,8 +231,23 @@ Admin endpoints:
 POST /api/admin/login
 GET /api/admin/users
 GET /api/admin/payments
+GET /api/admin/issue-reservations
 POST /api/admin/payments/recover
 POST /api/admin/logout
+```
+
+## Issue Reservations
+
+The public landing page reservation form stores Issue II email leads with:
+
+```text
+POST /api/issue-reservations
+```
+
+Run the table migration before enabling the form in production:
+
+```powershell
+Get-Content backend\database\migrations\010_create_issue_reservations.sql | mysql -u root -p aditi
 ```
 
 `POST /api/admin/payments/recover` accepts:

@@ -16,11 +16,12 @@ export default function AuthorsSection() {
                 Who writes it
               </p>
               <h2 className="mt-3 max-w-xl font-rajdhani text-[clamp(2rem,6vw,4rem)] font-bold leading-[0.96] text-chalk">
-                Read the people who
-made the decisions.
+                Read the people who made the decisions.
               </h2>
               <p className="mt-4 max-w-lg font-plex text-base font-light leading-[1.85] text-ash">
-                Issue I is written by some of the senior-most ranks of the Indian armed forces and the country's leading strategic minds — Air Marshals, Lieutenant Generals, Major Generals, a Commodore, Brigadiers, and one of India's foremost authorities on China.
+                Issue I is written by 15 contributors across the armed forces,
+                strategic scholarship, industry, space, cyber, aviation and
+                defence technology.
               </p>
             </div>
 

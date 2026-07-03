@@ -19,8 +19,12 @@ export default function MissionSection() {
           <p className="mission-word mt-4 font-rajdhani font-bold leading-none text-chalk">
             ADITI
           </p>
+          <p className="mission-audience mt-4 text-ember">
+            is for those
+          </p>
           <h2 className="mission-headline mt-5 font-rajdhani font-bold text-chalk">
-             Who wants the argument, not the headline. The reasoning, not the noise.
+            Who wants the argument, not the headline.
+            <span>The reasoning, not the noise.</span>
           </h2>
           <p className="mission-subtext mt-6 font-plex font-light text-ash">
             ADITI is India's strategy magazine - one deep argument per issue on the questions shaping Indian power, written by the soldiers, air marshals and scholars who built the doctrine. Issue I is out now.

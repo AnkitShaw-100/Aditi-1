@@ -7,6 +7,8 @@ import bookPage3 from "../../media/book-image-3.png";
 import bookPage4 from "../../media/book-image-4.png";
 import bookPage5 from "../../media/book-image-5.png";
 import bookPage6 from "../../media/book-image-6.png";
+import bookPage7 from "../../media/book-image-7.png";
+import bookPage8 from "../../media/book-image-8.png";
 
 const contributorImages = import.meta.glob("../../media/contributors image/*", {
   eager: true,
@@ -73,12 +75,52 @@ export const MISSION_PILLARS = [
 
 export const AUTHORS = [
   {
+    name: "Prof. (Dr.) Srikanth Kondapalli",
+    rank: "Dean, School of International Studies, JNU",
+    specialty: "Chinese politics, East Asian strategy, and cognitive warfare.",
+    summary:
+      "Chairman of the Centre for East Asian Studies at JNU, he examines China's cognitive warfare approach and its impact on India.",
+    image: contributorImage("srikanth"),
+  },
+  {
     name: "Lt. Gen. Dharam Vir Kalra",
     rank: "PVSM, AVSM (Retd.)",
-    specialty: "Defence logistics, supply-chain management, and operational planning.",
+    specialty: "Defence logistics, supply chains, and operational planning.",
     summary:
       "Former Director General of Ordnance Services, he brings a civilisational and logistics lens to questions of strategy.",
     image: contributorImage("dv kalra"),
+  },
+  {
+    name: "A.M. (Dr.) Diptendu Choudhury",
+    rank: "PVSM, AVSM, VM, VSM (Retd.)",
+    specialty: "Air power, strategic policy, and regional defence dynamics.",
+    summary:
+      "A former Commandant of the National Defence College and fighter pilot, he analyses Control of Air and future regional dynamics.",
+    image: contributorImage("diptendu"),
+  },
+  {
+    name: "Maj. Gen. (Dr.) Rajan Kochhar",
+    rank: "VSM (Retd.)",
+    specialty: "Army logistics, defence analysis, and higher defence management.",
+    summary:
+      "A former Army Ordnance Corps officer and defence writer, he assesses future-ready logistics for the Indian Army.",
+    image: contributorImage("rajan kochhar"),
+  },
+  {
+    name: "Maj. Gen. (Dr.) Mandip Singh",
+    rank: "SM, VSM (Retd.)",
+    specialty: "Operations, strategic planning, and perception management.",
+    summary:
+      "A senior Army veteran with deep operational and headquarters experience, he examines the revolution in drone affairs.",
+    image: contributorImage("mandip"),
+  },
+  {
+    name: "Maj. Gen. Neeraj Bali",
+    rank: "SM (Retd.)",
+    specialty: "China strategy, counter-terror operations, and professional military education.",
+    summary:
+      "An Army veteran with operational and advisory experience, he analyses why India's China strategy requires a rethink.",
+    image: contributorImage("neeraj bali"),
   },
   {
     name: "Cmde. Anil Jai Singh",
@@ -97,12 +139,44 @@ export const AUTHORS = [
     image: contributorImage("anshuman narang"),
   },
   {
+    name: "Brig. Brijesh Dhiman",
+    rank: "Brigadier (Retd.)",
+    specialty: "Counterinsurgency, internal security, and Northeast operations.",
+    summary:
+      "An Assam Regiment veteran, he analyses the Indian State's approach to non-state actors in the Northeast.",
+    image: contributorImage("brijesh dhiman"),
+  },
+  {
+    name: "Gp. Cpt. (Dr.) Rajiv Kumar Narang",
+    rank: "VM (Retd.)",
+    specialty: "Aviation safety, unmanned systems, drones, and defence indigenisation.",
+    summary:
+      "A former IAF helicopter pilot and Senior Fellow at MP-IDSA, he writes on Atmanirbharta in naval aviation.",
+    image: contributorImage("rk narang"),
+  },
+  {
     name: "Mr. Pawan Kakkar",
-    rank: "Industry Leader",
+    rank: "Chief Executive Officer, Jugapro India",
     specialty: "Emerging defence technologies, UAVs, and counter-unmanned systems.",
     summary:
-      "CEO of Jugapro India, he studies counter-UAS innovation through technological and operational relevance.",
+      "An industry leader in advanced construction and defence technologies, he studies counter-UAS innovation and operational relevance.",
     image: contributorImage("pawan kakkar"),
+  },
+  {
+    name: "Dr. Indranil Roy",
+    rank: "Co-founder and SVP, Natural Intelligence Systems",
+    specialty: "Neuromorphic computing, defence research, and manufacturing.",
+    summary:
+      "A technology builder and researcher, he writes on the need for a builder's psyche in pursuing Atmanirbharta in defence.",
+    image: contributorImage("indranil"),
+  },
+  {
+    name: "Mr. Jaidev Jamwal",
+    rank: "Defence Analyst",
+    specialty: "Chinese and Pakistani order of battle, force structure, and deployments.",
+    summary:
+      "A military affairs analyst and ORBAT author, he studies China's Western Theatre Command and the PLA's evolving posture.",
+    image: contributorImage("jaidev"),
   },
   {
     name: "Mr. Adithya Kothandhapani",
@@ -113,36 +187,12 @@ export const AUTHORS = [
     image: contributorImage("adithya kothandhapani"),
   },
   {
-    name: "Gp. Cpt. Rajiv Kumar Narang",
-    rank: "VM (Retd.)",
-    specialty: "Aviation safety, unmanned systems, drones, and defence indigenisation.",
+    name: "Mr. Sameep Agarwal",
+    rank: "Cybersecurity Expert",
+    specialty: "Cyber intelligence, digital forensics, homeland security, and threat intelligence.",
     summary:
-      "A former IAF helicopter pilot and Senior Fellow at MP-IDSA, he writes on Atmanirbharta in naval aviation.",
-    image: contributorImage("rk narang"),
-  },
-  {
-    name: "Brig. Brijesh Dhiman",
-    rank: "Brigadier (Retd.)",
-    specialty: "Counterinsurgency, internal security, and Northeast operations.",
-    summary:
-      "An Assam Regiment veteran, he analyses the Indian State's approach to non-state actors in the Northeast.",
-    image: contributorImage("brijesh dhiman"),
-  },
-  {
-    name: "Lt. Gen. Rakesh Sharma",
-    rank: "PVSM, UYSM, AVSM, VSM (Retd.)",
-    specialty: "Land warfare, military strategy, and national security policy.",
-    summary:
-      "A distinguished fellow in strategic affairs, he contributes a senior land-force perspective to national security questions.",
-    image: contributorImage("rakesh sharma"),
-  },
-  {
-    name: "Maj. Gen. Rajan Kochhar",
-    rank: "VSM (Retd.)",
-    specialty: "Army logistics, defence analysis, and higher defence management.",
-    summary:
-      "A prolific defence writer and former Army Ordnance Corps officer, he assesses future-ready logistics for the Indian Army.",
-    image: contributorImage("rajan kochhar"),
+      "A cybersecurity practitioner associated with national security work, he analyses India's challenges in cyber warfare capability.",
+    image: contributorImage("sameep"),
   },
 ];
 
@@ -470,6 +520,14 @@ export const PAGEFLIP_PAGES = [
   {
     image: bookPage6,
     alt: "ADITI booklet page 6",
+  },
+    {
+    image: bookPage7,
+    alt: "ADITI booklet page 7",
+  },
+    {
+    image: bookPage8,
+    alt: "ADITI booklet page 8",
   },
 ];
 
