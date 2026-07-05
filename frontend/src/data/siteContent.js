@@ -28,7 +28,7 @@ function contributorImage(matchText) {
   return match?.[1] ?? "https://i.pravatar.cc/240?img=15";
 }
 
-export const PREMIUM_MAGAZINE_PRICE_RUPEES = "1";
+export const PREMIUM_MAGAZINE_PRICE_RUPEES = "350";
 export const PREMIUM_MAGAZINE_PRICE_LABEL = `\u20B9${PREMIUM_MAGAZINE_PRICE_RUPEES}`;
 
 export const SECTION_IDS = [
