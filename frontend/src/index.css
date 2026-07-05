@@ -2918,6 +2918,10 @@ body.menu-open {
     linear-gradient(180deg, #0b0e09 0%, #161c14 100%);
 }
 
+.bookflip2-section--placeholder {
+  min-height: clamp(34rem, 78vw, 54rem);
+}
+
 .pageflip-stage {
   display: flex;
   justify-content: center;

@@ -4,7 +4,7 @@ import HTMLFlipBook from "react-pageflip";
 
 import SectionReveal from "@/components/site/SectionReveal";
 import { Button } from "@/components/ui/button";
-import { PAGEFLIP_PAGES } from "@/data/siteContent";
+import { PAGEFLIP_PAGES } from "@/data/pageflipPages";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const BOOK_PAGE_FRAME_RATIO = 1.2941176471;

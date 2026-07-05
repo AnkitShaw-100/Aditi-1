@@ -99,7 +99,7 @@ export default function HeroSection() {
         muted={isMuted}
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         aria-label="ADITI hero video"
         src={activeHeroVideo}
       >
