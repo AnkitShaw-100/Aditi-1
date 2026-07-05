@@ -37,7 +37,7 @@ export default function BrandSection() {
                   Buy the analysis you need without a subscription.
                 </p>
                 <ul className="reading-card-list mt-4 font-lora text-[1.06rem] leading-relaxed">
-                  <li>Premium Magzines at {"\u20B9"}350, no subscription required</li>
+                  <li>Premium Magzines at {premiumMagazine?.priceLabel ?? "\u20B9100"}, no subscription required</li>
                   <li>Open-access primers to start with, before you go premium</li>
                   <li>Built for mobile and desktop readability</li>
                 </ul>

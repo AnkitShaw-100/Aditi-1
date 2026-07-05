@@ -123,8 +123,7 @@ export default function HeroSection() {
               <em className="hero-editorial-italic">India was read by others.</em>
             </h1>
             <p className="hero-editorial-subline font-rajdhani font-bold text-chalk">
-              <span>This is India,</span>
-              <br />
+              <span>This is India,</span>{" "}
               <span>read by India.</span>
             </p>
             <div className="hero-editorial-actions flex flex-col gap-3 sm:flex-row sm:items-stretch">
@@ -140,7 +139,7 @@ export default function HeroSection() {
                   stopPropagation={false}
                   className="hero-issue-button h-12 rounded-full border border-white/15 bg-white/5 px-6 font-rajdhani text-base font-bold uppercase tracking-[0.14em] text-chalk hover:bg-white/10 hover:text-chalk"
                 >
-                  Own Issue I {"\u00B7"} {"\u20B9"}350
+                  Own Issue I {"\u00B7"} {premiumMagazine.priceLabel}
                 </AddToCartButton>
               ) : null}
             </div>

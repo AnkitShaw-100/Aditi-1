@@ -42,7 +42,7 @@ export default function IssueOfferSection() {
             <div className="issue-offer-badge">Volume I {"\u00B7"} Issue I</div>
             <div className="issue-offer-price">
               <span>{"\u20B9"}</span>
-              <strong>350</strong>
+              <strong>{premiumMagazine.priceLabel.replace("\u20B9", "")}</strong>
             </div>
             <h3>The complete magazine</h3>
             <p className="issue-offer-subtitle">
@@ -63,7 +63,7 @@ export default function IssueOfferSection() {
               stopPropagation={false}
               className="final-button issue-offer-button h-12 w-full rounded-none font-rajdhani text-base font-bold"
             >
-              Own Issue I {"\u00B7"} {"\u20B9"}350
+              Own Issue I {"\u00B7"} {premiumMagazine.priceLabel}
             </AddToCartButton>
 
             <p className="issue-offer-footnote">

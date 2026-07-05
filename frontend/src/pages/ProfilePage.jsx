@@ -342,8 +342,8 @@ function ProfilePanel() {
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
-      <form className="account-panel p-5 md:p-7" onSubmit={handleSubmit}>
+    <div className="profile-layout grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)]">
+      <form className="account-panel profile-card p-5 md:p-7" onSubmit={handleSubmit}>
         <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
           User Profile
         </p>
@@ -411,7 +411,7 @@ function ProfilePanel() {
           />
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="profile-actions mt-6 flex flex-wrap items-center gap-3">
           <Button
             type="submit"
             disabled={status === "saving" || profileLocked}
@@ -444,31 +444,37 @@ function ProfilePanel() {
         </div>
       </form>
 
-      <aside className="account-panel p-5 md:p-7">
+      <aside className="account-panel profile-side-panel p-5 md:p-7">
         <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
           Readiness
         </p>
-        <div className="mt-4 border-t border-steel/50 pt-4">
+        <div className="profile-readiness-card mt-4">
           <p className="font-rajdhani text-2xl font-bold text-chalk">
-            {profileLocked
-              ? "Ready for checkout"
-              : isComplete
-                ? "Review and save"
-                : "Profile needs details"}
+            {profileLocked ? "Ready" : isComplete ? "Review" : "Incomplete"}
           </p>
-          <p className="mt-3 font-plex text-sm leading-7 text-ash">
+          <p className="mt-2 font-plex text-sm leading-6 text-ash">
             {profileLocked
-              ? "These details are saved and cannot be edited again from this page."
+              ? "Saved for checkout."
               : isComplete
-                ? "Press Save Profile to confirm these details and unlock checkout."
-                : "Name, email, phone number, and date of birth are required before payment."}
+                ? "Save to unlock checkout."
+                : "Complete the required details."}
           </p>
+        </div>
+        <div className="profile-action-grid mt-4">
+          <div className="profile-action-card profile-action-card--status">
+            <span>Profile</span>
+            <b>{profileLocked ? "Locked" : isComplete ? "Ready" : "Pending"}</b>
+          </div>
+          <a className="profile-action-card profile-action-card--link" href="/#reserve">
+            <span>Upcoming</span>
+            <b>Issue II</b>
+          </a>
         </div>
         <div className="profile-download-panel mt-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
-                Your PDF Library
+                PDF Library
               </p>
               <h2 className="mt-2 font-rajdhani text-2xl font-bold leading-none text-chalk">
                 Bought magazines
@@ -492,11 +498,13 @@ function ProfilePanel() {
               magazines.map((magazine) => (
                 <div
                   key={`${magazine.id}-${magazine.razorpay_order_id}`}
-                  className="account-mini-row account-purchase-row"
+                  className="account-mini-row account-purchase-row profile-library-card"
                 >
-                  <span className="account-purchase-title">
-                    {magazine.title}
-                  </span>
+                  <div className="profile-library-copy">
+                    <span className="account-purchase-title">
+                      {magazine.title}
+                    </span>
+                  </div>
                   {magazine.status === "paid" ? (
                     <div className="account-download-actions">
                       <Button
@@ -505,7 +513,7 @@ function ProfilePanel() {
                         className="download-action download-action--primary h-auto rounded-none px-4 py-4 font-rajdhani text-base font-bold"
                         onClick={() => downloadMagazine(magazine)}
                       >
-                        <span>Download PDF</span>
+                        <span>Download now</span>
                         <Download className="size-4" />
                       </Button>
                     </div>

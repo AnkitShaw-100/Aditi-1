@@ -8,6 +8,7 @@ $config = require __DIR__ . '/../bootstrap.php';
 
 $pdfPath = $argv[1] ?? 'C:/Users/Ankit/Desktop/ADITI Strategy & Defence Magazine.pdf';
 $slug = $argv[2] ?? 'aditi-strategy-defence-volume-1-issue-1';
+$pdfFilename = $argv[3] ?? basename($pdfPath);
 
 if (!is_file($pdfPath)) {
     fwrite(STDERR, "PDF not found: {$pdfPath}\n");
@@ -31,7 +32,7 @@ $statement = $pdo->prepare(
      WHERE slug = :slug'
 );
 $statement->bindValue('pdf_file', $pdf, PDO::PARAM_LOB);
-$statement->bindValue('pdf_filename', 'ADITI-Strategy-Defence-Magazine-Volume-1-Issue-1.pdf');
+$statement->bindValue('pdf_filename', $pdfFilename);
 $statement->bindValue('slug', $slug);
 $statement->execute();
 

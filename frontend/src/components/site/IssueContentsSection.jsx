@@ -61,7 +61,7 @@ export default function IssueContentsSection() {
                     stopPropagation={false}
                     className="final-button issue-contents-primary h-11 rounded-none px-7 font-rajdhani text-base font-bold"
                   >
-                    Own Issue I {"\u00B7"} {"\u20B9"}350{" "}
+                    Own Issue I {"\u00B7"} {premiumMagazine.priceLabel}{" "}
                   </AddToCartButton>
                 ) : null}
                 <a className="issue-contents-link" href="#authors">

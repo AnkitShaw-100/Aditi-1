@@ -55,7 +55,7 @@ export default function IssueReserveSection() {
   };
 
   return (
-    <section className="reserve-section border-t border-steel px-4 py-16 md:px-8 md:py-24">
+    <section id="reserve" className="reserve-section border-t border-steel px-4 py-16 md:px-8 md:py-24">
       <div className="mx-auto max-w-7xl">
         <SectionReveal>
           <div className="reserve-layout">

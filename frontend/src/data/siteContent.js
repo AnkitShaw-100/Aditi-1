@@ -28,6 +28,9 @@ function contributorImage(matchText) {
   return match?.[1] ?? "https://i.pravatar.cc/240?img=15";
 }
 
+export const PREMIUM_MAGAZINE_PRICE_RUPEES = "1";
+export const PREMIUM_MAGAZINE_PRICE_LABEL = `\u20B9${PREMIUM_MAGAZINE_PRICE_RUPEES}`;
+
 export const SECTION_IDS = [
   "intro",
   "mission",
@@ -217,7 +220,7 @@ export const ARTICLE_ACCESS_OPTIONS = [
   },
   {
     label: "Premium Access",
-    value: "\u20B9350",
+    value: PREMIUM_MAGAZINE_PRICE_LABEL,
     copy:
       "Full-length strategic essays available one article at a time without a recurring subscription.",
   },
@@ -346,7 +349,7 @@ export const DISPATCHES = [
     author: "ADITI Editorial",
     readTime: "Magazine issue",
     cta: "Buy Now",
-    priceLabel: "\u20B9350",
+    priceLabel: PREMIUM_MAGAZINE_PRICE_LABEL,
     ariaLabel:
       "Buy ADITI Strategy and Defence Magazine Volume 1 Issue 1",
   },
@@ -458,12 +461,12 @@ export const EDITION_STATS = [
       "Four releases each year — each edition built as a complete strategic argument, not a news cycle reaction.",
   },
   {
-    value: "350",
+    value: PREMIUM_MAGAZINE_PRICE_RUPEES,
     prefix: "\u20B9",
     label: "Per Dispatch",
     tagline: "Pay per essay, not per month",
     description:
-      "Buy individual premium dispatches at \u20B9350 each. No recurring subscription, no paywall maze.",
+      `Buy individual premium dispatches at ${PREMIUM_MAGAZINE_PRICE_LABEL} each. No recurring subscription, no paywall maze.`,
   },
   {
     value: "5",
@@ -498,7 +501,7 @@ export const OJAS_PANELS = [
 
 export const FAQ_ITEMS = [
   {
-    question: "What exactly do I get for ₹350?",
+    question: `What exactly do I get for ${PREMIUM_MAGAZINE_PRICE_LABEL}?`,
     answer:
       "The complete first issue — all sixteen contributions, the full magazine, not a sample. It's yours to keep and re-read, on mobile or desktop, from the moment your payment clears.",
   },
