@@ -1,8 +1,8 @@
 import { lazy, Suspense } from "react";
 
+// import BrandSection from "@/components/site/BrandSection";
 import HeroSection from "@/components/site/HeroSection";
 import MissionSection from "@/components/site/MissionSection";
-// import BrandSection from "@/components/site/BrandSection";
 import IssueContentsSection from "@/components/site/IssueContentsSection";
 import AuthorsSection from "@/components/site/AuthorsSection";
 import FrameworkSection from "@/components/site/FrameworkSection";
@@ -53,7 +53,6 @@ export default function LandingPage() {
       <HeroSection />
       <MissionSection />
       <ReaderFeedbackSection />
-      {/* <BrandSection /> */}
       <IssueContentsSection />
       <AuthorsSection />
       <DeferredShowcaseStrip />
@@ -62,6 +61,7 @@ export default function LandingPage() {
       <IssueOfferSection />
       <FaqSection />
       <IssueReserveSection />
+      {/* <BrandSection /> */}
       {/* <EditionsSection /> */}
       {/* <OjasSection /> */}
     </>

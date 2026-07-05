@@ -19,9 +19,7 @@ export default function AuthorsSection() {
                 Read the people who made the decisions.
               </h2>
               <p className="mt-4 max-w-lg font-plex text-base font-light leading-[1.85] text-ash">
-                Issue I is written by 15 contributors across the armed forces,
-                strategic scholarship, industry, space, cyber, aviation and
-                defence technology.
+                16 contributors. One issue. India's military leaders, scholars and industry pioneers on space, cyber, aviation and defence technology {" "}&mdash; perspectives you won't find assembled anywhere else
               </p>
             </div>
 

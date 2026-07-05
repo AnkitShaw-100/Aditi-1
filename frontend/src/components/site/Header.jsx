@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
-import { MENU_ITEMS, NAV_ITEMS, SECTION_IDS, logoMark } from "@/data/siteContent";
+import { MENU_ITEMS, NAV_ITEMS, SECTION_IDS, navbarLogo } from "@/data/siteContent";
 import AuthNavButton from "@/components/site/AuthNavButton";
 
 export default function SiteHeader() {
@@ -24,22 +24,14 @@ export default function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-5 lg:px-4">
         <a
           href="/#intro"
-          className="flex items-center gap-3 font-rajdhani text-xl font-bold tracking-[0.16em] text-chalk md:text-[1.7rem]"
+          className="flex h-full items-center"
           aria-label="ADITI home"
         >
-          <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/90 bg-white/5 p-1">
-            <img
-              src={logoMark}
-              alt="ADITI logo"
-              className="h-full w-full object-contain brightness-0 invert opacity-95"
-            />
-          </span>
-          <span className="translate-y-px">
-            ADITI{" "}
-            <span className="inline-block align-middle text-[16px] leading-none text-ember">
-              &bull;
-            </span>
-          </span>
+          <img
+            src={navbarLogo}
+            alt="ADITI"
+            className="h-9 w-auto max-w-[9.5rem] object-contain sm:h-10 sm:max-w-[11rem] md:h-11 md:max-w-[12.5rem]"
+          />
         </a>
 
         <div className="flex items-center gap-2 sm:gap-3 xl:gap-7">

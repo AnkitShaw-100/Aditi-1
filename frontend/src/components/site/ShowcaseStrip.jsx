@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, X } from "lucide-react";
 import HTMLFlipBook from "react-pageflip";
 
 import SectionReveal from "@/components/site/SectionReveal";
+import { AddToCartButton } from "@/components/site/shared";
 import { Button } from "@/components/ui/button";
 import { PAGEFLIP_PAGES } from "@/data/pageflipPages";
+import { DISPATCHES } from "@/data/siteContent";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const BOOK_PAGE_FRAME_RATIO = 1.2941176471;
@@ -50,7 +52,9 @@ function ReactPageFlipShowcase() {
   const [stageWidth, setStageWidth] = useState(320);
   const [currentPage, setCurrentPage] = useState(0);
   const [direction, setDirection] = useState("next");
+  const [dismissedEndCta, setDismissedEndCta] = useState(false);
   const pageCount = PAGEFLIP_PAGES.length;
+  const premiumMagazine = DISPATCHES.find((item) => item.type === "premium");
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -138,6 +142,13 @@ function ReactPageFlipShowcase() {
   const displayPage = Math.min(currentPage + 1, pageCount);
   const canGoPrev = currentPage > 0;
   const canGoNext = currentPage < pageCount - 1;
+  const showEndCta = displayPage === pageCount && !dismissedEndCta && premiumMagazine;
+
+  useEffect(() => {
+    if (displayPage !== pageCount) {
+      setDismissedEndCta(false);
+    }
+  }, [displayPage, pageCount]);
 
   return (
     <section
@@ -277,6 +288,32 @@ function ReactPageFlipShowcase() {
               </Button>
             </div>
           </div>
+
+          {showEndCta ? (
+            <aside className="pageflip-end-cta" aria-live="polite">
+              <button
+                type="button"
+                className="pageflip-end-cta__close"
+                onClick={() => setDismissedEndCta(true)}
+                aria-label="Dismiss magazine purchase prompt"
+              >
+                <X className="size-4" />
+              </button>
+              <p className="pageflip-end-cta__eyebrow">Preview complete</p>
+              <h3>Own the full issue</h3>
+              <p>
+                Continue reading ADITI&apos;s inaugural strategy and defence
+                magazine.
+              </p>
+              <AddToCartButton
+                article={premiumMagazine}
+                stopPropagation={false}
+                className="pageflip-end-cta__button"
+              >
+                Buy magazine
+              </AddToCartButton>
+            </aside>
+          ) : null}
         </div>
       </SectionReveal>
     </section>
@@ -284,6 +321,18 @@ function ReactPageFlipShowcase() {
 }
 
 function CurvedLoopBand() {
+  const marqueeText = [
+    "Armament",
+    "Doctrine",
+    "Initiative",
+    "Terrain",
+    "Integration",
+    "Strategy",
+    "Sovereignty",
+    "Proudly Indian",
+    "Rigorously Analytical",
+  ];
+
   return (
     <section
       className="marquee-band overflow-hidden border-y border-steel bg-void py-3"
@@ -291,26 +340,18 @@ function CurvedLoopBand() {
     >
       <div className="marquee-track flex gap-4 font-plex text-xs font-medium uppercase tracking-[0.15em] text-fog">
         <span className="marquee-track__item">
-          Strategy <b className="font-medium text-ember">&middot;</b>{" "}
-          Sovereignty <b className="font-medium text-ember">&middot;</b>{" "}
-          Intelligence <b className="font-medium text-ember">&middot;</b>{" "}
-          Doctrine <b className="font-medium text-ember">&middot;</b>{" "}
-          Terrain <b className="font-medium text-ember">&middot;</b>{" "}
-          Armament <b className="font-medium text-ember">&middot;</b>{" "}
-          Initiative <b className="font-medium text-ember">&middot;</b>{" "}
-          Proudly Indian <b className="font-medium text-ember">&middot;</b>{" "}
-          Rigorously Analytical <b className="font-medium text-ember">&middot;</b>
+          {marqueeText.map((word, index) => (
+            <span key={`marquee-primary-${index}`}>
+              {word} <b className="font-medium text-ember">&middot;</b>{" "}
+            </span>
+          ))}
         </span>
         <span className="marquee-track__item" aria-hidden="true">
-          Strategy <b className="font-medium text-ember">&middot;</b>{" "}
-          Sovereignty <b className="font-medium text-ember">&middot;</b>{" "}
-          Intelligence <b className="font-medium text-ember">&middot;</b>{" "}
-          Doctrine <b className="font-medium text-ember">&middot;</b>{" "}
-          Terrain <b className="font-medium text-ember">&middot;</b>{" "}
-          Armament <b className="font-medium text-ember">&middot;</b>{" "}
-          Initiative <b className="font-medium text-ember">&middot;</b>{" "}
-          Proudly Indian <b className="font-medium text-ember">&middot;</b>{" "}
-          Rigorously Analytical <b className="font-medium text-ember">&middot;</b>
+          {marqueeText.map((word, index) => (
+            <span key={`marquee-copy-${index}`}>
+              {word} <b className="font-medium text-ember">&middot;</b>{" "}
+            </span>
+          ))}
         </span>
       </div>
     </section>

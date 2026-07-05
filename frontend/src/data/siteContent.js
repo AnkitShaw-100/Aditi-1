@@ -2,6 +2,17 @@ import heroVideo from "../../media/aditi-hero-video.mp4";
 import heroMobileVideo from "../../media/pre-comp-2-mobile.mp4";
 import frameworkBg from "../../media/Terrain-w-scaled.webp";
 import logoMark from "../../media/logo.png";
+import navbarLogo from "../../media/navbar-logo.webp";
+import readerAkash from "../../media/testimonials/akash.webp";
+import readerAmita from "../../media/testimonials/amita.webp";
+import readerAnkit from "../../media/testimonials/ankit.webp";
+import readerAyush from "../../media/testimonials/ayush.webp";
+import readerBhumika from "../../media/testimonials/bhumika.webp";
+import readerDhruv from "../../media/testimonials/dhruv.webp";
+import readerGeetanjali from "../../media/testimonials/geetanjali.webp";
+import readerKhushbu from "../../media/testimonials/khushbu.webp";
+import readerRitika from "../../media/testimonials/ritika.webp";
+import readerShivam from "../../media/testimonials/shivam.webp";
 
 const contributorImages = import.meta.glob("../../media/contributors image/*", {
   eager: true,
@@ -187,6 +198,14 @@ export const AUTHORS = [
       "A cybersecurity practitioner associated with national security work, he analyses India's challenges in cyber warfare capability.",
     image: contributorImage("sameep"),
   },
+  {
+    name: "Captain Sarabjeet Singh Parmar",
+    rank: "Former Navy helicopter pilot",
+    specialty: "Maritime strategy, Indian Ocean security, and naval transformation.",
+    summary:
+      "Captain Sarabjeet Singh Parmar is a former Navy helicopter pilot and has commanded Indian Navy Ships and an Indian Naval Air Squadron.",
+    image: contributorImage("sarabjeet singh parmar"),
+  },
 ];
 
 export const ARTICLE_ACCESS_OPTIONS = [
@@ -215,31 +234,31 @@ export const LENSES = [
     id: "armament",
     index: "01",
     title: "Armament",
-    copy: "Systems matter only when they change tempo, range, cost or political choice. ADITI reads weapons through doctrine, not catalogues.",
+    copy: "Concerns the means of war: weapons, platforms, logistics, industrial capacity, supply chains, and sustainment.",
   },
   {
     id: "doctrine",
     index: "02",
     title: "Doctrine",
-    copy: "Every force carries assumptions into battle. ADITI tests those assumptions against geography, adversary behavior and escalation risk.",
+    copy: "Concerns the ideas of war: how force is conceptualised, organised, and employed to achieve political ends.",
   },
   {
-    id: "intelligence",
+    id: "initiative",
     index: "03",
-    title: "Intelligence",
-    copy: "Signals, deception and uncertainty shape outcomes before the first shot. ADITI separates evidence from theatre.",
+    title: "Initiative",
+    copy: "Concerns agency and choice: who sets the agenda, controls escalation, and dictates tempo under uncertainty.",
   },
   {
     id: "terrain",
     index: "04",
     title: "Terrain",
-    copy: "Mountains, ports, deserts and cities are strategic actors. They decide what ambition can actually do.",
+    copy: "Concerns the environment of conflict: physical, political, technological, informational, legal, or cognitive.",
   },
   {
-    id: "initiative",
+    id: "integration",
     index: "05",
-    title: "Initiative",
-    copy: "The side that frames the contest often controls escalation. ADITI studies initiative as a political instrument.",
+    title: "Integration",
+    copy: "Concerns the joining of parts: civil-military fusion, inter-service coordination, whole-of-government or nation approaches.",
   },
 ];
 
@@ -315,22 +334,6 @@ export const DISPATCHES = [
     ariaLabel: "Read The Follower's Dilemma: The Cost of Chasing China in Space",
   },
   {
-    type: "free",
-    href: "/articles/control-of-air-future-regional-dynamics",
-    slug: "control-of-air-future-regional-dynamics",
-    contentPath: "/articles/control-of-air-future-regional-dynamics.txt",
-    image: "/article-banners/control-of-air-future-regional-dynamics-banner.png",
-    tag: "Armament",
-    title: "Control of Air: Future Regional Dynamics",
-    teaser:
-      "Air Marshal Diptendu Choudhury revisits control of air through contemporary conflicts, China, Pakistan, and India's future context.",
-    author: "Air Marshal (Dr) Diptendu Choudhury (Retd)",
-    readTime: "10 min read",
-    cta: "Read",
-    priceLabel: "Free",
-    ariaLabel: "Read Control of Air: Future Regional Dynamics",
-  },
-  {
     type: "premium",
     href: "/checkout",
     slug: "aditi-strategy-defence-volume-1-issue-1",
@@ -375,32 +378,74 @@ export const FEEDBACKS = [
 
 export const READER_FEEDBACKS = [
   {
+    category: "Reader View",
+    quote: "Came across ADITI on Instagram and ended up reading a couple of articles. Safe to say I'll be coming back for more.",
+    name: "Khushbu",
+    role: "Reader",
+    image: readerKhushbu,
+  },
+  {
+    category: "Credibility Note",
+    quote: "Not many pages manage to keep defence content both credible and engaging. This one does.",
+    name: "Geetanjali Bhati",
+    role: "Reader",
+    image: readerGeetanjali,
+  },
+  {
+    category: "Editorial View",
+    quote: "ADITI brings discipline, design, and depth together; it makes serious strategic writing easier to follow and worth returning to.",
+    name: "Ankit",
+    role: "Reader",
+    image: readerAnkit,
+  },
+  {
+    category: "Quality Note",
+    quote: "This deserves a much bigger audience. Really impressed with the quality of the articles.",
+    name: "Dhruv Sharma",
+    role: "Reader",
+    image: readerDhruv,
+  },
+  {
+    category: "Defence Affairs",
+    quote: "As someone interested in defence affairs, this is exactly the kind of content I've been looking for.",
+    name: "Amita Pilania",
+    role: "Reader",
+    image: readerAmita,
+  },
+  {
+    category: "Regular Reader",
+    quote: "Been following for a while now, and the articles just keep getting better. Great work by the team.",
+    name: "Akash Bhushan",
+    role: "Reader",
+    image: readerAkash,
+  },
+  {
     category: "Reader Note",
-    quote: "It reads like a briefing, but it stays elegant and human.",
-    name: "Nandini Shah",
-    role: "Policy Reader",
-    image: "https://i.pravatar.cc/160?img=47",
+    quote: "Finally, defence content that isn't just clickbait.",
+    name: "Ritika Basera",
+    role: "Reader",
+    image: readerRitika,
   },
   {
-    category: "Field Opinion",
-    quote: "The structure helps me through doctrine without clutter.",
-    name: "Aarav Khanna",
-    role: "Security Professional",
-    image: "https://i.pravatar.cc/160?img=68",
+    category: "Writing Note",
+    quote: "The writing feels thoughtful and well put together. Great work!",
+    name: "Shivam Kikan",
+    role: "Reader",
+    image: readerShivam,
   },
   {
-    category: "Dispatch Review",
-    quote: "Each piece feels like a serious argument, not a feed update.",
-    name: "Ishita Menon",
-    role: "Graduate Reader",
-    image: "https://i.pravatar.cc/160?img=5",
+    category: "Perspective",
+    quote: "Every article feels like it gives me a new perspective.",
+    name: "Bhumika",
+    role: "Reader",
+    image: readerBhumika,
   },
   {
-    category: "Subscriber View",
-    quote: "The essays give me a framework before they give me an opinion.",
-    name: "Rohan Malhotra",
-    role: "Defence Enthusiast",
-    image: "https://i.pravatar.cc/160?img=61",
+    category: "Strategic Affairs",
+    quote: "This feels like a page made for people who genuinely want to understand strategic affairs.",
+    name: "Ayush Negi",
+    role: "Reader",
+    image: readerAyush,
   },
 ];
 
@@ -465,12 +510,12 @@ export const FAQ_ITEMS = [
   {
     question: "I've never read defence or strategy writing. Is this for me?",
     answer:
-      "Yes. ADITI is written to be understood, not to show off. If you can follow the news, you can follow ADITI — you'll simply understand far more of what you're reading, and why it matters.",
+      "Yes — that's exactly who it's for. ADITI takes the depth of a strategic briefing and writes it in plain language. You don't need a defence background.",
   },
   {
     question: "Who actually writes it?",
     answer:
-      "Senior retired officers of the Indian armed forces and India's leading strategic scholars — Air Marshals, Lieutenant Generals, Major Generals, a Commodore, Brigadiers, and one of the country's foremost China experts.",
+      "India's most senior strategic voices — veterans who commanded at the highest levels of the Army, Navy and Air Force, alongside the scholars shaping the strategic discourse",
   },
   {
     question: "Is ADITI political?",
@@ -489,4 +534,4 @@ export const FAQ_ITEMS = [
   },
 ];
 
-export { heroVideo, heroMobileVideo, frameworkBg, logoMark };
+export { heroVideo, heroMobileVideo, frameworkBg, logoMark, navbarLogo };

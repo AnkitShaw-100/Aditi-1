@@ -1,11 +1,11 @@
-import bookPage1 from "../../media/book-image-1.png";
-import bookPage2 from "../../media/book-image-2.png";
-import bookPage3 from "../../media/book-image-3.png";
-import bookPage4 from "../../media/book-image-4.png";
-import bookPage5 from "../../media/book-image-5.png";
-import bookPage6 from "../../media/book-image-6.png";
-import bookPage7 from "../../media/book-image-7.png";
-import bookPage8 from "../../media/book-image-8.png";
+import bookPage1 from "../../media/book-image-1.webp";
+import bookPage2 from "../../media/book-image-2.webp";
+import bookPage3 from "../../media/book-image-3.webp";
+import bookPage4 from "../../media/book-image-4.webp";
+import bookPage5 from "../../media/book-image-5.webp";
+import bookPage6 from "../../media/book-image-6.webp";
+import bookPage7 from "../../media/book-image-7.webp";
+import bookPage8 from "../../media/book-image-8.webp";
 
 export const PAGEFLIP_PAGES = [
   {

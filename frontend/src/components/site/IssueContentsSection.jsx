@@ -35,19 +35,14 @@ export default function IssueContentsSection() {
                 Issue I {"\u00B7"} The Maiden Dispatch
               </p>
               <h2 className="issue-contents-title">
-                Cognitive <span>Dissonance</span> in Indian Strategy.
+                Cognitive <span>Dissonance</span> in Indian Strategy?
               </h2>
               <p className="issue-contents-question">
                 How does a rising power hold many competing strategic truths at once
                  and still move as one?
               </p>
               <p className="issue-contents-body">
-                As India's power grows, so does the complexity of its choices.
-                Different doctrines, different instincts, different timelines
-                 all alive inside the same state at the same moment. Issue I
-                reads that tension across capability, command, terrain and doctrine,
-                and asks the question every maturing power must answer: how do you
-                turn many truths into one clear strategy?
+                As India's power grows, so does the complexity of its choices. Different doctrines, different instincts, different timelines all alive inside the same state at the same moment. Issue I reads that tension across Armament, Doctrine, Initiative, Terrain and Integration and asks the question every maturing power must answer: how do you turn many truths into one clear strategy?
               </p>
 
               <div className="issue-contents-stats" aria-label="Issue I summary stats">

@@ -4,6 +4,7 @@ import SectionReveal from "@/components/site/SectionReveal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { LENSES, frameworkBg } from "@/data/siteContent";
+import frameworkWordmark from "../../../media/framework-wordmark.png";
 
 export default function FrameworkSection() {
   const [activeLens, setActiveLens] = useState(LENSES[0].id);
@@ -11,7 +12,7 @@ export default function FrameworkSection() {
   return (
     <section
       id="pillars"
-      className="bg-void px-4 py-16 scroll-mt-20 md:px-8 md:py-24"
+      className="bg-void px-4 py-12 scroll-mt-20 md:px-8 md:py-16"
     >
       <div className="mx-auto max-w-7xl">
         <SectionReveal>
@@ -38,9 +39,7 @@ export default function FrameworkSection() {
                   reads one hard question through all of them, to the end.
                 </p>
                 <div className="aditi-mark" aria-label="ADITI brand letters">
-                  {["A", "D", "I", "T", "I"].map((letter, index) => (
-                    <span key={`${letter}-${index}`}>{letter}</span>
-                  ))}
+                  <img src={frameworkWordmark} alt="ADITI" draggable={false} />
                 </div>
               </div>
 

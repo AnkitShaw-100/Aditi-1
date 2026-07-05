@@ -268,32 +268,41 @@ export function RailCarousel({
     scrollToPage(nextPage);
   };
 
+  const showPreviousArrow = wrapArrows || activePage > 0;
+  const showNextArrow = wrapArrows || activePage < pageCount - 1;
+
   return (
     <div className="rail-carousel" aria-label={ariaLabel}>
       {showArrows && pageCount > 1 ? (
         <div className={cn("carousel-arrows", arrowsClassName)}>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="carousel-arrow h-10 w-10 rounded-full border-steel/60 bg-bunker/80 text-chalk hover:border-ember/50 hover:bg-plate hover:text-chalk"
-            aria-label={`Previous ${ariaLabel} page`}
-            disabled={!wrapArrows && activePage === 0}
-            onClick={() => scrollByPage(-1)}
-          >
-            <ChevronLeft className="size-5" />
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="carousel-arrow h-10 w-10 rounded-full border-steel/60 bg-bunker/80 text-chalk hover:border-ember/50 hover:bg-plate hover:text-chalk"
-            aria-label={`Next ${ariaLabel} page`}
-            disabled={!wrapArrows && activePage >= pageCount - 1}
-            onClick={() => scrollByPage(1)}
-          >
-            <ChevronRight className="size-5" />
-          </Button>
+          {showPreviousArrow ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="carousel-arrow h-10 w-10 rounded-full border-steel/60 bg-bunker/80 text-chalk hover:border-ember/50 hover:bg-plate hover:text-chalk"
+              aria-label={`Previous ${ariaLabel} page`}
+              onClick={() => scrollByPage(-1)}
+            >
+              <ChevronLeft className="size-5" />
+            </Button>
+          ) : (
+            <span className="carousel-arrow-spacer" aria-hidden="true" />
+          )}
+          {showNextArrow ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="carousel-arrow h-10 w-10 rounded-full border-steel/60 bg-bunker/80 text-chalk hover:border-ember/50 hover:bg-plate hover:text-chalk"
+              aria-label={`Next ${ariaLabel} page`}
+              onClick={() => scrollByPage(1)}
+            >
+              <ChevronRight className="size-5" />
+            </Button>
+          ) : (
+            <span className="carousel-arrow-spacer" aria-hidden="true" />
+          )}
         </div>
       ) : null}
       <>

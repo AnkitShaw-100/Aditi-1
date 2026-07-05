@@ -34,8 +34,7 @@ export default function IssueOfferSection() {
               </span>
             </h2>
             <p className="mx-auto mt-5 max-w-3xl font-lora text-sm leading-[1.8] text-ash md:text-base">
-              No commitment. No account to manage. Just the complete first issue
-              {" "}&mdash; yours the moment you buy it.
+              One purchase, yours forever. The complete first issue lives in your ADITI account {" "}&mdash; read anytime, on any device.
             </p>
           </div>
 

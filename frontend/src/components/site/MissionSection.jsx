@@ -2,10 +2,7 @@ import AuroraGraphic from "@/components/site/AuroraGraphic";
 
 export default function MissionSection() {
   return (
-    <section
-      id="mission"
-      className="mission-section scroll-mt-20"
-    >
+    <section id="mission" className="mission-section scroll-mt-20">
       <div className="mission-mesh" aria-hidden="true" />
       <div className="mission-glow mission-glow--left" aria-hidden="true" />
       <div className="mission-glow mission-glow--right" aria-hidden="true" />
@@ -19,15 +16,15 @@ export default function MissionSection() {
           <p className="mission-word mt-4 font-rajdhani font-bold leading-none text-chalk">
             ADITI
           </p>
-          <p className="mission-audience mt-4 text-ember">
-            is for those
-          </p>
+          <p className="mission-audience mt-4 text-ember">is for those</p>
           <h2 className="mission-headline mt-5 font-rajdhani font-bold text-chalk">
             Who wants the argument, not the headline.
             <span>The reasoning, not the noise.</span>
           </h2>
           <p className="mission-subtext mt-6 font-plex font-light text-ash">
-            ADITI is India's strategy magazine - one deep argument per issue on the questions shaping Indian power, written by the soldiers, air marshals and scholars who built the doctrine. Issue I is out now.
+            One issue. One deep argument. The questions shaping Indian power,
+            answered by India's strategic minds. ADITI Issue I is out &mdash;
+            Read Issue I today.
           </p>
           <div className="mission-rail mt-8" aria-hidden="true">
             <span />
