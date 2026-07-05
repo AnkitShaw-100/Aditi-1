@@ -6,13 +6,18 @@ namespace App\Auth;
 
 final class ClerkUserClient
 {
+    private ?string $lastError = null;
+
     public function __construct(private readonly string $secretKey)
     {
     }
 
     public function getUserProfile(string $clerkUserId): array
     {
+        $this->lastError = null;
+
         if ($this->secretKey === '') {
+            $this->lastError = 'CLERK_SECRET_KEY is not configured.';
             return [];
         }
 
@@ -23,6 +28,7 @@ final class ClerkUserClient
                     'Authorization: Bearer ' . $this->secretKey,
                     'Accept: application/json',
                 ],
+                'ignore_errors' => true,
                 'timeout' => 10,
             ],
         ]);
@@ -34,12 +40,23 @@ final class ClerkUserClient
         );
 
         if ($json === false) {
+            $this->lastError = 'Unable to contact Clerk.';
             return [];
         }
 
         $user = json_decode($json, true);
 
         if (!is_array($user)) {
+            $this->lastError = 'Clerk returned an invalid response.';
+            return [];
+        }
+
+        $statusLine = $http_response_header[0] ?? '';
+        preg_match('#\s(\d{3})\s#', $statusLine, $matches);
+        $status = (int) ($matches[1] ?? 0);
+
+        if ($status < 200 || $status >= 300) {
+            $this->lastError = $this->errorMessage($user) ?? 'Clerk request failed.';
             return [];
         }
 
@@ -48,7 +65,13 @@ final class ClerkUserClient
             'phone_number' => $this->primaryPhone($user),
             'username' => $this->displayName($user),
             'profile_image_url' => $user['image_url'] ?? null,
+            'dob' => $this->dobFromClerkUser($user),
         ];
+    }
+
+    public function lastError(): ?string
+    {
+        return $this->lastError;
     }
 
     private function primaryEmail(array $user): ?string
@@ -90,5 +113,33 @@ final class ClerkUserClient
         }
 
         return $user['username'] ?? null;
+    }
+
+    private function dobFromClerkUser(array $user): ?string
+    {
+        $value = $user['public_metadata']['dob']
+            ?? $user['private_metadata']['dob']
+            ?? $user['unsafe_metadata']['dob']
+            ?? $user['public_metadata']['date_of_birth']
+            ?? $user['private_metadata']['date_of_birth']
+            ?? $user['unsafe_metadata']['date_of_birth']
+            ?? null;
+
+        if (!is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        $timestamp = strtotime($value);
+
+        return $timestamp === false ? trim($value) : date('Y-m-d', $timestamp);
+    }
+
+    private function errorMessage(array $payload): ?string
+    {
+        $message = $payload['errors'][0]['long_message']
+            ?? $payload['errors'][0]['message']
+            ?? null;
+
+        return is_string($message) && trim($message) !== '' ? $message : null;
     }
 }

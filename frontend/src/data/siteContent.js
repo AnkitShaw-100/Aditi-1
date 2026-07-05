@@ -1,4 +1,5 @@
 import heroVideo from "../../media/aditi-hero-video.mp4";
+import heroMobileVideo from "../../media/pre-comp-2-mobile.mp4";
 import frameworkBg from "../../media/Terrain-w-scaled.webp";
 import logoMark from "../../media/logo.png";
 import bookPage1 from "../../media/book-image-1.png";
@@ -531,4 +532,4 @@ export const PAGEFLIP_PAGES = [
   },
 ];
 
-export { heroVideo, frameworkBg, logoMark };
+export { heroVideo, heroMobileVideo, frameworkBg, logoMark };

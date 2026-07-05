@@ -378,44 +378,29 @@ if ($route === 'POST /api/webhooks/razorpay') {
 $verifier = new ClerkJwtVerifier($config['clerk']);
 $clerkUsers = new ClerkUserClient($config['clerk']['secret_key']);
 
-if ($route === 'POST /api/auth/sync-user') {
-    $claims = requireClaims($request, $verifier);
-    $clerkUserId = (string) $claims['sub'];
-    $clerkProfile = array_filter(
-        $clerkUsers->getUserProfile($clerkUserId),
-        static fn ($value): bool => $value !== null && $value !== ''
-    );
-
-    $profile = array_merge(
-        $request->only(['email', 'phone_number', 'dob', 'username', 'name']),
-        $clerkProfile
-    );
-
-    $user = $users->syncUserFromAuth($clerkUserId, $profile, [
-        'session_id' => $claims['sid'] ?? null,
-        'ip_address' => $request->ip(),
-        'user_agent' => $request->header('User-Agent'),
-    ]);
-
-    Response::json([
-        'message' => 'User synced',
-        'user' => $user,
-    ]);
-}
+// Deprecated: frontend no longer calls /api/auth/sync-user.
+// Protected routes now call requireClaimsWithLocalUser() and create the local user from Clerk when needed.
+// if ($route === 'POST /api/auth/sync-user') {
+//     $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users, true);
+//     Response::json([
+//         'message' => 'User synced from Clerk',
+//         'user' => $users->findProfileByClerkId((string) $claims['sub']),
+//     ]);
+// }
 
 if ($route === 'GET /api/me') {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
     $user = $users->findProfileByClerkId((string) $claims['sub']);
 
     if ($user === null) {
-        Response::json(['error' => 'User not found. Call /api/auth/sync-user first.'], 404);
+        Response::json(['error' => 'User not found. Check Clerk profile sync.'], 404);
     }
 
     Response::json(['user' => $user]);
 }
 
 if ($route === 'PUT /api/me') {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
 
     try {
         $user = $users->updateProfile(
@@ -429,7 +414,7 @@ if ($route === 'PUT /api/me') {
     }
 
     if ($user === null) {
-        Response::json(['error' => 'User not found. Call /api/auth/sync-user first.'], 404);
+        Response::json(['error' => 'User not found. Check Clerk profile sync.'], 404);
     }
 
     Response::json([
@@ -439,7 +424,7 @@ if ($route === 'PUT /api/me') {
 }
 
 if ($route === 'GET /api/cart') {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
 
     Response::json([
         'cart' => $users->getCart((string) $claims['sub']),
@@ -447,7 +432,7 @@ if ($route === 'GET /api/cart') {
 }
 
 if ($route === 'POST /api/cart') {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
     $slug = $request->body()['magazine_slug'] ?? null;
 
     if (!is_string($slug) || $slug === '') {
@@ -467,7 +452,7 @@ if ($route === 'POST /api/cart') {
 }
 
 if ($request->method() === 'DELETE' && preg_match('#^/api/cart/(\d+)$#', $request->path(), $matches)) {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
 
     Response::json([
         'message' => 'Removed from cart',
@@ -476,7 +461,7 @@ if ($request->method() === 'DELETE' && preg_match('#^/api/cart/(\d+)$#', $reques
 }
 
 if ($route === 'POST /api/payments/razorpay/order') {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
     $clerkUserId = (string) $claims['sub'];
     $summary = $users->cartSummary($clerkUserId);
 
@@ -524,7 +509,7 @@ if ($route === 'POST /api/payments/razorpay/order') {
 }
 
 if ($route === 'POST /api/payments/razorpay/verify') {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
     $body = $request->body();
     $orderId = $body['razorpay_order_id'] ?? null;
     $paymentId = $body['razorpay_payment_id'] ?? null;
@@ -575,7 +560,7 @@ if ($route === 'POST /api/payments/razorpay/verify') {
 }
 
 if ($route === 'POST /api/payments/razorpay/recover') {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
     $clerkUserId = (string) $claims['sub'];
     $razorpay = $config['razorpay'];
 
@@ -634,7 +619,7 @@ if ($route === 'POST /api/payments/razorpay/recover') {
 }
 
 if ($request->method() === 'GET' && preg_match('#^/api/orders/([^/]+)/invoice$#', $request->path(), $matches)) {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
     $orderId = rawurldecode($matches[1]);
     $invoice = $users->paidOrderInvoice((string) $claims['sub'], $orderId);
 
@@ -654,7 +639,7 @@ if ($request->method() === 'GET' && preg_match('#^/api/orders/([^/]+)/invoice$#'
 }
 
 if ($request->method() === 'GET' && preg_match('#^/api/magazines/([^/]+)/download$#', $request->path(), $matches)) {
-    $claims = requireClaims($request, $verifier);
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
     $slug = rawurldecode($matches[1]);
     $file = $users->paidMagazineFile((string) $claims['sub'], $slug);
 
@@ -1146,6 +1131,52 @@ function requireClaims(Request $request, ClerkJwtVerifier $verifier): array
 
         Response::json($payload, 401);
     }
+}
+
+function requireClaimsWithLocalUser(
+    Request $request,
+    ClerkJwtVerifier $verifier,
+    ClerkUserClient $clerkUsers,
+    UserRepository $users,
+    bool $refreshFromClerk = false
+): array {
+    $claims = requireClaims($request, $verifier);
+    $clerkUserId = (string) $claims['sub'];
+    $localUser = $users->findProfileByClerkId($clerkUserId);
+
+    if ($localUser !== null && !$refreshFromClerk && !localUserNeedsClerkIdentity($localUser)) {
+        return $claims;
+    }
+
+    $clerkProfile = array_filter(
+        $clerkUsers->getUserProfile($clerkUserId),
+        static fn ($value): bool => $value !== null && $value !== ''
+    );
+
+    if ($clerkProfile === []) {
+        if ($localUser !== null) {
+            return $claims;
+        }
+
+        Response::json([
+            'error' => 'Unable to fetch Clerk user profile',
+            'message' => $clerkUsers->lastError() ?? 'Check CLERK_SECRET_KEY and Clerk user data.',
+        ], 502);
+    }
+
+    $users->syncUserFromAuth($clerkUserId, $clerkProfile, [
+        'session_id' => $claims['sid'] ?? null,
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->header('User-Agent'),
+    ]);
+
+    return $claims;
+}
+
+function localUserNeedsClerkIdentity(array $user): bool
+{
+    return firstNonEmptyString($user['email'] ?? null) === null
+        || firstNonEmptyString($user['username'] ?? null) === null;
 }
 
 function requireAdmin(Request $request, AdminRepository $admins): array

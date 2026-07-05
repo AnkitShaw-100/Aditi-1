@@ -4,7 +4,6 @@ import {
   SignedIn,
   SignedOut,
   useAuth,
-  useUser,
 } from "@clerk/clerk-react";
 import { ArrowRight, Clock, Download, RefreshCw, Save } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -151,7 +150,6 @@ function AuthRequiredPanel() {
 
 function ProfilePanel() {
   const { getToken } = useAuth();
-  const { user } = useUser();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [profile, setProfile] = useState(emptyProfile);
@@ -170,14 +168,6 @@ function ProfilePanel() {
   const loadProfile = useCallback(
     async (shouldApply = () => true) => {
       try {
-        await apiRequest(getToken, "/api/auth/sync-user", {
-          method: "POST",
-          body: JSON.stringify({
-            username: user?.fullName || user?.username,
-            email: user?.primaryEmailAddress?.emailAddress,
-            phone_number: user?.primaryPhoneNumber?.phoneNumber,
-          }),
-        });
         const data = await apiRequest(getToken, "/api/me");
 
         if (!shouldApply()) return;
@@ -199,7 +189,7 @@ function ProfilePanel() {
         setMessage(error.message);
       }
     },
-    [getToken, user]
+    [getToken]
   );
 
   useEffect(() => {

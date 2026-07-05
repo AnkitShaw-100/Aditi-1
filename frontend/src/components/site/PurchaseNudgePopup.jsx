@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ShoppingCart, X } from "lucide-react";
-import { useAuth, useClerk, useUser } from "@clerk/clerk-react";
+import { useAuth, useClerk } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ const SHOW_DELAY_MS = 2500;
 export default function PurchaseNudgePopup() {
   const { getToken, isSignedIn } = useAuth();
   const { openSignIn } = useClerk();
-  const { user } = useUser();
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -55,7 +54,7 @@ export default function PurchaseNudgePopup() {
     setStatus("adding");
 
     try {
-      await addMagazineToCart({ getToken, user, magazineSlug: featuredArticle.slug });
+      await addMagazineToCart({ getToken, magazineSlug: featuredArticle.slug });
       setIsVisible(false);
       setIsDismissed(true);
       navigate("/checkout");

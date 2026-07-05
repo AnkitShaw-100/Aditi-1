@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Minus, Plus, Star } from "lucide-react";
-import { useAuth, useUser } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/clerk-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -471,7 +471,6 @@ export function ArticleCard({ article }) {
 
 export function AddToCartButton({ article, className, children, stopPropagation = true }) {
   const { getToken, isSignedIn } = useAuth();
-  const { user } = useUser();
   const navigate = useNavigate();
   const [status, setStatus] = useState("idle");
 
@@ -492,7 +491,7 @@ export function AddToCartButton({ article, className, children, stopPropagation 
     setStatus("adding");
 
     try {
-      await addMagazineToCart({ getToken, user, magazineSlug: article.slug });
+      await addMagazineToCart({ getToken, magazineSlug: article.slug });
       navigate("/checkout");
     } catch (error) {
       setStatus("error");

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   SignedIn,
   SignedOut,
@@ -14,9 +13,7 @@ import { Button } from "@/components/ui/button";
 import { clerkUserButtonAppearance } from "@/lib/clerkAppearance";
 import { cn } from "@/lib/utils";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
 const CLERK_ENABLED = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
-const syncedSessions = new Set();
 
 export default function AuthNavButton({ mobile = false, compact = false }) {
   if (!CLERK_ENABLED) {
@@ -43,7 +40,6 @@ export default function AuthNavButton({ mobile = false, compact = false }) {
       </SignedOut>
 
       <SignedIn>
-        <SyncClerkUser />
         <div
           className={cn(
             "auth-user-chip flex h-10 items-center gap-2 border-0 bg-transparent px-0",
@@ -124,58 +120,4 @@ function UserLabel() {
       {label}
     </span>
   );
-}
-
-function SyncClerkUser() {
-  const { getToken, sessionId, isSignedIn } = useAuth();
-  const { user, isLoaded } = useUser();
-
-  useEffect(() => {
-    if (!isSignedIn || !isLoaded || !user || !sessionId || syncedSessions.has(sessionId)) {
-      return;
-    }
-
-    const controller = new AbortController();
-
-    async function syncUser() {
-      const token = await getToken();
-
-      if (!token) {
-        return;
-      }
-
-      const response = await fetch(`${BACKEND_URL}/api/auth/sync-user`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: user.fullName || user.username,
-          email: user.primaryEmailAddress?.emailAddress,
-          phone_number: user.primaryPhoneNumber?.phoneNumber,
-        }),
-        signal: controller.signal,
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.error || data.message || "Unable to sync Clerk user");
-      }
-
-      syncedSessions.add(sessionId);
-    }
-
-    syncUser().catch((error) => {
-      if (error.name !== "AbortError") {
-        console.error("Unable to sync Clerk user", error);
-        syncedSessions.delete(sessionId);
-      }
-    });
-
-    return () => controller.abort();
-  }, [getToken, isLoaded, isSignedIn, sessionId, user]);
-
-  return null;
 }

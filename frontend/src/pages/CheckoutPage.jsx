@@ -57,19 +57,8 @@ function CheckoutPanel() {
     setStatus("loading");
 
     try {
-      await apiRequest(getToken, "/api/auth/sync-user", {
-        method: "POST",
-        body: JSON.stringify({
-          username: user?.fullName || user?.username,
-          email: user?.primaryEmailAddress?.emailAddress,
-          phone_number: user?.primaryPhoneNumber?.phoneNumber,
-        }),
-      });
-
-      const [cartData, profileData] = await Promise.all([
-        apiRequest(getToken, "/api/cart"),
-        apiRequest(getToken, "/api/me"),
-      ]);
+      const profileData = await apiRequest(getToken, "/api/me");
+      const cartData = await apiRequest(getToken, "/api/cart");
 
       setCart(cartData.cart ?? []);
       setProfile(profileData.user ?? null);
@@ -78,7 +67,7 @@ function CheckoutPanel() {
       setStatus("error");
       setMessage(error.message);
     }
-  }, [getToken, user]);
+  }, [getToken]);
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {

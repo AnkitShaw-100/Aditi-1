@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from "react";
-import { SignIn, SignedIn, SignedOut, useAuth, useUser } from "@clerk/clerk-react";
+import { SignIn, SignedIn, SignedOut, useAuth } from "@clerk/clerk-react";
 import { ArrowRight } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -54,8 +54,7 @@ export default function AuthPage() {
 
 function PendingCartRedirect({ redirectTo, magazineSlug }) {
   const navigate = useNavigate();
-  const { getToken } = useAuth();
-  const { user, isLoaded } = useUser();
+  const { getToken, isLoaded } = useAuth();
   const [message, setMessage] = useState("Preparing checkout...");
 
   useEffect(() => {
@@ -67,15 +66,6 @@ function PendingCartRedirect({ redirectTo, magazineSlug }) {
 
     async function continueFlow() {
       try {
-        await apiRequest(getToken, "/api/auth/sync-user", {
-          method: "POST",
-          body: JSON.stringify({
-            username: user?.fullName || user?.username,
-            email: user?.primaryEmailAddress?.emailAddress,
-            phone_number: user?.primaryPhoneNumber?.phoneNumber,
-          }),
-        });
-
         if (magazineSlug) {
           await apiRequest(getToken, "/api/cart", {
             method: "POST",
@@ -98,7 +88,7 @@ function PendingCartRedirect({ redirectTo, magazineSlug }) {
     return () => {
       active = false;
     };
-  }, [getToken, isLoaded, magazineSlug, navigate, redirectTo, user]);
+  }, [getToken, isLoaded, magazineSlug, navigate, redirectTo]);
 
   return (
     <div className="account-panel mx-auto max-w-xl p-6 text-center md:p-8">

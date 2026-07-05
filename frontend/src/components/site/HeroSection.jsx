@@ -3,11 +3,25 @@ import { Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { AddToCartButton } from "@/components/site/shared";
-import { DISPATCHES, heroVideo } from "@/data/siteContent";
+import { DISPATCHES, heroMobileVideo, heroVideo } from "@/data/siteContent";
+
+const DESKTOP_HERO_VIDEO_QUERY = "(min-width: 768px)";
+
+function getInitialHeroVideo() {
+  if (typeof window === "undefined") {
+    return heroVideo;
+  }
+
+  return window.matchMedia(DESKTOP_HERO_VIDEO_QUERY).matches
+    ? heroVideo
+    : heroMobileVideo;
+}
 
 export default function HeroSection() {
   const [isMuted, setIsMuted] = useState(true);
+  const [activeHeroVideo, setActiveHeroVideo] = useState(getInitialHeroVideo);
   const heroVideoRef = useRef(null);
+  const activeHeroVideoRef = useRef(activeHeroVideo);
   const premiumMagazine = DISPATCHES.find((item) => item.type === "premium");
 
   useEffect(() => {
@@ -19,6 +33,11 @@ export default function HeroSection() {
     video.muted = isMuted;
     video.playsInline = true;
     video.defaultMuted = true;
+
+    if (activeHeroVideoRef.current !== activeHeroVideo) {
+      activeHeroVideoRef.current = activeHeroVideo;
+      video.load();
+    }
 
     const playVideo = () => {
       video.play().catch(() => {});
@@ -32,7 +51,23 @@ export default function HeroSection() {
     }
 
     return () => video.removeEventListener("canplay", playVideo);
-  }, [isMuted]);
+  }, [activeHeroVideo, isMuted]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia(DESKTOP_HERO_VIDEO_QUERY);
+    const syncHeroVideo = () => {
+      setActiveHeroVideo(mediaQuery.matches ? heroVideo : heroMobileVideo);
+    };
+
+    syncHeroVideo();
+    mediaQuery.addEventListener("change", syncHeroVideo);
+
+    return () => mediaQuery.removeEventListener("change", syncHeroVideo);
+  }, []);
 
   const toggleVideoSound = () => {
     const video = heroVideoRef.current;
@@ -66,8 +101,8 @@ export default function HeroSection() {
         playsInline
         preload="auto"
         aria-label="ADITI hero video"
+        src={activeHeroVideo}
       >
-        <source src={heroVideo} type="video/mp4" />
       </video>
       <div className="absolute inset-0 z-10 bg-linear-to-b from-void/5 via-plate/20 to-void/85" />
       <button
