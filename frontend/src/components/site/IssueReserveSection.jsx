@@ -58,7 +58,7 @@ export default function IssueReserveSection() {
     <section id="reserve" className="reserve-section border-t border-steel px-4 py-16 md:px-8 md:py-24">
       <div className="mx-auto max-w-7xl">
         <SectionReveal>
-          <div className="reserve-layout">
+          <div id="reserve-content" className="reserve-layout">
             <div className="reserve-copy">
               <p className="reserve-kicker">Issue II {"\u00B7"} July 2026</p>
               <h2 className="reserve-title font-rajdhani font-bold text-chalk">

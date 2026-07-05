@@ -1,4 +1,5 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import SiteHeader from "@/components/site/Header";
 import SiteFooter from "@/components/site/SiteFooter";
@@ -13,9 +14,42 @@ import AdminLoginPage from "@/pages/AdminLoginPage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import { ADMIN_DASHBOARD_PATH, ADMIN_ENTRY_PATH } from "@/lib/adminRoutes";
 
+function HashScroll() {
+  const { hash, pathname } = useLocation();
+
+  useEffect(() => {
+    if (!hash) {
+      return undefined;
+    }
+
+    const targetId = hash.slice(1);
+    const timerId = window.setTimeout(() => {
+      const target = document.getElementById(targetId);
+
+      if (!target) {
+        return;
+      }
+
+      const headerOffset = 96;
+      const targetTop =
+        target.getBoundingClientRect().top + window.scrollY - headerOffset;
+
+      window.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: "smooth",
+      });
+    }, 0);
+
+    return () => window.clearTimeout(timerId);
+  }, [hash, pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-void text-chalk">
+      <HashScroll />
       <RadarCursor />
       <SiteHeader />
 

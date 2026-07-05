@@ -465,10 +465,10 @@ function ProfilePanel() {
             <span>Profile</span>
             <b>{profileLocked ? "Locked" : isComplete ? "Ready" : "Pending"}</b>
           </div>
-          <a className="profile-action-card profile-action-card--link" href="/#reserve">
+          <Link className="profile-action-card profile-action-card--link" to="/#reserve-content">
             <span>Upcoming</span>
             <b>Issue II</b>
-          </a>
+          </Link>
         </div>
         <div className="profile-download-panel mt-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
