@@ -1533,7 +1533,8 @@ body.menu-open {
   padding-top: clamp(1.1rem, 2.5vw, 1.5rem);
 }
 
-.issue-contents-nav__button {
+.issue-contents-nav__button,
+.issue-offer-nav__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1546,13 +1547,15 @@ body.menu-open {
     opacity 0.2s ease;
 }
 
-.issue-contents-nav__button:hover:not(:disabled) {
+.issue-contents-nav__button:hover:not(:disabled),
+.issue-offer-nav__button:hover:not(:disabled) {
   border-color: #c99a4a;
   background: rgba(201, 154, 74, 0.14);
   color: #f2eada;
 }
 
-.issue-contents-nav__button:disabled {
+.issue-contents-nav__button:disabled,
+.issue-offer-nav__button:disabled {
   border-color: rgba(242, 234, 218, 0.14);
   color: rgba(242, 234, 218, 0.3);
   cursor: not-allowed;
@@ -5952,15 +5955,6 @@ body.menu-open {
   justify-items: center;
 }
 
-.issue-offer-heading p:first-child::before {
-  content: "";
-  display: inline-block;
-  width: 1.2rem;
-  height: 1px;
-  margin-right: 0.65rem;
-  transform: translateY(-0.22rem);
-  background: #c99a4a;
-}
 
 .issue-offer-title {
   max-width: 18ch;
@@ -5981,12 +5975,53 @@ body.menu-open {
   font-weight: 500;
 }
 
-.issue-offer-card {
-  position: relative;
-  display: grid;
-  justify-items: center;
+.issue-offer-carousel {
   width: min(100%, 41rem);
   margin: clamp(2.5rem, 5vw, 3.75rem) auto 0;
+}
+
+.issue-offer-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.9rem, 3vw, 1.5rem);
+  margin-top: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+.issue-offer-nav__status {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #a8aa9d;
+}
+
+.issue-offer-card {
+  animation: issue-contents-swap 0.35s ease both;
+}
+
+@media (max-width: 400px) {
+  .issue-offer-nav__status {
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .issue-offer-card {
+    animation: none;
+  }
+}
+
+.issue-offer-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 41rem);
+  margin: 0 auto;
   padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem) clamp(2rem, 5vw, 3rem);
   border: 1px solid rgba(201, 154, 74, 0.72);
   background:
@@ -6057,6 +6092,7 @@ body.menu-open {
   gap: 1rem;
   width: min(100%, 31rem);
   margin-top: clamp(1.8rem, 4vw, 2.6rem);
+  margin-bottom: clamp(1.8rem, 4vw, 2.5rem);
 }
 
 .issue-offer-list li {
@@ -6077,7 +6113,9 @@ body.menu-open {
 
 .issue-offer-button {
   width: min(100%, 33rem) !important;
-  margin-top: clamp(1.8rem, 4vw, 2.5rem);
+  /* auto keeps the CTA on the card's bottom edge when the two cards end up
+     different heights. The gap above it comes from the list's margin. */
+  margin-top: auto;
 }
 
 .issue-offer-footnote {
@@ -6111,10 +6149,6 @@ body.menu-open {
   .issue-offer-title {
     max-width: 14ch;
     font-size: clamp(2.15rem, 10vw, 3rem);
-  }
-
-  .issue-offer-card {
-    margin-top: 2.6rem;
   }
 
   .dispatch-carousel-arrows {
