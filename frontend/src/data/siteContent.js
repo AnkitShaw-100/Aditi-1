@@ -3,6 +3,7 @@ import heroMobileVideo from "../../media/pre-comp-2-mobile.mp4";
 import frameworkBg from "../../media/Terrain-w-scaled.webp";
 import logoMark from "../../media/logo.png";
 import navbarLogo from "../../media/navbar-logo.webp";
+import contributorPlaceholder from "../../media/contributor-placeholder.svg";
 import readerAkash from "../../media/testimonials/akash.webp";
 import readerAmita from "../../media/testimonials/amita.webp";
 import readerAnkit from "../../media/testimonials/ankit.webp";
@@ -20,12 +21,38 @@ const contributorImages = import.meta.glob("../../media/contributors image/*", {
   query: "?url",
 });
 
-function contributorImage(matchText) {
-  const match = Object.entries(contributorImages).find(([path]) =>
+const contributorImagesIssueTwo = import.meta.glob(
+  "../../media/contributors images issue II/*.webp",
+  {
+    eager: true,
+    import: "default",
+    query: "?url",
+  }
+);
+
+function findImage(images, matchText) {
+  const match = Object.entries(images).find(([path]) =>
     path.toLowerCase().includes(matchText.toLowerCase())
   );
 
   return match?.[1] ?? "https://i.pravatar.cc/240?img=15";
+}
+
+function contributorImage(matchText) {
+  return findImage(contributorImages, matchText);
+}
+
+// Contributors whose portrait has not been supplied yet fall back to this mark.
+function contributorImageIssueTwo(matchText) {
+  if (matchText === null) {
+    return contributorPlaceholder;
+  }
+
+  const match = Object.entries(contributorImagesIssueTwo).find(([path]) =>
+    path.toLowerCase().includes(matchText.toLowerCase())
+  );
+
+  return match?.[1] ?? contributorPlaceholder;
 }
 
 export const PREMIUM_MAGAZINE_PRICE_RUPEES = "350";
@@ -211,6 +238,128 @@ export const AUTHORS = [
   },
 ];
 
+// Issue II contributors, in the order supplied by the editorial team.
+// `null` as the image key means no portrait has been supplied yet.
+export const AUTHORS_ISSUE_2 = [
+  {
+    name: "Prof. (Dr.) Sukhwant S. Bindra",
+    rank: "Director (Research), Amity Institute of International Studies",
+    specialty: "International relations, foreign policy analysis, and political theory.",
+    summary:
+      "Nearly five decades of teaching and research, over 70 published papers, and an advisory role with the Union Public Service Commission.",
+    image: contributorImageIssueTwo("sukhwant singh bindra"),
+  },
+  {
+    name: "Prof. (Dr.) Cdr. Bhushan Dewan",
+    rank: "Commander (Retd.)",
+    specialty: "Entrepreneurship, innovation, technology, and educational leadership.",
+    summary:
+      "A 1971 war veteran and author of four books, he has led at TCS, Tanla Solutions and the Adani Group, and served as Founding Provost and Pro Vice-Chancellor.",
+    image: contributorImageIssueTwo("bhushan dewan"),
+  },
+  {
+    name: "Prof. (Dr.) Y. Nithiyanandam",
+    rank: "Head, Geospatial Research Programme, Takshashila Institution",
+    specialty: "Geospatial intelligence, remote sensing, GIS analytics, and geospatial policy.",
+    summary:
+      "Lead author of the Takshashila Geospatial Bulletin, he has established geospatial programmes at leading Indian institutions.",
+    image: contributorImageIssueTwo("nithiyanandam"),
+  },
+  {
+    name: "Air Mshl. Anil Khosla",
+    rank: "PVSM, AVSM, VM, ADC (Retd.)",
+    specialty: "Ground attack, air defence, and maritime air operations.",
+    summary:
+      "A former Vice Chief of the Air Staff with over 4,000 hours on the Jaguar and MiG-21, he writes on integrating air operations for credible conventional deterrence.",
+    image: contributorImageIssueTwo("anil khosla"),
+  },
+  {
+    name: "Air Mshl. Anil Chopra",
+    rank: "PVSM, AVSM, VM, VSM (Retd.)",
+    specialty: "Air power, flight testing, and aerospace capability.",
+    summary:
+      "A test pilot and Mirage-2000 pioneer, and former Director General of the Centre for Air Power Studies, he examines Indian missiles pushing ahead with precision and reach.",
+    image: contributorImageIssueTwo("anil chopra"),
+  },
+  {
+    name: "Lt. Gen. (Dr.) Sunil Kumar Gadeock",
+    rank: "AVSM (Retd.)",
+    specialty: "Defence logistics, military training, and defence education.",
+    summary:
+      "A Brigade of the Guards veteran and former Logistics Advisor to the Botswana Defence Force, he writes on the Russian-Ukrainian war conundrum and the way forward.",
+    image: contributorImageIssueTwo("sunil kumar gadeock"),
+  },
+  {
+    name: "Lt. Gen. Vijay Singh",
+    rank: "Lieutenant General (Retd.)",
+    specialty: "Counter-insurgency, border management, and UN peacekeeping.",
+    summary:
+      "A 9th Gorkha Rifles veteran and former Chief of Staff, South Western Command, he studies the power dynamics shaping India's strategic environment.",
+    image: contributorImageIssueTwo("vijay singh"),
+  },
+  {
+    name: "Maj. Gen. Brajesh Kumar",
+    rank: "AVSM, VSM (Retd.)",
+    specialty: "Defence infrastructure, project execution, and military engineering.",
+    summary:
+      "A Corps of Engineers veteran of 39 years, he oversaw tri-service infrastructure projects with annual capital expenditure above ₹6,500 crore.",
+    image: contributorImageIssueTwo("brajesh kumar"),
+  },
+  {
+    name: "Col. (Dr.) Amitabh Hoskote",
+    rank: "Colonel (Retd.)",
+    specialty: "Military doctrine, conflict and security, and post-conflict transition.",
+    summary:
+      "Senior Fellow and PhD supervisor at CLAWS-MAHE, he researches new-age threats and security in the nuclearised subcontinent.",
+    image: contributorImageIssueTwo("amitabh hoskote"),
+  },
+  {
+    name: "Col. Amitabh Bhagat",
+    rank: "Colonel (Retd.)",
+    specialty: "Defence policy, procurement, and international security.",
+    summary:
+      "An Army veteran and former BAE Systems business leader, he brings three decades across military service and the aerospace and defence industry.",
+    image: contributorImageIssueTwo("amitabh bhagat"),
+  },
+  {
+    name: "Col. Shailender Arya",
+    rank: "Colonel (Retd.)",
+    specialty: "Geopolitics, defence and aerospace policy, and risk advisory.",
+    summary:
+      "Senior Advisor at The Asia Group and an Adviser in the Ministry of Defence from 2020 to 2025, he has helped shape Indian policy and regulatory frameworks.",
+    image: contributorImageIssueTwo("shailender arya"),
+  },
+  {
+    name: "Mr. Adithya Krishna Menon",
+    rank: "India Contributor, Naval News",
+    specialty: "Naval technology, indigenous R&D, and defence procurement.",
+    summary:
+      "He tracks naval developments across the Indian Ocean Region, from modernisation and procurement to India's defence export efforts.",
+    image: contributorImageIssueTwo("adithya krishna menon"),
+  },
+  {
+    name: "Mr. Kartikeya Gupt",
+    rank: "Co-founder, C SCAN",
+    specialty: "Strategy and air power theory.",
+    summary:
+      "Previously with Janes, WikiStrat and the National Maritime Foundation, he studies strategy and air power theory.",
+    image: contributorImageIssueTwo("kartikeya gupta"),
+  },
+  {
+    name: "Mr. Pranav K. Paranjape",
+    rank: "Amity Institute of Defence and Strategic Studies",
+    specialty: "Military history, land warfare, and the Af-Pak region.",
+    summary:
+      "An avid reader of military history, his work focuses on India's western neighbourhood.",
+    image: contributorImageIssueTwo("pranav"),
+  },
+];
+
+export const AUTHOR_ISSUES = [
+  { id: "issue-2", ordinal: "II", label: "Issue II", authors: AUTHORS_ISSUE_2 },
+  { id: "issue-1", ordinal: "I", label: "Issue I", authors: AUTHORS },
+];
+
 export const ARTICLE_ACCESS_OPTIONS = [
   {
     label: "Free Access",
@@ -353,7 +502,51 @@ export const DISPATCHES = [
     ariaLabel:
       "Buy ADITI Strategy and Defence Magazine Volume 1 Issue 1",
   },
+  {
+    type: "premium",
+    href: "/checkout",
+    slug: "aditi-strategy-defence-volume-1-issue-2",
+    image: "/article-banners/aditi-magazine-issue-2-mockup.webp",
+    tag: "Premium Magazine",
+    title:
+      "ADITI Strategy & Defence Magazine - Volume 1, Issue 2: Forging the Republic's Power",
+    teaser:
+      "India's deliberate push to strengthen its military capabilities during a period of strategic transition, read across missiles, air operations, and the lessons of the Russian-Ukrainian war.",
+    author: "ADITI Editorial",
+    readTime: "Magazine issue",
+    cta: "Buy Now",
+    priceLabel: PREMIUM_MAGAZINE_PRICE_LABEL,
+    ariaLabel:
+      "Buy ADITI Strategy and Defence Magazine Volume 1 Issue 2",
+  },
 ];
+
+// Every purchasable issue, newest first. `slug` must match the `magazines.slug`
+// column in the backend catalogue.
+export const MAGAZINE_ISSUES = [
+  {
+    ordinal: "II",
+    label: "Issue II",
+    slug: "aditi-strategy-defence-volume-1-issue-2",
+    shortTitle: "Forging the Republic's Power",
+    cover: "/article-banners/aditi-strategy-defence-magazine-issue-2-cover.webp",
+  },
+  {
+    ordinal: "I",
+    label: "Issue I",
+    slug: "aditi-strategy-defence-volume-1-issue-1",
+    shortTitle: "Cognitive Dissonance in Indian Strategy",
+    cover: "/article-banners/aditi-strategy-defence-magazine-cover.webp",
+  },
+].map((issue) => ({ ...issue, priceLabel: PREMIUM_MAGAZINE_PRICE_LABEL }));
+
+export const LATEST_MAGAZINE_ISSUE = MAGAZINE_ISSUES[0];
+
+export function magazineForIssue(ordinal) {
+  const issue = MAGAZINE_ISSUES.find((item) => item.ordinal === ordinal);
+
+  return DISPATCHES.find((item) => item.slug === issue?.slug) ?? null;
+}
 
 export const FEEDBACKS = [
   {

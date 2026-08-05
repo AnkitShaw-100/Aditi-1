@@ -434,7 +434,10 @@
   object-position: center;
   box-shadow: none;
   filter: saturate(1.02) contrast(1.03);
-  transform: none;
+  /* The mockup carries a lot of empty backdrop; zoom past it so the book fills
+     the panel. Origin sits below centre because the book does too. */
+  transform: scale(1.32);
+  transform-origin: 50% 60%;
 }
 
 .purchase-popup__content {
@@ -561,6 +564,9 @@
   .purchase-popup__media img {
     height: 100%;
     object-fit: cover;
+    /* The mobile banner is wide and short, so the portrait mockup is already
+       cropped tight on the sides. Zooming further would clip the book. */
+    transform: none;
   }
 
   .purchase-popup__content {
@@ -1518,6 +1524,74 @@ body.menu-open {
   flex-shrink: 0;
 }
 
+.issue-contents-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: clamp(1.6rem, 3.5vw, 2.4rem);
+  border-top: 1px solid rgba(242, 234, 218, 0.14);
+  padding-top: clamp(1.1rem, 2.5vw, 1.5rem);
+}
+
+.issue-contents-nav__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(201, 154, 74, 0.55);
+  background: transparent;
+  color: #d9bd79;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.issue-contents-nav__button:hover:not(:disabled) {
+  border-color: #c99a4a;
+  background: rgba(201, 154, 74, 0.14);
+  color: #f2eada;
+}
+
+.issue-contents-nav__button:disabled {
+  border-color: rgba(242, 234, 218, 0.14);
+  color: rgba(242, 234, 218, 0.3);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.issue-contents-nav__status {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #a8aa9d;
+}
+
+.issue-contents-cover__image,
+.issue-contents-copy {
+  animation: issue-contents-swap 0.4s ease both;
+}
+
+@keyframes issue-contents-swap {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .issue-contents-cover__image,
+  .issue-contents-copy {
+    animation: none;
+  }
+}
+
 @media (min-width: 1024px) {
   .issue-contents-layout {
     grid-template-columns: minmax(19rem, 0.84fr) minmax(0, 1.16fr);
@@ -1525,6 +1599,36 @@ body.menu-open {
 
   .issue-contents-cover {
     justify-self: center;
+  }
+}
+
+/* Tablets: single column, so the cover no longer needs to fill the width and
+   the title can stop scaling off a viewport unit that overshoots here. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .issue-contents-layout {
+    gap: 2.75rem;
+  }
+
+  .issue-contents-cover {
+    width: min(100%, 22rem);
+  }
+
+  .issue-contents-title {
+    max-width: 20ch;
+    font-size: clamp(2.1rem, 5.4vw, 2.9rem);
+  }
+
+  .issue-contents-question,
+  .issue-contents-body {
+    max-width: 46rem;
+  }
+
+  .issue-contents-stats {
+    max-width: 34rem;
+  }
+
+  .issue-contents-nav {
+    justify-content: center;
   }
 }
 
@@ -1594,6 +1698,28 @@ body.menu-open {
     width: 100%;
     justify-content: center;
   }
+
+  .issue-contents-nav {
+    justify-content: center;
+  }
+}
+
+/* Narrow phones: three stat columns stop fitting, so drop to two. */
+@media (max-width: 400px) {
+  .issue-contents-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.1rem 0.85rem;
+  }
+
+  .issue-contents-nav {
+    justify-content: center;
+    gap: 0.6rem;
+  }
+
+  .issue-contents-nav__status {
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+  }
 }
 
 .authors-section {
@@ -1609,6 +1735,38 @@ body.menu-open {
 
 .authors-carousel-wrap {
   width: 100%;
+}
+
+.authors-issue-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: clamp(1.6rem, 3vw, 2.25rem);
+}
+
+.authors-issue-switch__button {
+  min-height: 2.75rem;
+  border: 1px solid rgba(201, 154, 74, 0.4);
+  padding: 0 1.5rem;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #d9bd79;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.authors-issue-switch__button:hover {
+  border-color: #c99a4a;
+  background: rgba(201, 154, 74, 0.12);
+  color: #f2eada;
+}
+
+.authors-issue-switch__button.is-active {
+  border-color: #c99a4a;
+  background: #c99a4a;
+  color: #090b08;
 }
 
 .authors-carousel-arrows {
@@ -4198,7 +4356,7 @@ body.menu-open {
   border-color: rgba(168, 170, 157, 0.24) !important;
   background: rgba(242, 234, 218, 0.025);
   padding-inline: clamp(0.85rem, 2vw, 1.2rem);
-  transition: background 0.25s ease, border-color 0.25s ease;
+  transition: background 0.18s ease, border-color 0.18s ease;
 }
 
 .faq-item[open],
@@ -4219,7 +4377,28 @@ body.menu-open {
 .faq-answer {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease;
+  transition: max-height 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* The copy fades up slightly behind the opening panel, which reads faster than
+   the height alone even though the whole thing lasts a fifth of a second. */
+.faq-answer > p {
+  opacity: 0;
+  transform: translateY(-0.35rem);
+  transition: opacity 0.16s ease-out, transform 0.16s ease-out;
+}
+
+.faq-item[open] .faq-answer > p {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.03s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-answer,
+  .faq-answer > p {
+    transition: none;
+  }
 }
 
 .faq-final-cta {
@@ -5001,7 +5180,6 @@ body.menu-open {
 .cart-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
   border: 1px solid rgba(168, 170, 157, 0.18);
   background: rgba(242, 234, 218, 0.025);
@@ -5076,6 +5254,144 @@ body.menu-open {
   word-break: normal;
 }
 
+/* Download tile: cover + issue label + short title, so the reader can tell the
+   issues apart at a glance instead of parsing a full catalogue title. */
+.download-card {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.9rem;
+  border: 1px solid rgba(201, 154, 74, 0.55);
+  background: rgba(201, 154, 74, 0.95);
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  color: #090b08;
+  transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+}
+
+.download-card:hover {
+  border-color: rgba(242, 234, 218, 0.4);
+  background: #f2eada;
+  transform: translateY(-1px);
+  box-shadow: 0 1.25rem 2.6rem rgba(0, 0, 0, 0.32);
+}
+
+/* Tiles alternate gold / cream down the list, and each swaps to the other on
+   hover. :nth-child is 1-based, so "even" here is the 2nd, 4th, ... tile. */
+.download-card:nth-child(even) {
+  border-color: rgba(242, 234, 218, 0.4);
+  background: #f2eada;
+}
+
+.download-card:nth-child(even):hover {
+  border-color: rgba(201, 154, 74, 0.55);
+  background: rgba(201, 154, 74, 0.95);
+}
+
+.download-card__cover {
+  width: 2.9rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(9, 11, 8, 0.25);
+  aspect-ratio: 4 / 5.1;
+  object-fit: cover;
+}
+
+.download-card__copy {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 0.15rem;
+}
+
+.download-card__issue {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.download-card__title {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.download-card__hint {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.download-card__icon {
+  flex-shrink: 0;
+}
+
+.profile-summary {
+  display: grid;
+  gap: 0.75rem;
+  border-top: 1px solid rgba(168, 170, 157, 0.18);
+  border-bottom: 1px solid rgba(168, 170, 157, 0.18);
+  padding: 1rem 0;
+}
+
+.profile-summary__row {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.profile-summary__row dt {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #a8aa9d;
+}
+
+.profile-summary__row dd {
+  margin: 0;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #f2eada;
+  overflow-wrap: anywhere;
+}
+
+.profile-summary__note {
+  margin-top: 0.9rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: #a8aa9d;
+}
+
+/* Purchases still awaiting payment confirmation: same tile, muted and inert.
+   Listed with :nth-child so it outranks the alternating gold/cream rules. */
+.download-card--pending,
+.download-card--pending:nth-child(even),
+.download-card--pending:hover,
+.download-card--pending:nth-child(even):hover {
+  border-color: rgba(168, 170, 157, 0.24);
+  background: rgba(242, 234, 218, 0.04);
+  color: #d8d2c0;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.download-card--pending .download-card__hint {
+  color: #c99a4a;
+  opacity: 1;
+}
+
 .download-action {
   align-items: flex-start !important;
   justify-content: space-between !important;
@@ -5119,39 +5435,167 @@ body.menu-open {
 }
 
 .cart-row {
-  position: relative;
-  align-items: flex-start;
-  min-height: 9.5rem;
-  padding: clamp(1rem, 2.2vw, 1.25rem);
-  padding-bottom: 4.5rem;
+  padding: clamp(0.9rem, 2.2vw, 1.1rem);
   background:
     linear-gradient(135deg, rgba(242, 234, 218, 0.055), rgba(242, 234, 218, 0.018)),
     rgba(9, 11, 8, 0.26);
   box-shadow: inset 0 1px 0 rgba(242, 234, 218, 0.04);
 }
 
+.cart-row__cover {
+  width: 4rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(242, 234, 218, 0.16);
+  aspect-ratio: 4 / 5.1;
+  object-fit: cover;
+}
+
 .cart-row-copy {
   min-width: 0;
+  flex: 1 1 auto;
   padding-right: 0;
 }
 
+.cart-row__issue {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #a8aa9d;
+}
+
 .cart-row-title {
+  margin-top: 0.3rem;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #f2eada;
   overflow-wrap: anywhere;
 }
 
-.cart-row-actions {
-  position: absolute;
-  right: clamp(1rem, 2.2vw, 1.25rem);
-  bottom: clamp(1rem, 2.2vw, 1.25rem);
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.75rem;
+.cart-row-price {
+  margin-top: 0.25rem;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #c99a4a;
 }
 
-.cart-row-price {
-  line-height: 1;
+@media (max-width: 640px) {
+  .cart-row {
+    flex-wrap: wrap;
+  }
+
+  .cart-row__remove {
+    margin-left: auto;
+  }
+}
+
+.issue-picker {
+  margin-top: clamp(1.6rem, 3vw, 2.25rem);
+  border-top: 1px solid rgba(168, 170, 157, 0.18);
+  padding-top: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.issue-picker__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+}
+
+.issue-picker__label {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c99a4a;
+}
+
+.issue-picker__grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.1rem;
+}
+
+.issue-picker__card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(168, 170, 157, 0.18);
+  background:
+    linear-gradient(135deg, rgba(242, 234, 218, 0.05), rgba(242, 234, 218, 0.015)),
+    rgba(9, 11, 8, 0.26);
+  padding: 0.85rem 1rem;
+}
+
+.issue-picker__cover {
+  width: 3.25rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(242, 234, 218, 0.16);
+  aspect-ratio: 4 / 5.1;
+  object-fit: cover;
+}
+
+.issue-picker__copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.issue-picker__issue {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #a8aa9d;
+}
+
+.issue-picker__title {
+  margin-top: 0.3rem;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #f2eada;
+  overflow-wrap: anywhere;
+}
+
+.issue-picker__price {
+  margin-top: 0.25rem;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #c99a4a;
+}
+
+.issue-picker__add {
+  flex-shrink: 0;
+  border: 1px solid rgba(201, 154, 74, 0.55);
+  background: transparent;
+  color: #d9bd79;
+}
+
+.issue-picker__add:hover {
+  border-color: #c99a4a;
+  background: rgba(201, 154, 74, 0.14);
+  color: #f2eada;
+}
+
+@media (max-width: 640px) {
+  .issue-picker__card {
+    flex-wrap: wrap;
+  }
+
+  .issue-picker__add {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .checkout-pay-button {
@@ -5405,9 +5849,7 @@ body.menu-open {
   }
 
   .cart-row {
-    display: grid;
-    min-height: 12rem;
-    padding: 1rem 1rem 4.6rem;
+    padding: 1rem;
   }
 
   .cart-row-copy {
@@ -5415,18 +5857,8 @@ body.menu-open {
   }
 
   .cart-row-title {
-    font-size: 1.12rem !important;
-    line-height: 1.25 !important;
-  }
-
-  .cart-row-sku {
-    margin-top: 0.7rem;
-    letter-spacing: 0.14em;
-  }
-
-  .cart-row-actions {
-    right: 1rem;
-    bottom: 1rem;
+    font-size: 1.12rem;
+    line-height: 1.25;
   }
 }
 

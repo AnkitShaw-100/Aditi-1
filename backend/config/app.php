@@ -27,6 +27,14 @@ return [
         'password' => Env::get('DB_PASSWORD', ''),
         'charset' => Env::get('DB_CHARSET', 'utf8mb4'),
     ],
+    'magazines' => [
+        // Directory holding the paid issue PDFs. Keep it OUTSIDE the web root:
+        // files are streamed by the download route only after a paid check.
+        'storage_path' => rtrim(
+            Env::get('MAGAZINE_STORAGE_PATH', __DIR__ . '/../storage/magazines'),
+            "/\\"
+        ),
+    ],
     'clerk' => [
         'jwks_url' => Env::get('CLERK_JWKS_URL', 'https://api.clerk.com/v1/jwks'),
         'issuer' => Env::get('CLERK_ISSUER', ''),

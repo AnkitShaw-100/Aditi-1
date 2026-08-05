@@ -375,9 +375,11 @@ export function AuthorCard({ author }) {
         <p className="authors-card-specialty mt-2 font-lora text-base italic leading-relaxed text-ash">
           {author.specialty}
         </p>
-        <p className="authors-card-summary mt-4 font-plex text-base font-light leading-[1.8] text-fog">
-          {author.summary}
-        </p>
+        {author.summary ? (
+          <p className="authors-card-summary mt-4 font-plex text-base font-light leading-[1.8] text-fog">
+            {author.summary}
+          </p>
+        ) : null}
       </div>
     </Card>
   );
@@ -478,12 +480,25 @@ export function ArticleCard({ article }) {
   );
 }
 
-export function AddToCartButton({ article, className, children, stopPropagation = true }) {
+/**
+ * `preselect={false}` sends the reader to checkout without putting anything in
+ * the cart, so they pick the issue themselves. Use it for CTAs that are not
+ * tied to one specific issue.
+ */
+export function AddToCartButton({
+  article,
+  className,
+  children,
+  stopPropagation = true,
+  preselect = true,
+}) {
   const { getToken, isSignedIn } = useAuth();
   const navigate = useNavigate();
   const [status, setStatus] = useState("idle");
 
-  const authUrl = `/auth?redirect=${encodeURIComponent("/checkout")}&magazine_slug=${encodeURIComponent(article.slug)}`;
+  const authUrl = preselect
+    ? `/auth?redirect=${encodeURIComponent("/checkout")}&magazine_slug=${encodeURIComponent(article.slug)}`
+    : `/auth?redirect=${encodeURIComponent("/checkout")}`;
 
   async function addToCart(event) {
     event?.preventDefault();
@@ -494,6 +509,11 @@ export function AddToCartButton({ article, className, children, stopPropagation 
 
     if (!isSignedIn) {
       navigate(authUrl);
+      return;
+    }
+
+    if (!preselect) {
+      navigate("/checkout");
       return;
     }
 

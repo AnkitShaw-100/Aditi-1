@@ -5,6 +5,8 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { apiRequest, formatRupees } from "@/lib/api";
+import { addMagazineToCart } from "@/lib/cart";
+import { MAGAZINE_ISSUES } from "@/data/siteContent";
 
 export default function CheckoutPage() {
   useLayoutEffect(() => {
@@ -76,6 +78,42 @@ function CheckoutPanel() {
 
     return () => window.clearTimeout(timerId);
   }, [loadCheckout]);
+
+  const cartSlugs = useMemo(
+    () => new Set(cart.map((item) => item.slug)),
+    [cart]
+  );
+
+  const ownedSlugs = useMemo(() => {
+    const bought = profile?.magazines_bought ?? [];
+
+    return new Set(
+      bought
+        .filter((item) => String(item.status ?? "").toLowerCase() === "paid")
+        .map((item) => item.slug)
+    );
+  }, [profile]);
+
+  // Issues the reader can still add: not in the cart, not already paid for.
+  const availableIssues = MAGAZINE_ISSUES.filter(
+    (issue) => !cartSlugs.has(issue.slug) && !ownedSlugs.has(issue.slug)
+  );
+
+  async function addIssues(slugs) {
+    setMessage("");
+
+    try {
+      let latestCart = null;
+
+      for (const slug of slugs) {
+        latestCart = await addMagazineToCart({ getToken, magazineSlug: slug });
+      }
+
+      setCart(latestCart?.cart ?? []);
+    } catch (error) {
+      setMessage(error.message);
+    }
+  }
 
   async function removeItem(cartItemId) {
     try {
@@ -218,33 +256,37 @@ function CheckoutPanel() {
           {status === "loading" ? (
             <p className="font-plex text-sm text-ash">Loading cart...</p>
           ) : cart.length ? (
-            cart.map((item) => (
-              <article key={item.cart_item_id} className="cart-row">
-                <div className="cart-row-copy">
-                  <p className="cart-row-title font-rajdhani text-xl font-bold leading-tight text-chalk">
-                    {item.title}
-                  </p>
-                  <p className="cart-row-sku mt-1 font-plex text-xs uppercase tracking-[0.16em] text-fog">
-                    {item.sku}
-                  </p>
-                </div>
-                <div className="cart-row-actions">
-                  <span className="cart-row-price font-rajdhani text-xl font-bold text-ember">
-                    {formatRupees(item.price_paise)}
-                  </span>
+            cart.map((item) => {
+              const issue = MAGAZINE_ISSUES.find((entry) => entry.slug === item.slug);
+
+              return (
+                <article key={item.cart_item_id} className="cart-row">
+                  {issue ? (
+                    <img
+                      src={issue.cover}
+                      alt={`ADITI ${issue.label} cover`}
+                      className="cart-row__cover"
+                      loading="lazy"
+                    />
+                  ) : null}
+                  <div className="cart-row-copy">
+                    <p className="cart-row__issue">{issue?.label ?? item.sku}</p>
+                    <p className="cart-row-title">{issue?.shortTitle ?? item.title}</p>
+                    <p className="cart-row-price">{formatRupees(item.price_paise)}</p>
+                  </div>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 rounded-none border border-steel/60 text-fog hover:border-ember hover:bg-plate hover:text-chalk"
-                    aria-label={`Remove ${item.title}`}
+                    className="cart-row__remove h-10 w-10 shrink-0 rounded-none border border-steel/60 text-fog hover:border-ember hover:bg-plate hover:text-chalk"
+                    aria-label={`Remove ${issue?.label ?? item.title}`}
                     onClick={() => removeItem(item.cart_item_id)}
                   >
                     <Trash2 className="size-4" />
                   </Button>
-                </div>
-              </article>
-            ))
+                </article>
+              );
+            })
           ) : (
             <p className="font-plex text-sm leading-7 text-ash">
               Your cart is empty. Add a premium dispatch from the articles section.
@@ -252,6 +294,50 @@ function CheckoutPanel() {
           )}
           {message ? <p className="font-plex text-sm text-ember">{message}</p> : null}
         </div>
+
+        {status === "ready" && availableIssues.length ? (
+          <div className="issue-picker">
+            <div className="issue-picker__head">
+              <p className="issue-picker__label">
+                {cart.length ? "Complete your set" : "Choose your issues"}
+              </p>
+              {availableIssues.length > 1 ? (
+                <Button
+                  type="button"
+                  className="final-button issue-picker__all h-10 rounded-none px-5 font-rajdhani text-sm font-bold"
+                  onClick={() => addIssues(availableIssues.map((issue) => issue.slug))}
+                >
+                  Add both issues
+                </Button>
+              ) : null}
+            </div>
+
+            <div className="issue-picker__grid">
+              {availableIssues.map((issue) => (
+                <article className="issue-picker__card" key={issue.slug}>
+                  <img
+                    src={issue.cover}
+                    alt={`ADITI ${issue.label} cover`}
+                    className="issue-picker__cover"
+                    loading="lazy"
+                  />
+                  <div className="issue-picker__copy">
+                    <p className="issue-picker__issue">{issue.label}</p>
+                    <p className="issue-picker__title">{issue.shortTitle}</p>
+                    <p className="issue-picker__price">{issue.priceLabel}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    className="issue-picker__add h-10 rounded-none px-5 font-rajdhani text-sm font-bold"
+                    onClick={() => addIssues([issue.slug])}
+                  >
+                    Add
+                  </Button>
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <aside className="account-panel checkout-payment-panel p-5 md:p-7">

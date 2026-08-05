@@ -727,7 +727,7 @@ final class UserRepository
         }
 
         $statement = $this->pdo->prepare(
-            'SELECT m.title, m.slug, m.pdf_file, m.pdf_filename, m.pdf_mime_type
+            'SELECT m.title, m.slug, m.pdf_path, m.pdf_file, m.pdf_filename, m.pdf_mime_type
              FROM user_magazines um
              INNER JOIN magazines m ON m.id = um.magazine_id
              WHERE um.user_id = :user_id

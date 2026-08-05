@@ -647,14 +647,38 @@ if ($request->method() === 'GET' && preg_match('#^/api/magazines/([^/]+)/downloa
         Response::json(['error' => 'Magazine not found for this paid user'], 404);
     }
 
-    if (($file['pdf_file'] ?? null) === null || $file['pdf_file'] === '') {
-        Response::json(['error' => 'Magazine PDF is not available yet'], 404);
-    }
-
     $filename = safeDownloadFilename(
         $file['pdf_filename'] ?? ($file['slug'] . '.pdf')
     );
     $mime = $file['pdf_mime_type'] ?: 'application/pdf';
+    $diskPath = magazineStoragePath($config, $file['pdf_path'] ?? null);
+
+    // Preferred path for large issues: stream the file off disk so a 100 MB PDF
+    // never has to fit in PHP memory or travel through a MySQL packet.
+    if ($diskPath !== null) {
+        http_response_code(200);
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . (string) filesize($diskPath));
+
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        $handle = fopen($diskPath, 'rb');
+
+        if ($handle !== false) {
+            fpassthru($handle);
+            fclose($handle);
+            exit;
+        }
+    }
+
+    // Legacy fallback: the PDF was imported into the pdf_file LONGBLOB column.
+    if (($file['pdf_file'] ?? null) === null || $file['pdf_file'] === '') {
+        Response::json(['error' => 'Magazine PDF is not available yet'], 404);
+    }
+
     $payload = $file['pdf_file'];
 
     http_response_code(200);
@@ -808,6 +832,32 @@ function safeDownloadFilename(string $filename): string
     $filename = preg_replace('/[^A-Za-z0-9._-]+/', '-', $filename) ?: 'aditi-magazine.pdf';
 
     return str_ends_with(strtolower($filename), '.pdf') ? $filename : $filename . '.pdf';
+}
+
+/**
+ * Resolves a magazines.pdf_path value to a readable file inside the configured
+ * storage directory. Returns null when unset, missing, or pointing outside that
+ * directory, so a bad DB value can never expose an arbitrary file.
+ */
+function magazineStoragePath(array $config, ?string $pdfPath): ?string
+{
+    if ($pdfPath === null || trim($pdfPath) === '') {
+        return null;
+    }
+
+    $storageRoot = realpath((string) ($config['magazines']['storage_path'] ?? ''));
+
+    if ($storageRoot === false) {
+        return null;
+    }
+
+    $candidate = realpath($storageRoot . DIRECTORY_SEPARATOR . basename(trim($pdfPath)));
+
+    if ($candidate === false || !is_file($candidate) || !is_readable($candidate)) {
+        return null;
+    }
+
+    return str_starts_with($candidate, $storageRoot) ? $candidate : null;
 }
 
 function generateInvoicePdf(array $invoice): string

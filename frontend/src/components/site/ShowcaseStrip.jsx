@@ -308,9 +308,10 @@ function ReactPageFlipShowcase() {
               <AddToCartButton
                 article={premiumMagazine}
                 stopPropagation={false}
+                preselect={false}
                 className="pageflip-end-cta__button"
               >
-                Buy magazine
+                Own the issue
               </AddToCartButton>
             </aside>
           ) : null}

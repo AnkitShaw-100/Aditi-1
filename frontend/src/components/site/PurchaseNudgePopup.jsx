@@ -4,10 +4,11 @@ import { useAuth, useClerk } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-import { DISPATCHES } from "@/data/siteContent";
+import { DISPATCHES, LATEST_MAGAZINE_ISSUE } from "@/data/siteContent";
 import { addMagazineToCart } from "@/lib/cart";
 
 const SHOW_DELAY_MS = 2500;
+const POPUP_IMAGE = "/article-banners/aditi-magazine-issue-2-mockup.webp";
 
 export default function PurchaseNudgePopup() {
   const { getToken, isSignedIn } = useAuth();
@@ -18,7 +19,10 @@ export default function PurchaseNudgePopup() {
   const [status, setStatus] = useState("idle");
 
   const featuredArticle = useMemo(
-    () => DISPATCHES.find((item) => item.type === "premium") ?? DISPATCHES[0],
+    () =>
+      DISPATCHES.find((item) => item.slug === LATEST_MAGAZINE_ISSUE.slug) ??
+      DISPATCHES.find((item) => item.type === "premium") ??
+      DISPATCHES[0],
     []
   );
 
@@ -80,12 +84,21 @@ export default function PurchaseNudgePopup() {
       </button>
 
       <div className="purchase-popup__media" aria-hidden="true">
-        <img src={featuredArticle.image} alt="" loading="eager" />
+        <img
+          src={POPUP_IMAGE}
+          alt=""
+          loading="eager"
+          onError={(event) => {
+            if (event.currentTarget.src.endsWith(POPUP_IMAGE)) {
+              event.currentTarget.src = featuredArticle.image;
+            }
+          }}
+        />
       </div>
 
       <div className="purchase-popup__content">
         <p className="purchase-popup__eyebrow">Magazine access</p>
-        <h2>Buy the inaugural ADITI magazine.</h2>
+        <h2>Buy the latest ADITI magazine.</h2>
         <p>
           Sign in only when you choose to buy. Payment opens securely from checkout.
         </p>

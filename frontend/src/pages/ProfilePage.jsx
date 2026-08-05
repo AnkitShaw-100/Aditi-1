@@ -10,6 +10,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { apiRequest, downloadProtectedFile } from "@/lib/api";
+import { MAGAZINE_ISSUES } from "@/data/siteContent";
 
 const emptyProfile = {
   username: "",
@@ -101,6 +102,23 @@ function cleanProfile(profile) {
       ? `+${phoneDigits}`
       : phoneDigits,
   };
+}
+
+// "1998-06-30" -> "30 June 1998". Returns the raw value if it is not a date.
+function formatDobLabel(value) {
+  if (!value) {
+    return "";
+  }
+
+  const parsed = new Date(`${value}T00:00:00`);
+
+  return Number.isNaN(parsed.getTime())
+    ? value
+    : parsed.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
 }
 
 function safeRedirectPath(value) {
@@ -341,6 +359,175 @@ function ProfilePanel() {
     }
   }
 
+  const libraryPanel = (
+    <div className="profile-download-panel">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
+            PDF Library
+          </p>
+          <h2 className="mt-2 font-rajdhani text-2xl font-bold leading-none text-chalk">
+            Bought magazines
+          </h2>
+        </div>
+        {hasPendingPurchase ? (
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={recoveryStatus === "checking"}
+            className="h-9 rounded-none border border-ember/50 px-3 font-rajdhani text-sm font-bold text-chalk hover:border-ember hover:bg-plate hover:text-chalk"
+            onClick={() => recoverPendingPayments()}
+          >
+            <RefreshCw className="size-4" />
+            {recoveryStatus === "checking" ? "Checking" : "Verify Payment"}
+          </Button>
+        ) : null}
+      </div>
+      <div className="mt-3 grid gap-3">
+        {magazines.length ? (
+          magazines.map((magazine) => {
+            const issue = MAGAZINE_ISSUES.find(
+              (entry) => entry.slug === magazine.slug
+            );
+            const isPaid = magazine.status === "paid";
+
+            const body = (
+              <>
+                {issue ? (
+                  <img
+                    src={issue.cover}
+                    alt=""
+                    className="download-card__cover"
+                    loading="lazy"
+                  />
+                ) : null}
+                <span className="download-card__copy">
+                  <span className="download-card__issue">
+                    {issue?.label ?? "Magazine"}
+                  </span>
+                  <span className="download-card__title">
+                    {issue?.shortTitle ?? magazine.title}
+                  </span>
+                  <span className="download-card__hint">
+                    {isPaid ? "Download PDF" : magazine.status}
+                  </span>
+                </span>
+                {isPaid ? <Download className="download-card__icon size-5" /> : null}
+              </>
+            );
+
+            return isPaid ? (
+              <button
+                key={`${magazine.id}-${magazine.razorpay_order_id}`}
+                type="button"
+                className="download-card"
+                onClick={() => downloadMagazine(magazine)}
+              >
+                {body}
+              </button>
+            ) : (
+              <div
+                key={`${magazine.id}-${magazine.razorpay_order_id}`}
+                className="download-card download-card--pending"
+              >
+                {body}
+              </div>
+            );
+          })
+        ) : (
+          <p className="font-plex text-sm text-ash">No paid magazines yet.</p>
+        )}
+      </div>
+    </div>
+  );
+
+  const upcomingCard = (
+    <Link className="profile-action-card profile-action-card--link" to="/#reserve-content">
+      <span>Upcoming</span>
+      <b>Issue II</b>
+    </Link>
+  );
+
+  // Saved profiles have nothing left to fill in, so the library leads and the
+  // details become a read-only summary beside it.
+  if (profileLocked) {
+    return (
+      <div className="profile-layout grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)]">
+        <section className="account-panel profile-card p-5 md:p-7">
+          <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
+            Your Library
+          </p>
+          <h1 className="mt-3 font-rajdhani text-[clamp(2.2rem,7vw,4.5rem)] font-bold leading-none text-chalk">
+            Your ADITI issues.
+          </h1>
+          <p className="mt-4 max-w-2xl font-plex text-sm leading-7 text-ash">
+            Every issue you own, ready to download any time.
+          </p>
+
+          <div className="mt-7">{libraryPanel}</div>
+
+          {message ? (
+            <p className="mt-5 font-plex text-sm text-ember">{message}</p>
+          ) : null}
+        </section>
+
+        <aside className="account-panel profile-side-panel p-5 md:p-7">
+          <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
+            Your Details
+          </p>
+          <h2 className="mt-2 font-rajdhani text-2xl font-bold leading-none text-chalk">
+            {profile.username}
+          </h2>
+
+          <dl className="profile-summary mt-5">
+            <div className="profile-summary__row">
+              <dt>Email</dt>
+              <dd>{profile.email}</dd>
+            </div>
+            <div className="profile-summary__row">
+              <dt>Phone</dt>
+              <dd>{profile.phone_number}</dd>
+            </div>
+            <div className="profile-summary__row">
+              <dt>Date of birth</dt>
+              <dd>{formatDobLabel(profile.dob)}</dd>
+            </div>
+          </dl>
+
+          <p className="profile-summary__note">
+            These details are locked and used for checkout, receipt email, and
+            magazine access. Contact support to change them.
+          </p>
+
+          <div className="profile-action-grid mt-5">
+            <div className="profile-action-card profile-action-card--status">
+              <span>Profile</span>
+              <b>Locked</b>
+            </div>
+            {upcomingCard}
+          </div>
+
+          <Button
+            asChild
+            variant="ghost"
+            className="mt-5 h-11 w-full rounded-none border border-steel/70 px-5 font-rajdhani text-base font-bold text-chalk hover:border-ember hover:bg-plate hover:text-chalk"
+          >
+            <Link to={checkoutRedirect}>
+              Go to Cart <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+
+          {redirectCountdown !== null ? (
+            <span className="profile-redirect-notice mt-4" role="status" aria-live="polite">
+              <Clock className="size-4" />
+              Redirecting you to the payment page in {redirectCountdown}
+            </span>
+          ) : null}
+        </aside>
+      </div>
+    );
+  }
+
   return (
     <div className="profile-layout grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)]">
       <form className="account-panel profile-card p-5 md:p-7" onSubmit={handleSubmit}>
@@ -463,72 +650,11 @@ function ProfilePanel() {
         <div className="profile-action-grid mt-4">
           <div className="profile-action-card profile-action-card--status">
             <span>Profile</span>
-            <b>{profileLocked ? "Locked" : isComplete ? "Ready" : "Pending"}</b>
+            <b>{isComplete ? "Ready" : "Pending"}</b>
           </div>
-          <Link className="profile-action-card profile-action-card--link" to="/#reserve-content">
-            <span>Upcoming</span>
-            <b>Issue II</b>
-          </Link>
+          {upcomingCard}
         </div>
-        <div className="profile-download-panel mt-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
-                PDF Library
-              </p>
-              <h2 className="mt-2 font-rajdhani text-2xl font-bold leading-none text-chalk">
-                Bought magazines
-              </h2>
-            </div>
-            {hasPendingPurchase ? (
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={recoveryStatus === "checking"}
-                className="h-9 rounded-none border border-ember/50 px-3 font-rajdhani text-sm font-bold text-chalk hover:border-ember hover:bg-plate hover:text-chalk"
-                onClick={() => recoverPendingPayments()}
-              >
-                <RefreshCw className="size-4" />
-                {recoveryStatus === "checking" ? "Checking" : "Verify Payment"}
-              </Button>
-            ) : null}
-          </div>
-          <div className="mt-3 grid gap-3">
-            {magazines.length ? (
-              magazines.map((magazine) => (
-                <div
-                  key={`${magazine.id}-${magazine.razorpay_order_id}`}
-                  className="account-mini-row account-purchase-row profile-library-card"
-                >
-                  <div className="profile-library-copy">
-                    <span className="account-purchase-title">
-                      {magazine.title}
-                    </span>
-                  </div>
-                  {magazine.status === "paid" ? (
-                    <div className="account-download-actions">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="download-action download-action--primary h-auto rounded-none px-4 py-4 font-rajdhani text-base font-bold"
-                        onClick={() => downloadMagazine(magazine)}
-                      >
-                        <span>Download now</span>
-                        <Download className="size-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <b>{magazine.status}</b>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p className="font-plex text-sm text-ash">
-                No paid magazines yet.
-              </p>
-            )}
-          </div>
-        </div>
+        <div className="mt-6">{libraryPanel}</div>
       </aside>
     </div>
   );

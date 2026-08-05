@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { apiRequest, downloadProtectedFile, formatRupees } from "@/lib/api";
+import { MAGAZINE_ISSUES } from "@/data/siteContent";
 
 export default function PaymentSuccessPage() {
   const location = useLocation();
@@ -189,18 +190,39 @@ function PaymentSuccessPanel() {
             {status === "loading" ? (
               <p className="font-plex text-sm text-ash">Preparing downloads...</p>
             ) : purchases.length ? (
-              purchases.map((magazine) => (
-                <Button
-                  key={`${magazine.slug}-${magazine.razorpay_order_id}`}
-                  type="button"
-                  variant="ghost"
-                  className="download-action download-action--primary h-auto w-full rounded-none px-4 py-4 text-left font-rajdhani text-base font-bold"
-                  onClick={() => downloadMagazine(magazine)}
-                >
-                  <span>{magazine.title}</span>
-                  <Download className="size-4" />
-                </Button>
-              ))
+              purchases.map((magazine) => {
+                const issue = MAGAZINE_ISSUES.find(
+                  (entry) => entry.slug === magazine.slug
+                );
+
+                return (
+                  <button
+                    key={`${magazine.slug}-${magazine.razorpay_order_id}`}
+                    type="button"
+                    className="download-card"
+                    onClick={() => downloadMagazine(magazine)}
+                  >
+                    {issue ? (
+                      <img
+                        src={issue.cover}
+                        alt=""
+                        className="download-card__cover"
+                        loading="lazy"
+                      />
+                    ) : null}
+                    <span className="download-card__copy">
+                      <span className="download-card__issue">
+                        {issue?.label ?? "Magazine"}
+                      </span>
+                      <span className="download-card__title">
+                        {issue?.shortTitle ?? magazine.title}
+                      </span>
+                      <span className="download-card__hint">Download PDF</span>
+                    </span>
+                    <Download className="download-card__icon size-5" />
+                  </button>
+                );
+              })
             ) : (
               <p className="font-plex text-sm leading-6 text-ash">
                 No paid magazine was found for this order yet. Your profile will show every paid issue once the payment record is ready.

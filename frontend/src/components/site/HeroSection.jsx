@@ -137,9 +137,10 @@ export default function HeroSection() {
                 <AddToCartButton
                   article={premiumMagazine}
                   stopPropagation={false}
+                  preselect={false}
                   className="hero-issue-button h-12 rounded-full border border-white/15 bg-white/5 px-6 font-rajdhani text-base font-bold uppercase tracking-[0.14em] text-chalk hover:bg-white/10 hover:text-chalk"
                 >
-                  Own Issue I {"\u00B7"} {premiumMagazine.priceLabel}
+                  Own the issue {"\u00B7"} {premiumMagazine.priceLabel}
                 </AddToCartButton>
               ) : null}
             </div>

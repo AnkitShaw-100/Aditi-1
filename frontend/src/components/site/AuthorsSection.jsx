@@ -1,8 +1,16 @@
+import { useState } from "react";
+
 import SectionReveal from "@/components/site/SectionReveal";
 import { AuthorCard, RailCarousel } from "@/components/site/shared";
-import { AUTHORS } from "@/data/siteContent";
+import { AUTHOR_ISSUES } from "@/data/siteContent";
+import { cn } from "@/lib/utils";
 
 export default function AuthorsSection() {
+  const [activeIssueId, setActiveIssueId] = useState(AUTHOR_ISSUES[0].id);
+
+  const activeIssue =
+    AUTHOR_ISSUES.find((issue) => issue.id === activeIssueId) ?? AUTHOR_ISSUES[0];
+
   return (
     <section
       id="authors"
@@ -19,16 +27,49 @@ export default function AuthorsSection() {
                 Read the people who made the decisions.
               </h2>
               <p className="mt-4 max-w-lg font-plex text-base font-light leading-[1.85] text-ash">
-                16 contributors. One issue. India's military leaders, scholars and industry pioneers on space, cyber, aviation and defence technology {" "}&mdash; perspectives you won't find assembled anywhere else
+                {activeIssue.authors.length} contributors. {activeIssue.label}.
+                India's military leaders, scholars and industry pioneers on space,
+                cyber, aviation and defence technology {" "}&mdash; perspectives you
+                won't find assembled anywhere else
               </p>
+
+              <div
+                className="authors-issue-switch"
+                role="tablist"
+                aria-label="Contributors by issue"
+              >
+                {AUTHOR_ISSUES.map((issue) => (
+                  <button
+                    key={issue.id}
+                    type="button"
+                    role="tab"
+                    id={`authors-tab-${issue.id}`}
+                    aria-selected={issue.id === activeIssue.id}
+                    aria-controls={`authors-panel-${issue.id}`}
+                    className={cn(
+                      "authors-issue-switch__button",
+                      issue.id === activeIssue.id && "is-active"
+                    )}
+                    onClick={() => setActiveIssueId(issue.id)}
+                  >
+                    {issue.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="authors-carousel-wrap min-w-0">
+            <div
+              className="authors-carousel-wrap min-w-0"
+              id={`authors-panel-${activeIssue.id}`}
+              role="tabpanel"
+              aria-labelledby={`authors-tab-${activeIssue.id}`}
+            >
               <RailCarousel
-                items={AUTHORS}
+                key={activeIssue.id}
+                items={activeIssue.authors}
                 desktopPageSize={2}
                 mobilePageSize={1}
-                ariaLabel="Contributors carousel"
+                ariaLabel={`${activeIssue.label} contributors carousel`}
                 trackClassName="authors-track"
                 itemClassName="authors-carousel-item"
                 showArrows

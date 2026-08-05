@@ -61,9 +61,10 @@ export default function IssueOfferSection() {
             <AddToCartButton
               article={premiumMagazine}
               stopPropagation={false}
+              preselect={false}
               className="final-button issue-offer-button h-12 w-full rounded-none font-rajdhani text-base font-bold"
             >
-              Own Issue I {"\u00B7"} {premiumMagazine.priceLabel}
+              Choose your issue {"\u00B7"} {premiumMagazine.priceLabel}
             </AddToCartButton>
 
             <p className="issue-offer-footnote">

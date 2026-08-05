@@ -95,6 +95,7 @@ export default function BrandSection() {
                     <AddToCartButton
                       article={premiumMagazine}
                       stopPropagation={false}
+                      preselect={false}
                       className="mt-2 min-h-11 rounded-full bg-ember px-6 py-3 font-rajdhani text-base font-bold text-void transition hover:bg-chalk hover:text-void"
                     >
                       Buy Now

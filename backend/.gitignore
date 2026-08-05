@@ -2,3 +2,7 @@
 .env.*
 storage/cache/*.json
 !storage/cache/.gitkeep
+
+# Magazine PDFs are attached by file, never committed.
+storage/magazines/*
+!storage/magazines/.gitkeep

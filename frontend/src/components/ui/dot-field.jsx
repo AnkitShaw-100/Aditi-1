@@ -155,6 +155,7 @@ const DotField = memo(
     const sizeRef = useRef({ w: 0, h: 0 });
     const propsRef = useRef({});
     const rebuildRef = useRef(null);
+    const exclusionRef = useRef(null);
     const engagement = useRef(0);
 
     propsRef.current = {
@@ -220,6 +221,20 @@ const DotField = memo(
         sizeRef.current = { w, h };
 
         buildDots(w, h);
+        refreshExclusion();
+      }
+
+      // getBoundingClientRect forces a synchronous layout, so this is cached
+      // rather than recomputed inside the animation frame. The rect only moves
+      // when the layout does, and every such change already routes through
+      // doResize via the ResizeObserver below.
+      function refreshExclusion() {
+        const p = propsRef.current;
+        exclusionRef.current = resolveElementExclusion(
+          canvas,
+          p.exclusionSelector,
+          p.exclusionPadding
+        );
       }
 
       function scheduleResize() {
@@ -258,11 +273,13 @@ const DotField = memo(
         const p = propsRef.current;
         const len = dots.length;
         const time = frameCount * 0.02;
-        const exclusion = resolveElementExclusion(
-          canvas,
-          p.exclusionSelector,
-          p.exclusionPadding
-        );
+        // Refreshed on a cadence rather than every frame: the layout read is
+        // the expensive part, and the rect only shifts while content animates.
+        if (frameCount % 5 === 0) {
+          refreshExclusion();
+        }
+
+        const exclusion = exclusionRef.current;
 
         const targetEngagement = Math.min(m.speed / 5, 1);
         // Smooth engagement keeps the field from flickering when the cursor slows.
@@ -356,6 +373,19 @@ const DotField = memo(
       doResize();
       window.addEventListener("resize", scheduleResize);
       window.addEventListener("mousemove", onMouseMove, { passive: true });
+
+      // The host section can change height without the window resizing (an
+      // accordion opening, fonts loading, content swapping). Without this the
+      // grid keeps its old height and stops mid-section with a hard edge.
+      const observer =
+        typeof ResizeObserver === "undefined"
+          ? null
+          : new ResizeObserver(scheduleResize);
+
+      if (observer && canvas.parentElement) {
+        observer.observe(canvas.parentElement);
+      }
+
       rafRef.current = window.requestAnimationFrame(tick);
 
       rebuildRef.current = () => {
@@ -363,12 +393,14 @@ const DotField = memo(
         if (w > 0 && h > 0) {
           buildDots(w, h);
         }
+        refreshExclusion();
       };
 
       return () => {
         window.cancelAnimationFrame(rafRef.current);
         window.clearInterval(speedInterval);
         window.clearTimeout(resizeTimer);
+        observer?.disconnect();
         window.removeEventListener("resize", scheduleResize);
         window.removeEventListener("mousemove", onMouseMove);
       };
