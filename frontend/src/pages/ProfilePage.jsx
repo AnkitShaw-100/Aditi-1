@@ -176,6 +176,7 @@ function ProfilePanel() {
   const [recoveryStatus, setRecoveryStatus] = useState("idle");
   const [autoRecoveryAttempted, setAutoRecoveryAttempted] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [downloadingSlug, setDownloadingSlug] = useState("");
   const [message, setMessage] = useState("");
   const [redirectCountdown, setRedirectCountdown] = useState(null);
   const checkoutRedirect = useMemo(
@@ -348,6 +349,12 @@ function ProfilePanel() {
   }
 
   async function downloadMagazine(magazine) {
+    if (downloadingSlug) {
+      return;
+    }
+
+    setDownloadingSlug(magazine.slug);
+
     try {
       await downloadProtectedFile(
         getToken,
@@ -356,6 +363,8 @@ function ProfilePanel() {
       );
     } catch (error) {
       setMessage(error.message);
+    } finally {
+      setDownloadingSlug("");
     }
   }
 
@@ -390,6 +399,7 @@ function ProfilePanel() {
               (entry) => entry.slug === magazine.slug
             );
             const isPaid = magazine.status === "paid";
+            const isDownloading = downloadingSlug === magazine.slug;
 
             const body = (
               <>
@@ -409,10 +419,20 @@ function ProfilePanel() {
                     {issue?.shortTitle ?? magazine.title}
                   </span>
                   <span className="download-card__hint">
-                    {isPaid ? "Download PDF" : magazine.status}
+                    {!isPaid
+                      ? magazine.status
+                      : isDownloading
+                        ? "Preparing your PDF"
+                        : "Download PDF"}
                   </span>
                 </span>
-                {isPaid ? <Download className="download-card__icon size-5" /> : null}
+                {isPaid ? (
+                  isDownloading ? (
+                    <span className="download-card__spinner" aria-hidden="true" />
+                  ) : (
+                    <Download className="download-card__icon size-5" />
+                  )
+                ) : null}
               </>
             );
 
@@ -421,6 +441,8 @@ function ProfilePanel() {
                 key={`${magazine.id}-${magazine.razorpay_order_id}`}
                 type="button"
                 className="download-card"
+                disabled={Boolean(downloadingSlug)}
+                aria-busy={isDownloading}
                 onClick={() => downloadMagazine(magazine)}
               >
                 {body}
@@ -441,19 +463,12 @@ function ProfilePanel() {
     </div>
   );
 
-  const upcomingCard = (
-    <Link className="profile-action-card profile-action-card--link" to="/#reserve-content">
-      <span>Upcoming</span>
-      <b>Issue II</b>
-    </Link>
-  );
-
   // Saved profiles have nothing left to fill in, so the library leads and the
   // details become a read-only summary beside it.
   if (profileLocked) {
     return (
       <div className="profile-layout grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)]">
-        <section className="account-panel profile-card p-5 md:p-7">
+        <section className="account-panel profile-card profile-library-panel p-5 md:p-7">
           <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
             Your Library
           </p>
@@ -464,14 +479,14 @@ function ProfilePanel() {
             Every issue you own, ready to download any time.
           </p>
 
-          <div className="mt-7">{libraryPanel}</div>
+          {libraryPanel}
 
           {message ? (
             <p className="mt-5 font-plex text-sm text-ember">{message}</p>
           ) : null}
         </section>
 
-        <aside className="account-panel profile-side-panel p-5 md:p-7">
+        <aside className="account-panel profile-side-panel profile-details-panel p-5 md:p-7">
           <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
             Your Details
           </p>
@@ -499,18 +514,10 @@ function ProfilePanel() {
             magazine access. Contact support to change them.
           </p>
 
-          <div className="profile-action-grid mt-5">
-            <div className="profile-action-card profile-action-card--status">
-              <span>Profile</span>
-              <b>Locked</b>
-            </div>
-            {upcomingCard}
-          </div>
-
           <Button
             asChild
             variant="ghost"
-            className="mt-5 h-11 w-full rounded-none border border-steel/70 px-5 font-rajdhani text-base font-bold text-chalk hover:border-ember hover:bg-plate hover:text-chalk"
+            className="profile-details-cta h-11 w-full rounded-none border border-steel/70 px-5 font-rajdhani text-base font-bold text-chalk hover:border-ember hover:bg-plate hover:text-chalk"
           >
             <Link to={checkoutRedirect}>
               Go to Cart <ArrowRight className="size-4" />
@@ -652,7 +659,6 @@ function ProfilePanel() {
             <span>Profile</span>
             <b>{isComplete ? "Ready" : "Pending"}</b>
           </div>
-          {upcomingCard}
         </div>
         <div className="mt-6">{libraryPanel}</div>
       </aside>

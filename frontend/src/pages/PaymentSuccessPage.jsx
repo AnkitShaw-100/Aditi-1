@@ -52,6 +52,7 @@ function PaymentSuccessPanel() {
   const location = useLocation();
   const [profile, setProfile] = useState(null);
   const [status, setStatus] = useState("loading");
+  const [downloadingSlug, setDownloadingSlug] = useState("");
   const [message, setMessage] = useState("");
 
   const savedOrder = useMemo(() => {
@@ -112,6 +113,8 @@ function PaymentSuccessPanel() {
 
   const downloadMagazine = useCallback(
     async (magazine) => {
+      setDownloadingSlug(magazine.slug);
+
       try {
         await downloadProtectedFile(
           getToken,
@@ -120,6 +123,8 @@ function PaymentSuccessPanel() {
         );
       } catch (error) {
         setMessage(error.message);
+      } finally {
+        setDownloadingSlug("");
       }
     },
     [getToken]
@@ -195,11 +200,15 @@ function PaymentSuccessPanel() {
                   (entry) => entry.slug === magazine.slug
                 );
 
+                const isDownloading = downloadingSlug === magazine.slug;
+
                 return (
                   <button
                     key={`${magazine.slug}-${magazine.razorpay_order_id}`}
                     type="button"
                     className="download-card"
+                    disabled={Boolean(downloadingSlug)}
+                    aria-busy={isDownloading}
                     onClick={() => downloadMagazine(magazine)}
                   >
                     {issue ? (
@@ -217,9 +226,15 @@ function PaymentSuccessPanel() {
                       <span className="download-card__title">
                         {issue?.shortTitle ?? magazine.title}
                       </span>
-                      <span className="download-card__hint">Download PDF</span>
+                      <span className="download-card__hint">
+                        {isDownloading ? "Preparing your PDF" : "Download PDF"}
+                      </span>
                     </span>
-                    <Download className="download-card__icon size-5" />
+                    {isDownloading ? (
+                      <span className="download-card__spinner" aria-hidden="true" />
+                    ) : (
+                      <Download className="download-card__icon size-5" />
+                    )}
                   </button>
                 );
               })

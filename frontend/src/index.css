@@ -5264,31 +5264,55 @@ body.menu-open {
   width: 100%;
   align-items: center;
   gap: 0.9rem;
-  border: 1px solid rgba(201, 154, 74, 0.55);
-  background: rgba(201, 154, 74, 0.95);
+  border: 1px solid rgba(242, 234, 218, 0.4);
+  background: #f2eada;
   padding: 0.75rem 0.9rem;
   text-align: left;
   color: #090b08;
   transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
 }
 
-.download-card:hover {
-  border-color: rgba(242, 234, 218, 0.4);
-  background: #f2eada;
+.download-card:hover:not(:disabled) {
+  border-color: rgba(201, 154, 74, 0.55);
+  background: rgba(201, 154, 74, 0.95);
   transform: translateY(-1px);
   box-shadow: 0 1.25rem 2.6rem rgba(0, 0, 0, 0.32);
 }
 
-/* Tiles alternate gold / cream down the list, and each swaps to the other on
-   hover. :nth-child is 1-based, so "even" here is the 2nd, 4th, ... tile. */
-.download-card:nth-child(even) {
-  border-color: rgba(242, 234, 218, 0.4);
-  background: #f2eada;
+/* A 38 MB PDF is fetched whole before the browser saves it, so the tile stays
+   busy for a while. Without this the click looks like it did nothing. */
+.download-card[aria-busy="true"] {
+  background: rgba(242, 234, 218, 0.72);
 }
 
-.download-card:nth-child(even):hover {
-  border-color: rgba(201, 154, 74, 0.55);
-  background: rgba(201, 154, 74, 0.95);
+.download-card:disabled {
+  cursor: default;
+}
+
+.download-card:disabled:not([aria-busy="true"]) {
+  opacity: 0.55;
+}
+
+.download-card__spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  border: 2px solid rgba(9, 11, 8, 0.25);
+  border-top-color: #090b08;
+  border-radius: 999px;
+  animation: download-card-spin 0.7s linear infinite;
+}
+
+@keyframes download-card-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .download-card__spinner {
+    animation-duration: 2s;
+  }
 }
 
 .download-card__cover {
@@ -5336,6 +5360,29 @@ body.menu-open {
   flex-shrink: 0;
 }
 
+/* Locked profile: the library is the only content in this panel, so it sits on
+   the bottom edge instead of floating mid-panel beside the taller sidebar. */
+.profile-library-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-library-panel .profile-download-panel {
+  margin-top: auto;
+  padding-top: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+/* Locked profile sidebar: the CTA sits on the panel's bottom edge rather than
+   floating under the details, since the panel stretches to the library's height. */
+.profile-details-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-details-cta {
+  margin-top: auto !important;
+}
+
 .profile-summary {
   display: grid;
   gap: 0.75rem;
@@ -5369,6 +5416,9 @@ body.menu-open {
 }
 
 .profile-summary__note {
+  /* Keeps a gap above the CTA when the panel is short enough that its auto
+     margin collapses to zero. */
+  margin-bottom: 1.35rem;
   margin-top: 0.9rem;
   font-family: "IBM Plex Sans", sans-serif;
   font-size: 0.78rem;
