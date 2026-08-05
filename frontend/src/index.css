@@ -1789,6 +1789,9 @@ body.menu-open {
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scrollbar-width: none;
+  /* Room for the card's hover lift, which the forced overflow-y would clip. */
+  padding-top: 0.75rem;
+  margin-top: -0.75rem;
   padding-bottom: 0.5rem;
   -webkit-overflow-scrolling: touch;
 }
@@ -3858,6 +3861,11 @@ body.menu-open {
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scrollbar-width: none;
+  /* overflow-x: auto forces the y axis to clip too, so cards that lift on hover
+     lose their top edge. The padding gives them room; the negative margin keeps
+     the rail sitting where it did. */
+  padding-top: 0.75rem;
+  margin-top: -0.75rem;
   padding-bottom: 0.5rem;
 }
 
@@ -4113,6 +4121,9 @@ body.menu-open {
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scrollbar-width: none;
+  /* Room for the card's hover lift, which the forced overflow-y would clip. */
+  padding-top: 0.75rem;
+  margin-top: -0.75rem;
   padding-bottom: 0.5rem;
 }
 
