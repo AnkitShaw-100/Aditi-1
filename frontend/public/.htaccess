@@ -6,6 +6,11 @@ Options -MultiViews
 
   RewriteRule ^favicon\.ico$ /favicon.svg [L]
 
+  # The PHP API lives at backend/public but must answer on /api, because the
+  # router matches routes against REQUEST_URI. This is an internal rewrite, so
+  # REQUEST_URI stays /api/... and the routes still match.
+  RewriteRule ^api(/|$) backend/public/index.php [QSA,L]
+
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
