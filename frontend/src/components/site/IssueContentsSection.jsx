@@ -18,33 +18,31 @@ function issueStats(contributorCount) {
   ];
 }
 
-// Issue II currently mirrors the Issue I copy; only the numbering, the cover and
-// the contributor count change. Swap the strings here once the Issue II
-// editorial copy is final.
-function issueCopy(ordinal, contributors) {
-  return {
-    kicker: `Issue ${ordinal} ${"·"} The Maiden Dispatch`,
-    title: { lead: "Cognitive ", accent: "Dissonance", tail: " in Indian Strategy?" },
-    question:
-      "How does a rising power hold many competing strategic truths at once and still move as one?",
-    body: `As India's power grows, so does the complexity of its choices. Different doctrines, different instincts, different timelines all alive inside the same state at the same moment. Issue ${ordinal} reads that tension across Armament, Doctrine, Initiative, Terrain and Integration and asks the question every maturing power must answer: how do you turn many truths into one clear strategy?`,
-    stats: issueStats(contributors),
-  };
-}
-
 // Newest issue first. Moving "next" walks back through the archive.
 const ISSUES = [
   {
     id: "issue-2",
     ordinal: "II",
     cover: "/article-banners/aditi-strategy-defence-magazine-issue-2-cover.webp",
-    ...issueCopy("II", contributorCount("II")),
+    kicker: `Issue II ${"·"} The Maiden Dispatch`,
+    title: { lead: "Forging the Republic's ", accent: "Power", tail: "" },
+    question:
+      "How does a republic forge enduring power without losing the principles that give it purpose?",
+    body:
+      "As India's ambitions expand, so must the institutions, industries, and ideas that sustain them. Power is not built through military strength alone, but through the steady forging of doctrine, technology, industry, diplomacy, and national resolve. Issue II explores how these elements converge across Armament, Doctrine, Initiative, Terrain, and Integration, asking the defining question of a rising republic: how do you transform national potential into enduring power?",
+    stats: issueStats(contributorCount("II")),
   },
   {
     id: "issue-1",
     ordinal: "I",
     cover: "/article-banners/aditi-strategy-defence-magazine-cover.webp",
-    ...issueCopy("I", contributorCount("I")),
+    kicker: `Issue I ${"·"} The Maiden Dispatch`,
+    title: { lead: "Cognitive ", accent: "Dissonance", tail: " in Indian Strategy?" },
+    question:
+      "How does a rising power hold many competing strategic truths at once and still move as one?",
+    body:
+      "As India's power grows, so does the complexity of its choices. Different doctrines, different instincts, different timelines all alive inside the same state at the same moment. Issue I reads that tension across Armament, Doctrine, Initiative, Terrain and Integration and asks the question every maturing power must answer: how do you turn many truths into one clear strategy?",
+    stats: issueStats(contributorCount("I")),
   },
 ];
 
