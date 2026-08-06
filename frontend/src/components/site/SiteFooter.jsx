@@ -48,7 +48,7 @@ export default function SiteFooter() {
             Current Issue
           </p>
           <p className="mt-4 font-rajdhani text-xl font-bold text-chalk">
-            Volume II, Dispatch Series
+            Volume I, Dispatch Series
           </p>
           <p className="mt-3 font-plex text-sm font-light leading-relaxed text-fog">
             Receive one article at a time. No feed churn. No noise. Just analysis worth keeping.
