@@ -1,0 +1,497 @@
+﻿import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight, Share2 } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+
+import { DISPATCHES } from "@/data/siteContent";
+
+const textFixes = [
+  ["Ã¢â‚¬â€œ", "-"],
+  ["Ã¢â‚¬â€", "-"],
+  ["Ã¢â‚¬Ëœ", "'"],
+  ["Ã¢â‚¬â„¢", "'"],
+  ["Ã¢â‚¬Å“", '"'],
+  ["Ã¢â‚¬Â", '"'],
+  ["Ã¢â‚¬Â¢", "-"],
+  ["ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“", "-"],
+  ["ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â", "-"],
+  ["ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“", "'"],
+  ["ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢", "'"],
+  ["ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ", '"'],
+  ["ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â", '"'],
+  ["ÃƒÂ¢Ã¢â€šÂ¬", '"'],
+  ["Ãƒâ€š", ""],
+  ["ÃƒÆ’Ã‚Â®", "i"],
+  ["ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢", "-"],
+];
+
+function cleanArticleText(value) {
+  return textFixes.reduce((text, [broken, fixed]) => text.replaceAll(broken, fixed), value);
+}
+
+function normalizeFigureCaption(value) {
+  return cleanArticleText(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function splitCaptionPrefix(block, figure) {
+  const caption = cleanArticleText(figure.caption);
+
+  if (!block.startsWith(caption)) {
+    return "";
+  }
+
+  return block.slice(caption.length).trim();
+}
+
+function isFigureMarker(block) {
+  return block.startsWith("[[FIGURE|") && block.endsWith("]]");
+}
+
+function parseFigureMarker(block, slug) {
+  const marker = block.slice("[[FIGURE|".length, -2);
+  const [image, ...captionParts] = marker.split("|");
+
+  return {
+    image: resolveFigureImage(image, slug),
+    caption: captionParts.join("|").trim(),
+  };
+}
+function resolveFigureImage(image, slug) {
+  const value = image.trim().replaceAll("\\", "/");
+
+  // Already an absolute/public path or external URL.
+  if (
+    value.startsWith("/") ||
+    value.startsWith("http://") ||
+    value.startsWith("https://") ||
+    value.startsWith("data:")
+  ) {
+    return value;
+  }
+
+  // New structure:
+  // public/article-doc-assets/<article-slug>/<image>
+  return `/article-doc-assets/${slug}/${value}`;
+}
+
+function isArticleHeading(block) {
+  if (isFigureMarker(block)) {
+    return false;
+  }
+
+  return block.length < 82 && !block.endsWith(".");
+}
+
+function headingId(block, index) {
+  return `${block
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")}-${index}`;
+}
+
+function splitLongParagraph(paragraph) {
+  if (paragraph.length < 760) {
+    return [paragraph];
+  }
+
+  const sentences = paragraph.match(/[^.!?]+[.!?]+["')\]]*|.+$/g) ?? [paragraph];
+  const chunks = [];
+  let current = "";
+
+  sentences.forEach((sentence) => {
+    const next = current ? `${current} ${sentence.trim()}` : sentence.trim();
+
+    if (next.length > 620 && current) {
+      chunks.push(current);
+      current = sentence.trim();
+      return;
+    }
+
+    current = next;
+  });
+
+  if (current) {
+    chunks.push(current);
+  }
+
+  return chunks;
+}
+
+function splitArticleText(value) {
+  const lines = cleanArticleText(value).split(/\r?\n/);
+  const bodyLines = lines.slice(3);
+  const blocks = [];
+  let paragraphLines = [];
+  let previousWasBlank = true;
+
+  const pushParagraph = () => {
+    if (!paragraphLines.length) {
+      return;
+    }
+
+    splitLongParagraph(paragraphLines.join(" ").trim()).forEach((paragraph) => {
+      blocks.push(paragraph);
+    });
+    paragraphLines = [];
+  };
+
+  bodyLines.forEach((line) => {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      pushParagraph();
+      previousWasBlank = true;
+      return;
+    }
+
+    if (isFigureMarker(trimmed)) {
+      pushParagraph();
+      blocks.push(trimmed);
+      previousWasBlank = true;
+      return;
+    }
+
+    const looksLikeHeading =
+      previousWasBlank && trimmed.length < 96 && !/[.!?;:]$/.test(trimmed);
+
+    if (looksLikeHeading) {
+      pushParagraph();
+      blocks.push(trimmed);
+      previousWasBlank = false;
+      return;
+    }
+
+    paragraphLines.push(trimmed);
+    previousWasBlank = false;
+  });
+
+  pushParagraph();
+
+  return blocks.filter(Boolean);
+}
+
+export default function ArticlePage() {
+  const { slug } = useParams();
+  const article = useMemo(
+    () => DISPATCHES.find((item) => item.type === "free" && item.slug === slug),
+    [slug]
+  );
+  const [content, setContent] = useState([]);
+  const [status, setStatus] = useState("loading");
+  const [message, setMessage] = useState("");
+  const [readingProgress, setReadingProgress] = useState(0);
+  const freeArticles = useMemo(
+    () => DISPATCHES.filter((item) => item.type === "free"),
+    []
+  );
+  const relatedArticles = useMemo(() => {
+    if (!article) {
+      return [];
+    }
+
+    const currentIndex = freeArticles.findIndex((item) => item.slug === article.slug);
+    const nextArticle = freeArticles[(currentIndex + 1) % freeArticles.length];
+    const sameCategory = freeArticles.filter(
+      (item) => item.slug !== article.slug && item.tag === article.tag
+    );
+    const fallback = freeArticles.filter(
+      (item) => item.slug !== article.slug && item.slug !== nextArticle?.slug
+    );
+
+    const seen = new Set([article.slug]);
+
+    return [nextArticle, ...sameCategory, ...fallback]
+      .filter(Boolean)
+      .filter((item) => {
+        if (seen.has(item.slug)) {
+          return false;
+        }
+
+        seen.add(item.slug);
+        return true;
+      })
+      .slice(0, 3);
+  }, [article, freeArticles]);
+  const tableOfContents = useMemo(
+    () =>
+      content
+        .map((block, index) =>
+          isArticleHeading(block)
+            ? {
+                id: headingId(block, index),
+                title: block,
+              }
+            : null
+        )
+        .filter(Boolean),
+    [content]
+  );
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [slug]);
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollable =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      setReadingProgress(scrollable > 0 ? Math.min(100, (scrollTop / scrollable) * 100) : 0);
+    };
+
+    updateProgress();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+
+    return () => {
+      window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("resize", updateProgress);
+    };
+  }, [slug]);
+
+  useEffect(() => {
+    if (!article?.contentPath) {
+      return undefined;
+    }
+
+    const controller = new AbortController();
+
+    async function loadArticle() {
+      setStatus("loading");
+      setMessage("");
+
+      try {
+        const response = await fetch(article.contentPath, { signal: controller.signal });
+
+        if (!response.ok) {
+          throw new Error("Unable to load article");
+        }
+
+        const text = await response.text();
+        const blocks = splitArticleText(text);
+
+        setContent(blocks);
+        setStatus("ready");
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          setMessage(error.message);
+          setStatus("error");
+        }
+      }
+    }
+
+    loadArticle();
+
+    return () => controller.abort();
+  }, [article]);
+
+  async function shareArticle() {
+    const shareUrl = window.location.href;
+
+    if (navigator.share) {
+      await navigator.share({
+        title: article.title,
+        text: article.teaser,
+        url: shareUrl,
+      });
+      return;
+    }
+
+    await navigator.clipboard?.writeText(shareUrl);
+  }
+
+  if (!article) {
+    return (
+      <section className="article-reader-page min-h-screen px-4 pb-16 pt-28 md:px-8">
+        <div className="mx-auto max-w-3xl">
+          <div className="article-reader-panel p-6 md:p-8">
+            <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
+              Article
+            </p>
+            <h1 className="mt-3 font-rajdhani text-4xl font-bold leading-none text-chalk">
+              Article not found.
+            </h1>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="article-reader-page min-h-screen px-4 pb-16 pt-24 md:px-8">
+      <div className="article-progress-bar" aria-hidden="true">
+        <span style={{ width: `${readingProgress}%` }} />
+      </div>
+      <div className="mx-auto max-w-7xl">
+        <article className="article-reader-panel overflow-hidden">
+          <header
+            className="article-reader-hero"
+            style={{ "--article-hero-image": `url(${article.image})` }}
+          >
+            <div className="article-reader-hero__content">
+              <div className="article-reader-meta">
+                <span>{article.tag}</span>
+                <span>{article.readTime}</span>
+              </div>
+              <h1 className="mt-5 font-rajdhani text-[clamp(2.4rem,6.6vw,5.35rem)] font-bold leading-[0.95] text-chalk">
+                {article.title}
+              </h1>
+              <p className="article-reader-deck">
+                {article.teaser}
+              </p>
+              <p className="article-reader-byline">
+                by {article.author}
+              </p>
+            </div>
+            <div className="article-reader-hero__image" aria-hidden="true" />
+          </header>
+
+          <div className="article-reader-layout">
+            <aside className="article-side-panel" aria-label="Article tools">
+              <Link to="/#read" className="article-side-link">
+                <ArrowLeft className="size-4" />
+                Articles
+              </Link>
+              <div className="article-side-card">
+                <p className="article-side-kicker">Brief</p>
+                <dl>
+                  <div>
+                    <dt>Category</dt>
+                    <dd>{article.tag}</dd>
+                  </div>
+                  <div>
+                    <dt>Read Time</dt>
+                    <dd>{article.readTime}</dd>
+                  </div>
+                  <div>
+                    <dt>Author</dt>
+                    <dd>{article.author}</dd>
+                  </div>
+                </dl>
+                <button
+                  type="button"
+                  className="article-share-button"
+                  onClick={() => {
+                    shareArticle().catch(() => {});
+                  }}
+                >
+                  <Share2 className="size-4" />
+                  Share
+                </button>
+              </div>
+              {tableOfContents.length ? (
+                <nav className="article-toc" aria-label="Article sections">
+                  <p className="article-side-kicker">In This Article</p>
+                  {tableOfContents.map((item) => (
+                    <a key={item.id} href={`#${item.id}`}>
+                      {item.title}
+                    </a>
+                  ))}
+                </nav>
+              ) : null}
+            </aside>
+
+            <div className="article-reader-body">
+              {status === "loading" ? (
+                <p className="font-plex text-sm text-ash">Loading article...</p>
+              ) : null}
+
+              {status === "error" ? (
+                <p className="font-plex text-sm text-ember">{message}</p>
+              ) : null}
+
+              {status === "ready" && content.length
+                ? (() => {
+                    let paragraphIndex = 0;
+
+                    return content.map((block, index) => {
+                      if (isFigureMarker(block)) {
+                        const figure = parseFigureMarker(block, slug);
+
+                        return (
+                          <figure key={`${figure.image}-${index}`} className="article-reader-figure">
+                            <img src={figure.image} alt={figure.caption} loading="lazy" />
+                            {figure.caption ? <figcaption>{figure.caption}</figcaption> : null}
+                          </figure>
+                        );
+                      }
+
+                      const normalizedBlock = normalizeFigureCaption(block);
+                      const figure = figures.find((item) =>
+                        normalizedBlock.startsWith(normalizeFigureCaption(item.caption))
+                      );
+
+                      if (figure) {
+                        const remainingText = splitCaptionPrefix(block, figure);
+
+                        return (
+                          <div key={`${figure.image}-${index}`} className="article-figure-block">
+                            <figure className="article-reader-figure">
+                              <img src={figure.image} alt={figure.caption} loading="lazy" />
+                              <figcaption>{figure.caption}</figcaption>
+                            </figure>
+                            {remainingText ? <p>{remainingText}</p> : null}
+                          </div>
+                        );
+                      }
+
+                      if (isArticleHeading(block)) {
+                        return (
+                          <h2 id={headingId(block, index)} key={`${block}-${index}`}>
+                            {block}
+                          </h2>
+                        );
+                      }
+
+                      paragraphIndex += 1;
+
+                      return (
+                        <p
+                          key={`${block.slice(0, 40)}-${index}`}
+                          className={paragraphIndex === 1 ? "article-lede" : undefined}
+                        >
+                          {block}
+                        </p>
+                      );
+                    });
+                  })()
+                : null}
+            </div>
+          </div>
+
+          {relatedArticles.length ? (
+            <section className="article-related" aria-label="Related articles">
+              <div>
+                <p className="article-side-kicker">Keep Reading</p>
+                <h2>Related Articles</h2>
+              </div>
+              <div className="article-related-grid">
+                {relatedArticles.map((item, index) => (
+                  <Link
+                    key={item.slug}
+                    to={item.href}
+                    className={index === 0 ? "article-related-card article-related-card--next" : "article-related-card"}
+                  >
+                    <div className="article-related-card__media" aria-hidden="true">
+                      <img src={item.image} alt="" loading="lazy" />
+                    </div>
+                    <span>{index === 0 ? "Next Article" : item.tag}</span>
+                    <b>{item.title}</b>
+                    <small>{item.readTime}</small>
+                    <ArrowRight className="size-4" />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </article>
+      </div>
+    </section>
+  );
+}
+
+
+

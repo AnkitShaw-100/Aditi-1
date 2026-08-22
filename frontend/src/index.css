@@ -373,6 +373,7 @@
   pointer-events: none;
 }
 
+
 .purchase-popup__close {
   position: absolute;
   top: 0.55rem;
@@ -810,7 +811,9 @@
     align-items: flex-end !important;
     justify-content: flex-start;
     padding-top: 5rem;
-    padding-bottom: max(1.15rem, env(safe-area-inset-bottom));
+    /* Leave room for the scroll cue pinned to the bottom of the hero,
+       which otherwise sits on top of the last CTA. */
+    padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2.15rem));
   }
 
   .hero-editorial-copy {
@@ -1394,21 +1397,154 @@ body.menu-open {
   align-items: center;
 }
 
-.issue-contents-cover {
+.issue-contents-book-wrap {
+  perspective: 1600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.issue-book-3d {
   position: relative;
-  width: min(100%, 28rem);
-  margin: 0 auto;
-  padding: clamp(0.45rem, 1vw, 0.65rem);
-  border: 1px solid rgba(242, 234, 218, 0.22);
-  background: rgba(242, 234, 218, 0.92);
-  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.32);
+  width: min(100%, 24rem);
+  aspect-ratio: 4 / 5.2;
+  transform: none;
+  animation: none;
+  transition: transform 300ms ease;
 }
 
-.issue-contents-cover__image {
-  display: block;
-  aspect-ratio: 4 / 5.1;
+.issue-book-3d:hover {
+  transform: translateY(-2px);
+}
+
+.issue-book-cover,
+.issue-book-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #111;
+  backface-visibility: hidden;
+}
+
+
+.issue-book-cover__image {
   width: 100%;
+  height: 100%;
   object-fit: cover;
+  display: block;
+  transform: scale(1.01);
+}
+
+.issue-book-back {
+  background: linear-gradient(180deg, #1b2017, #090b08);
+  transform: rotateY(180deg) translateZ(12px);
+}
+
+.issue-book-pages {
+  display: none;
+}
+
+.issue-book-cover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 0;
+  z-index: 3;
+  transform: none;
+  background: #efe8db;
+  border: 14px solid #efe8db;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+..issue-book-pages {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  right: -1px;
+  width: 14px;
+  z-index: 2;
+  transform: translateZ(2px);
+}
+
+.issue-book-pages span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  background: linear-gradient(
+    to right,
+    #f8f5ed,
+    #ece4d5,
+    #d9cfbe
+  );
+  border-left: 1px solid rgba(0,0,0,0.08);
+  border-radius: 0 4px 4px 0;
+  box-shadow: inset 0 0 1px rgba(255,255,255,0.8);
+}
+
+.issue-book-pages span:nth-child(1) {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.issue-book-pages span:nth-child(2) {
+  transform: translateX(2px);
+  opacity: 0.85;
+}
+
+.issue-book-pages span:nth-child(3) {
+  transform: translateX(4px);
+  opacity: 0.7;
+}
+
+.issue-book-pages span:nth-child(1) {
+  transform: translateX(0);
+  opacity: 0.9;
+}
+
+.issue-book-pages span:nth-child(2) {
+  transform: translateX(1px);
+  opacity: 0.7;
+}
+
+.issue-book-pages span:nth-child(3) {
+  transform: translateX(2px);
+  opacity: 0.5;
+}
+
+.issue-book-3d::after {
+  display: none;
+}
+@keyframes bookFloat {
+  0%, 100% {
+    transform: rotateY(-12deg) rotateX(3deg) translateY(0);
+  }
+  50% {
+    transform: rotateY(-10deg) rotateX(2deg) translateY(-10px);
+  }
+}
+
+.issue-book-cover,
+.issue-contents-copy {
+  animation: issue-contents-swap 0.45s ease both;
+}
+
+@keyframes bookFlipIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .issue-book-3d {
+    width: min(100%, 18rem);
+    transform: none;
+  }
 }
 
 .issue-contents-copy {
@@ -1589,19 +1725,35 @@ body.menu-open {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .issue-contents-cover__image,
+  .issue-book-3d,
+  .issue-book-cover,
   .issue-contents-copy {
-    animation: none;
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
   }
 }
 
 @media (min-width: 1024px) {
   .issue-contents-layout {
-    grid-template-columns: minmax(19rem, 0.84fr) minmax(0, 1.16fr);
+    grid-template-columns: minmax(20rem, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
   }
 
-  .issue-contents-cover {
+  .issue-contents-book-wrap {
     justify-self: center;
+  }
+
+  .issue-book-3d {
+    width: 27rem;
+  }
+}
+
+/* Wide desktops: the left grid column is ~33rem here, so the cover was
+   sitting small inside a lot of empty space. Let it use that room. */
+@media (min-width: 1280px) {
+  .issue-book-3d {
+    width: 31rem;
   }
 }
 
@@ -1826,6 +1978,43 @@ body.menu-open {
 .authors-card-head {
   min-height: 8.75rem;
   align-items: center;
+}
+
+/* Two cards share the rail at ~391px each, which is where the longest
+   name (66 chars) and rank (120 chars) wrap hardest. The old 8.75rem floor
+   was shorter than that worst case, so each header sized to its own text
+   and the "Highlighted expertise" divider landed at a different height on
+   every card. This floor clears the longest pair, so every divider aligns. */
+@media (min-width: 1024px) {
+  /* Tighter name/rank type fits the longest credentials in fewer lines, so
+     the space the header has to reserve for them drops from 11.5rem to
+     8.5rem - same aligned divider, far less empty card. */
+  .authors-card-head {
+    min-height: 8.5rem;
+    align-items: flex-start;
+    padding-top: 0.2rem;
+  }
+
+  .authors-card-name {
+    font-size: 1.1rem;
+    line-height: 1.2;
+  }
+
+  .authors-card-identity > p {
+    margin-top: 0.4rem;
+    font-size: 0.72rem !important;
+    line-height: 1.45 !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  /* Longest expertise line is three rows; 5.75rem reserved a fourth. */
+  .authors-card-specialty {
+    min-height: 5rem;
+  }
+
+  .authors-card-body {
+    min-height: 13.5rem;
+  }
 }
 
 .authors-card-identity {
@@ -2494,8 +2683,10 @@ body.menu-open {
 
 .framework-title {
   max-width: 18ch;
-  font-size: clamp(2.65rem, 4.2vw, 4.25rem);
-  line-height: 1.04;
+  /* Was clamp(2.65rem, 4.2vw, 4.25rem) - up to 68px, which dwarfed
+     everything else in the panel. */
+  font-size: clamp(2.1rem, 3.05vw, 3.05rem);
+  line-height: 1.06;
   letter-spacing: 0;
 }
 
@@ -2880,13 +3071,86 @@ body.menu-open {
     min-height: 14rem;
   }
 }
+/* =========================================================
+   ADITI MAGAZINE — BASE SECTION
+   ========================================================= */
 
-.book-section {
+.book-section,
+.bookflip2-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
   background:
-    radial-gradient(circle at 18% 12%, rgba(201, 154, 74, 0.12), transparent 20rem),
-    radial-gradient(circle at 82% 20%, rgba(128, 135, 83, 0.1), transparent 18rem),
-    linear-gradient(180deg, #0b0e09 0%, #161c14 100%);
+    radial-gradient(
+      circle at 18% 12%,
+      rgba(201, 154, 74, 0.12),
+      transparent 20rem
+    ),
+    radial-gradient(
+      circle at 82% 20%,
+      rgba(128, 135, 83, 0.1),
+      transparent 18rem
+    ),
+    linear-gradient(
+      180deg,
+      #080b07 0%,
+      #10150f 52%,
+      #080b07 100%
+    );
 }
+
+/* Ambient background */
+.bookflip2-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(201, 154, 74, 0.055),
+      transparent 32rem
+    ),
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.018) 50%,
+      transparent 100%
+    );
+}
+
+/* Cinematic center glow */
+.bookflip2-section::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  z-index: -1;
+
+  width: min(75vw, 900px);
+  height: min(75vw, 900px);
+
+  transform: translate(-50%, -50%);
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(201, 154, 74, 0.08) 0%,
+      rgba(201, 154, 74, 0.035) 30%,
+      transparent 68%
+    );
+
+  filter: blur(25px);
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   OLD BOOK LAYOUT SUPPORT
+   ========================================================= */
 
 .book-shell {
   display: grid;
@@ -2911,6 +3175,7 @@ body.menu-open {
 .book-viewport {
   display: flex;
   justify-content: center;
+  align-items: center;
   perspective: 2400px;
 }
 
@@ -2923,6 +3188,7 @@ body.menu-open {
   width: min(100%, 40rem);
   aspect-ratio: 0.8;
   margin-inline: auto;
+
   perspective: 2400px;
   transform-style: preserve-3d;
 }
@@ -2931,27 +3197,51 @@ body.menu-open {
   content: "";
   position: absolute;
   inset: 6% 8%;
+
   border-radius: 2rem;
+
   background:
-    radial-gradient(circle at 50% 48%, rgba(201, 154, 74, 0.2), transparent 42%),
-    radial-gradient(circle at 50% 48%, rgba(0, 0, 0, 0.2), transparent 62%);
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(201, 154, 74, 0.2),
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(0, 0, 0, 0.3),
+      transparent 62%
+    );
+
   filter: blur(30px);
   opacity: 0.7;
+
   transform: translateZ(-1px);
 }
 
 .book__page {
   position: absolute;
   inset: 0;
+
   overflow: hidden;
+
   border: 1px solid rgba(242, 234, 218, 0.16);
   border-radius: 1.3rem;
+
   background:
-    linear-gradient(145deg, rgba(18, 21, 15, 0.98), rgba(9, 11, 8, 0.97));
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+    linear-gradient(
+      145deg,
+      rgba(18, 21, 15, 0.98),
+      rgba(9, 11, 8, 0.97)
+    );
+
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.32);
+
   transform-style: preserve-3d;
   transform-origin: left center;
+
   will-change: transform, opacity;
+
   transition:
     transform 1.4s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1),
@@ -2962,26 +3252,50 @@ body.menu-open {
   content: "";
   position: absolute;
   inset: 0;
+
   background:
-    linear-gradient(180deg, rgba(242, 234, 218, 0.03), transparent 26%),
-    linear-gradient(90deg, rgba(242, 234, 218, 0.04), transparent 12%, transparent 88%, rgba(242, 234, 218, 0.03));
+    linear-gradient(
+      180deg,
+      rgba(242, 234, 218, 0.03),
+      transparent 26%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(242, 234, 218, 0.04),
+      transparent 12%,
+      transparent 88%,
+      rgba(242, 234, 218, 0.03)
+    );
+
   pointer-events: none;
 }
 
 .book__page[data-state="0"] {
-  transform: translate3d(0, 0, 0) rotateY(0deg) scale(1);
+  transform:
+    translate3d(0, 0, 0)
+    rotateY(0deg)
+    scale(1);
+
   opacity: 1;
   z-index: 3;
 }
 
 .book__page[data-state="1"] {
-  transform: translate3d(1rem, -0.6rem, 0) rotateY(-18deg) scale(0.99);
+  transform:
+    translate3d(1rem, -0.6rem, 0)
+    rotateY(-18deg)
+    scale(0.99);
+
   opacity: 0.82;
   z-index: 2;
 }
 
 .book__page[data-state="2"] {
-  transform: translate3d(0.4rem, 0, 0) rotateY(-180deg) scale(0.99);
+  transform:
+    translate3d(0.4rem, 0, 0)
+    rotateY(-180deg)
+    scale(0.99);
+
   opacity: 0.95;
   z-index: 1;
 }
@@ -2989,15 +3303,19 @@ body.menu-open {
 .book__page-inner {
   position: absolute;
   inset: 0;
+
   width: 100%;
   height: 100%;
+
   transform-style: preserve-3d;
 }
 
 .book__face {
   position: absolute;
   inset: 0;
+
   overflow: hidden;
+
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -3008,8 +3326,13 @@ body.menu-open {
 
 .book__face--back {
   transform: rotateY(180deg);
+
   background:
-    linear-gradient(145deg, rgba(22, 25, 18, 0.98), rgba(10, 12, 8, 0.98));
+    linear-gradient(
+      145deg,
+      rgba(22, 25, 18, 0.98),
+      rgba(10, 12, 8, 0.98)
+    );
 }
 
 .book-cover-sheet,
@@ -3027,21 +3350,38 @@ body.menu-open {
 .book-cover-image {
   width: 100%;
   height: 100%;
+
   border-radius: 1rem;
+
   object-fit: cover;
   display: block;
-  filter: saturate(0.95) contrast(1.04);
+
+  filter:
+    saturate(0.95)
+    contrast(1.04);
 }
 
 .book-cover-overlay {
   position: absolute;
+
   left: 1rem;
   right: 1rem;
   bottom: 1rem;
+
   padding: 1.15rem 1.2rem 1rem;
-  border: 1px solid rgba(242, 234, 218, 0.16);
+
+  border:
+    1px solid rgba(242, 234, 218, 0.16);
+
   border-radius: 1rem;
-  background: linear-gradient(180deg, rgba(9, 11, 8, 0.14), rgba(9, 11, 8, 0.84));
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(9, 11, 8, 0.14),
+      rgba(9, 11, 8, 0.84)
+    );
+
   backdrop-filter: blur(6px);
 }
 
@@ -3073,8 +3413,12 @@ body.menu-open {
 
 .page__content-blockquote {
   padding: 1rem 1.1rem;
-  border-left: 2px solid #c99a4a;
-  background: rgba(201, 154, 74, 0.06);
+
+  border-left:
+    2px solid #c99a4a;
+
+  background:
+    rgba(201, 154, 74, 0.06);
 }
 
 .page__content-blockquote-text {
@@ -3088,8 +3432,12 @@ body.menu-open {
 .book-side-image {
   width: 100%;
   aspect-ratio: 0.92;
-  border: 1px solid rgba(242, 234, 218, 0.14);
+
+  border:
+    1px solid rgba(242, 234, 218, 0.14);
+
   border-radius: 1rem;
+
   object-fit: cover;
   display: block;
 }
@@ -3111,12 +3459,15 @@ body.menu-open {
 
 .book__number {
   position: absolute;
+
   right: 1rem;
   bottom: 0.9rem;
+
   font-family: "Rajdhani", sans-serif;
   font-size: clamp(1.2rem, 2.6vw, 1.75rem);
   font-weight: 700;
   line-height: 1;
+
   color: rgba(242, 234, 218, 0.36);
 }
 
@@ -3129,8 +3480,11 @@ body.menu-open {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 1rem;
+
   padding-bottom: 0.85rem;
-  border-bottom: 1px solid rgba(168, 170, 157, 0.18);
+
+  border-bottom:
+    1px solid rgba(168, 170, 157, 0.18);
 }
 
 .book-contents-row span {
@@ -3142,9 +3496,11 @@ body.menu-open {
 
 .book-contents-row b {
   display: block;
+
   font-family: "Rajdhani", sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
+
   color: #f2eada;
 }
 
@@ -3152,15 +3508,23 @@ body.menu-open {
   display: grid;
   gap: 1rem;
   align-items: end;
+
   margin-top: auto;
-  grid-template-columns: minmax(0, 1fr) 7.5rem;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    7.5rem;
 }
 
 .book-contents-image {
   width: 100%;
   aspect-ratio: 1;
-  border: 1px solid rgba(242, 234, 218, 0.14);
+
+  border:
+    1px solid rgba(242, 234, 218, 0.14);
+
   border-radius: 1rem;
+
   object-fit: cover;
   display: block;
 }
@@ -3169,266 +3533,557 @@ body.menu-open {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
   gap: 1rem;
+
   padding: clamp(1.15rem, 2.8vw, 2rem);
 }
 
-/* react-pageflip showcase */
-.bookflip2-section {
-  background:
-    radial-gradient(circle at 18% 12%, rgba(201, 154, 74, 0.12), transparent 20rem),
-    radial-gradient(circle at 82% 20%, rgba(128, 135, 83, 0.1), transparent 18rem),
-    linear-gradient(180deg, #0b0e09 0%, #161c14 100%);
-}
 
-.bookflip2-section--placeholder {
-  min-height: clamp(34rem, 78vw, 54rem);
-}
+/* =========================================================
+   PAGEFLIP STAGE
+   ========================================================= */
 
 .pageflip-stage {
+  position: relative;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: clamp(0.5rem, 2vw, 1rem);
+
   width: 100%;
+
   min-height: 0;
+
+  padding:
+    clamp(2rem, 5vw, 4rem)
+    0;
+
+  perspective: 2200px;
+  perspective-origin: 50% 48%;
+
+  isolation: isolate;
 }
 
+/*
+  Soft floor/glow behind the magazine
+*/
+.pageflip-stage::before {
+  content: "";
+  position: absolute;
+
+  left: 50%;
+  bottom: 7%;
+
+  width: min(70vw, 720px);
+  height: 100px;
+
+  transform:
+    translateX(-50%)
+    rotateX(70deg);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(0, 0, 0, 0.8),
+      rgba(0, 0, 0, 0.35) 45%,
+      transparent 72%
+    );
+
+  filter: blur(20px);
+
+  pointer-events: none;
+  z-index: -1;
+}
+
+/*
+  Warm light behind the magazine
+*/
+.pageflip-stage::after {
+  content: "";
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: min(65vw, 700px);
+  height: min(65vw, 700px);
+
+  transform:
+    translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(201, 154, 74, 0.11),
+      transparent 66%
+    );
+
+  filter: blur(35px);
+
+  pointer-events: none;
+  z-index: -2;
+}
+
+
+/* =========================================================
+   SHELL
+   ========================================================= */
+
 .pageflip-shell {
+  position: relative;
+
   display: flex;
+
   width: 100%;
   max-width: 100%;
+
   align-items: center;
   justify-content: center;
+
   gap: clamp(0.75rem, 2vw, 1.5rem);
+
+  transform-style: preserve-3d;
 }
 
 .pageflip-shell__center {
   display: flex;
+
   align-items: center;
   justify-content: center;
-  gap: clamp(0.75rem, 2vw, 1.5rem);
+
+  width: 100%;
   max-width: 100%;
+
   flex: 1;
+
+  transform-style: preserve-3d;
+
+  perspective: 2200px;
 }
 
 .pageflip-shell__book-wrap {
   position: relative;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   flex-shrink: 0;
+
   width: min(100%, var(--book-w));
-  transform: none;
+
+  margin-inline: auto;
+
+  transform-style: preserve-3d;
+
+  transform:
+    translateZ(0)
+    rotateX(0.8deg)
+    rotateY(0deg);
+
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.6s ease;
 }
 
-.pageflip-guide {
-  display: flex;
-  flex-shrink: 0;
-  flex-direction: column;
-  width: min(24rem, 32vw);
-  padding: clamp(1rem, 2vw, 1.35rem);
-  border: 1px dashed rgba(201, 154, 74, 0.38);
-  border-radius: 0.85rem;
-  background: linear-gradient(155deg, rgba(255, 247, 224, 0.12), rgba(245, 222, 166, 0.08));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  opacity: 1;
-  transition: opacity 0.4s ease, transform 0.4s ease, width 0.4s ease, margin 0.4s ease;
+
+/* =========================================================
+   BOOK SHADOW
+   ========================================================= */
+
+.pageflip-shell__book-wrap::before {
+  content: "";
+
+  position: absolute;
+
+  left: 5%;
+  right: 5%;
+
+  bottom: -7%;
+
+  height: 14%;
+
+  z-index: -2;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(0, 0, 0, 0.88),
+      transparent 70%
+    );
+
+  filter: blur(18px);
+
+  transform:
+    translateZ(-30px)
+    rotateX(65deg);
+
+  opacity: 0.72;
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
 }
 
-.pageflip-guide--hidden {
-  width: 0 !important;
-  margin: 0;
-  padding: 0;
-  border-width: 0;
-  opacity: 0;
-  overflow: hidden;
+
+/* =========================================================
+   MAGAZINE GLOW
+   ========================================================= */
+
+.pageflip-shell__book-wrap::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 4%;
+
+  z-index: -3;
+
+  border-radius: 1.5rem;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(201, 154, 74, 0.18),
+      rgba(201, 154, 74, 0.04) 45%,
+      transparent 72%
+    );
+
+  filter: blur(28px);
+
+  opacity: 0.6;
+
+  transform:
+    translateZ(-45px);
+
   pointer-events: none;
 }
 
-.pageflip-book {
-  touch-action: pan-y;
-  overscroll-behavior: contain;
-  user-select: none;
-  border-radius: 0;
-  overflow: hidden;
-  margin-inline: auto;
-  transform: translateZ(0);
-  will-change: transform;
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+.pageflip-shell__book-wrap:hover {
+  transform:
+    translateY(-6px)
+    translateZ(12px)
+    rotateX(0deg)
+    rotateY(0deg);
+
+  filter: brightness(1.035);
 }
+
+.pageflip-shell__book-wrap:hover::before {
+  opacity: 0.9;
+
+  transform:
+    translateZ(-40px)
+    rotateX(65deg)
+    scale(1.04);
+}
+
+/* =========================================================
+   REACT PAGEFLIP BOOK
+   ========================================================= */
+.pageflip-book {
+  position: relative;
+  touch-action: auto;
+  overscroll-behavior: auto;
+  user-select: none;
+  margin-inline: auto;
+  border-radius: 0.8rem;
+  overflow: visible;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  transform: translateZ(8px);
+  will-change: transform;
+
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.18),
+    0 24px 55px rgba(0, 0, 0, 0.32),
+    0 45px 90px rgba(0, 0, 0, 0.22);
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
 
 .pageflip-page {
+  position: relative;
+
   overflow: hidden;
-  border: 1px solid rgba(242, 234, 218, 0.16);
-  border-radius: 0;
+
+  border:
+    1px solid rgba(242, 234, 218, 0.18);
+
+  border-radius: 0.2rem;
+
   background:
-    linear-gradient(145deg, rgba(18, 21, 15, 0.98), rgba(9, 11, 8, 0.97));
+    linear-gradient(
+      145deg,
+      #171a13,
+      #0b0d09
+    );
+
   color: #f2eada;
+
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  transform-style: preserve-3d;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+    3px 0 0 rgba(0, 0, 0, 0.14),
+    7px 0 0 rgba(0, 0, 0, 0.08);
 }
 
-.pageflip-page-inner {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  padding: 0;
-  border-radius: 0;
-  overflow: hidden;
+
+/*
+  Page light/reflection
+*/
+.pageflip-page::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 5;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.055),
+      transparent 7%,
+      transparent 92%,
+      rgba(0, 0, 0, 0.12)
+    );
+
+  opacity: 0.65;
+
+  mix-blend-mode: screen;
 }
+
+
+/*
+  Page edge
+*/
+.pageflip-page::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.18),
+    rgba(255,255,255,0.04),
+    rgba(0,0,0,0.22)
+  );
+  opacity: 0.35;
+}
+
+
+/* =========================================================
+   PAGE INNER
+   ========================================================= */
+
+.pageflip-page-inner {
+  position: relative;
+
+  display: flex;
+
+  width: 100%;
+  height: 100%;
+
+  flex-direction: column;
+
+  padding: 0;
+
+  overflow: hidden;
+
+  border-radius: 0.15rem;
+
+  transform-style: preserve-3d;
+}
+
+
+/* =========================================================
+   PAGE IMAGE
+   ========================================================= */
 
 .pageflip-page-image {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
+
   display: block;
+
+  margin: 0;
+  padding: 0;
+
   background: transparent;
+
   border-radius: 0;
-  transform: translateZ(0);
+
+  transform:
+    translateZ(1px);
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  user-select: none;
+  -webkit-user-drag: none;
 }
+
+
+/* =========================================================
+   COVER
+   ========================================================= */
+
+.pageflip-cover {
+  background: #090b08 !important;
+}
+
+.pageflip-cover .pageflip-page-inner {
+  background: #090b08;
+}
+
+.pageflip-cover .pageflip-page-image {
+  object-fit: cover;
+
+  filter:
+    saturate(0.98)
+    contrast(1.035)
+    brightness(1.015);
+}
+
+
+/* =========================================================
+   BACK COVER
+   ========================================================= */
+
+.pageflip-back-cover {
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(201, 154, 74, 0.09),
+      transparent 45%
+    ),
+    linear-gradient(
+      145deg,
+      #171a13,
+      #080a07
+    ) !important;
+}
+
+.pageflip-back-cover__inner {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 2rem;
+}
+
+.pageflip-back-cover__logo {
+  font-family: "Rajdhani", sans-serif;
+
+  font-size: clamp(3rem, 8vw, 5rem);
+
+  font-weight: 700;
+
+  letter-spacing: 0.18em;
+
+  color: #c99a4a;
+
+  text-shadow:
+    0 0 30px rgba(201, 154, 74, 0.18);
+}
+
+.pageflip-back-cover__copy {
+  margin-top: 0.7rem;
+
+  font-family: "IBM Plex Sans", sans-serif;
+
+  font-size: 0.75rem;
+
+  letter-spacing: 0.22em;
+
+  text-transform: uppercase;
+
+  color: rgba(216, 210, 192, 0.65);
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
 
 .pageflip-footer {
+  position: relative;
+
   width: 100%;
   max-width: 22rem;
+
   margin-inline: auto;
-}
-
-.pageflip-end-cta {
-  position: fixed;
-  right: clamp(1rem, 2.5vw, 2rem);
-  bottom: clamp(1rem, 2.5vw, 2rem);
-  z-index: 70;
-  width: min(22rem, calc(100vw - 2rem));
-  overflow: hidden;
-  border: 1px solid rgba(201, 154, 74, 0.5);
-  border-radius: 1.35rem;
-  background:
-    radial-gradient(circle at 12% 0%, rgba(201, 154, 74, 0.1), transparent 13rem),
-    rgba(9, 11, 8, 0.9);
-  padding: 1.35rem;
-  color: #f2eada;
-  box-shadow:
-    0 22px 70px rgba(0, 0, 0, 0.52),
-    inset 0 1px 0 rgba(242, 234, 218, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.pageflip-end-cta::before {
-  content: "";
-  position: absolute;
-  inset: 0.5rem;
-  pointer-events: none;
-  border: 1px solid rgba(242, 234, 218, 0.06);
-  border-radius: 1rem;
-}
-
-.pageflip-end-cta::after {
-  content: "";
-  position: absolute;
-  top: 0.85rem;
-  left: 1.35rem;
-  width: 3.4rem;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #c99a4a, rgba(201, 154, 74, 0));
-}
-
-.pageflip-end-cta__close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  display: grid;
-  width: 2.1rem;
-  height: 2.1rem;
-  place-items: center;
-  border: 1px solid rgba(242, 234, 218, 0.12);
-  border-radius: 999px;
-  background: rgba(242, 234, 218, 0.045);
-  color: #f2eada;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
-}
-
-.pageflip-end-cta__close:hover {
-  border-color: rgba(201, 154, 74, 0.65);
-  background: rgba(201, 154, 74, 0.12);
-  color: #ddb255;
-}
-
-.pageflip-end-cta__eyebrow {
-  margin-top: 0.35rem;
-  padding-right: 2rem;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #c99a4a;
-}
-
-.pageflip-end-cta h3 {
-  margin-top: 0.55rem;
-  font-family: "Rajdhani", sans-serif;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: 0;
-}
-
-.pageflip-end-cta p:not(.pageflip-end-cta__eyebrow) {
-  max-width: 17.5rem;
-  margin-top: 0.8rem;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 0.92rem;
-  line-height: 1.65;
-  color: rgba(216, 210, 192, 0.78);
-}
-
-.pageflip-end-cta__button {
-  margin-top: 1.1rem;
-  min-height: 3rem;
-  width: 100%;
-  justify-content: center;
-  border-radius: 999px;
-  border: 1px solid rgba(242, 234, 218, 0.18);
-  background: linear-gradient(135deg, #ddb255, #c99a4a);
-  color: #090b08;
-  font-family: "Rajdhani", sans-serif;
-  font-size: 0.98rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  box-shadow: 0 12px 30px rgba(201, 154, 74, 0.26);
-}
-
-.pageflip-end-cta__button:hover {
-  background: linear-gradient(135deg, #e6bf6a, #d5a451);
-  color: #090b08;
 }
 
 .pageflip-progress {
   display: grid;
+
   gap: 0.55rem;
+
   width: 100%;
+
   text-align: center;
 }
 
 .pageflip-progress-track {
+  width: 100%;
+
   height: 3px;
-  border-radius: 999px;
-  background: rgba(168, 170, 157, 0.2);
+
   overflow: hidden;
+
+  border-radius: 999px;
+
+  background:
+    rgba(168, 170, 157, 0.2);
 }
 
 .pageflip-progress-fill {
   height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #c99a4a, #ddb255);
-  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
 
-.pageflip-mobile-controls {
-  width: 100%;
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #c99a4a,
+      #ddb255
+    );
+
+  transition:
+    width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .pageflip-controls {
@@ -3436,70 +4091,639 @@ body.menu-open {
   max-width: 22rem;
 }
 
+
+/* =========================================================
+   END CTA
+   ========================================================= */
+
+.pageflip-end-cta {
+  position: fixed;
+
+  right: clamp(1rem, 2.5vw, 2rem);
+  bottom: clamp(1rem, 2.5vw, 2rem);
+
+  z-index: 70;
+
+  width:
+    min(
+      22rem,
+      calc(100vw - 2rem)
+    );
+
+  overflow: hidden;
+
+  border:
+    1px solid rgba(201, 154, 74, 0.5);
+
+  border-radius: 1.35rem;
+
+  background:
+    radial-gradient(
+      circle at 12% 0%,
+      rgba(201, 154, 74, 0.1),
+      transparent 13rem
+    ),
+    rgba(9, 11, 8, 0.92);
+
+  padding: 1.35rem;
+
+  color: #f2eada;
+
+  box-shadow:
+    0 22px 70px rgba(0, 0, 0, 0.52),
+    inset 0 1px 0 rgba(242, 234, 218, 0.08);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.pageflip-end-cta::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0.5rem;
+
+  pointer-events: none;
+
+  border:
+    1px solid rgba(242, 234, 218, 0.06);
+
+  border-radius: 1rem;
+}
+
+.pageflip-end-cta::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0.85rem;
+  left: 1.35rem;
+
+  width: 3.4rem;
+  height: 2px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #c99a4a,
+      rgba(201, 154, 74, 0)
+    );
+}
+
+.pageflip-end-cta__close {
+  position: absolute;
+
+  top: 0.75rem;
+  right: 0.75rem;
+
+  display: grid;
+
+  width: 2.1rem;
+  height: 2.1rem;
+
+  place-items: center;
+
+  border:
+    1px solid rgba(242, 234, 218, 0.12);
+
+  border-radius: 999px;
+
+  background:
+    rgba(242, 234, 218, 0.045);
+
+  color: #f2eada;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.pageflip-end-cta__close:hover {
+  border-color:
+    rgba(201, 154, 74, 0.65);
+
+  background:
+    rgba(201, 154, 74, 0.12);
+
+  color: #ddb255;
+}
+
+.pageflip-end-cta__eyebrow {
+  margin-top: 0.35rem;
+
+  padding-right: 2rem;
+
+  font-family: "IBM Plex Sans", sans-serif;
+
+  font-size: 0.72rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+
+  color: #c99a4a;
+}
+
+.pageflip-end-cta h3 {
+  margin-top: 0.55rem;
+
+  font-family: "Rajdhani", sans-serif;
+
+  font-size: 2rem;
+
+  font-weight: 700;
+
+  line-height: 0.95;
+}
+
+.pageflip-end-cta p:not(.pageflip-end-cta__eyebrow) {
+  max-width: 17.5rem;
+
+  margin-top: 0.8rem;
+
+  font-family: "IBM Plex Sans", sans-serif;
+
+  font-size: 0.92rem;
+
+  line-height: 1.65;
+
+  color:
+    rgba(216, 210, 192, 0.78);
+}
+
+.pageflip-end-cta__button {
+  margin-top: 1.1rem;
+
+  min-height: 3rem;
+
+  width: 100%;
+
+  justify-content: center;
+
+  border:
+    1px solid rgba(242, 234, 218, 0.18);
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ddb255,
+      #c99a4a
+    );
+
+  color: #090b08;
+
+  font-family: "Rajdhani", sans-serif;
+
+  font-size: 0.98rem;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.14em;
+
+  box-shadow:
+    0 12px 30px rgba(201, 154, 74, 0.26);
+}
+
+.pageflip-end-cta__button:hover {
+  background:
+    linear-gradient(
+      135deg,
+      #e6bf6a,
+      #d5a451
+    );
+
+  color: #090b08;
+}
+
+
+/* =========================================================
+   MOBILE MAGAZINE
+   ========================================================= */
+
 .mobile-magazine-viewer {
   display: flex;
+
   justify-content: center;
+
   width: 100%;
-  max-width: min(100%, 21.5rem);
+
+  max-width:
+    min(
+      100%,
+      21.5rem
+    );
+
   margin-inline: auto;
 }
 
 .mobile-magazine-viewer__frame {
   position: relative;
+
   width: 100%;
+
   aspect-ratio: 510 / 660;
+
   overflow: hidden;
+
   isolation: isolate;
+
   contain: layout paint;
-  border-radius: 0;
-  border: 1px solid rgba(242, 234, 218, 0.16);
-  background: linear-gradient(145deg, rgba(18, 21, 15, 0.98), rgba(9, 11, 8, 0.97));
-  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.35);
+
+  border:
+    1px solid rgba(242, 234, 218, 0.16);
+
+  background:
+    linear-gradient(
+      145deg,
+      #12150f,
+      #090b08
+    );
+
+  box-shadow:
+    0 22px 55px rgba(0, 0, 0, 0.35);
 }
 
-.mobile-magazine-viewer__track {
-  display: flex;
+.mobile-magazine-page {
+  position: absolute;
+
+  inset: 0;
+
   width: 100%;
   height: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  overscroll-behavior-x: contain;
-  overscroll-behavior-y: auto;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x pinch-zoom;
-  scrollbar-width: none;
+
+  transform:
+    translateX(0)
+    scale(1);
+
+  opacity: 1;
+
+  animation:
+    mobile-page-enter 0.48s
+    cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.mobile-magazine-viewer__track::-webkit-scrollbar {
-  display: none;
+.mobile-magazine-page[data-direction="next"] {
+  animation-name:
+    mobile-page-next;
 }
 
-.mobile-magazine-hint {
+.mobile-magazine-page[data-direction="prev"] {
+  animation-name:
+    mobile-page-prev;
+}
+
+.mobile-magazine-page__inner {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+}
+
+.mobile-magazine-page__image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+
+  user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+
+/* =========================================================
+   MOBILE ANIMATION
+   ========================================================= */
+
+@keyframes mobile-page-next {
+  from {
+    opacity: 0;
+    transform:
+      translateX(12%)
+      rotateY(-8deg)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateX(0)
+      rotateY(0)
+      scale(1);
+  }
+}
+
+@keyframes mobile-page-prev {
+  from {
+    opacity: 0;
+    transform:
+      translateX(-12%)
+      rotateY(8deg)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateX(0)
+      rotateY(0)
+      scale(1);
+  }
+}
+
+
+/* =========================================================
+   MARQUEE
+   ========================================================= */
+
+.marquee-band {
+  position: relative;
+
+  overflow: hidden;
+
+  border-top:
+    1px solid rgba(168, 170, 157, 0.16);
+
+  border-bottom:
+    1px solid rgba(168, 170, 157, 0.16);
+
+  background:
+    #080b07;
+
+  padding-block: 0.75rem;
+}
+
+.marquee-track {
+  width: max-content;
+
+  animation:
+    marquee-scroll 30s
+    linear infinite;
+}
+
+.marquee-track__item {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+
+/* =========================================================
+   TRUE POPUP MODE
+   ---------------------------------------------------------
+   If the parent receives .magazine-popup-open,
+   this turns the magazine into a centered modal.
+   ========================================================= */
+
+.magazine-popup-open {
+  position: fixed !important;
+
+  inset: 0 !important;
+
+  z-index: 9999 !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
+
+  padding:
+    clamp(1rem, 4vw, 3rem) !important;
+
+  overflow: hidden !important;
+
+  background:
+    rgba(3, 5, 3, 0.94) !important;
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.magazine-popup-open::before {
+  content: "";
+
   position: absolute;
-  bottom: 0.85rem;
-  left: 50%;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  border: 1px solid rgba(201, 154, 74, 0.35);
-  background: rgba(9, 11, 8, 0.82);
-  padding: 0.45rem 0.85rem;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #d8d2c0;
-  backdrop-filter: blur(8px);
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(201, 154, 74, 0.09),
+      transparent 48%
+    );
+
   pointer-events: none;
-  animation: mobile-hint-fade 4s ease-in-out infinite;
 }
 
+.magazine-popup-open::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 1rem;
+
+  border:
+    1px solid rgba(242, 234, 218, 0.06);
+
+  border-radius: 1.5rem;
+
+  pointer-events: none;
+}
+
+.magazine-popup-open .pageflip-stage {
+  width: auto;
+
+  min-width: 0;
+
+  padding: 0;
+
+  z-index: 2;
+}
+
+.magazine-popup-open .pageflip-shell {
+  width: auto;
+}
+
+.magazine-popup-open .pageflip-shell__center {
+  width: auto;
+}
+
+.magazine-popup-open .pageflip-shell__book-wrap {
+  width: var(--book-w);
+
+  max-width: calc(100vw - 2rem);
+
+  max-height: calc(100vh - 4rem);
+
+  transform:
+    translateZ(0)
+    rotateX(0)
+    rotateY(0);
+}
+
+.magazine-popup-open .pageflip-shell__book-wrap::before {
+  bottom: -8%;
+
+  opacity: 0.9;
+}
+
+.magazine-popup-open .pageflip-shell__book-wrap::after {
+  opacity: 0.85;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 767px) {
+  .pageflip-stage {
+    padding:
+      1.25rem
+      0
+      1.5rem;
+  }
+
+  .pageflip-shell {
+    gap: 0;
+  }
+
+  .pageflip-shell__book-wrap {
+    width:
+      min(
+        calc(100vw - 3rem),
+        var(--book-w)
+      );
+
+    transform:
+      rotateX(0)
+      rotateY(0)
+      translateZ(0);
+  }
+
+  .pageflip-shell__book-wrap:hover {
+    transform:
+      translateY(-3px)
+      translateZ(5px);
+  }
+
+  .pageflip-book {
+    box-shadow:
+      0 8px 20px rgba(0, 0, 0, 0.3),
+      0 25px 55px rgba(0, 0, 0, 0.38);
+  }
+
+  .pageflip-controls {
+    max-width: 20rem;
+  }
+
+  .pageflip-end-cta {
+    right: 0.75rem;
+    bottom: 0.75rem;
+
+    width:
+      calc(100vw - 1.5rem);
+  }
+
+  .magazine-popup-open {
+    padding: 0.75rem !important;
+  }
+
+  .magazine-popup-open .pageflip-shell__book-wrap {
+    width:
+      min(
+        calc(100vw - 1.5rem),
+        var(--book-w)
+      );
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .pageflip-shell {
+    gap: 1rem;
+  }
+
+  .pageflip-shell__book-wrap {
+    transform:
+      rotateX(0.5deg)
+      rotateY(0deg);
+  }
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+   ========================================================= */
+
+@media (min-width: 1200px) {
+  .pageflip-stage {
+    padding-block: 3rem;
+  }
+
+  .pageflip-shell__book-wrap {
+    transform:
+      rotateX(0.8deg)
+      rotateY(0deg)
+      translateZ(4px);
+  }
+
+  .pageflip-shell__book-wrap:hover {
+    transform:
+      translateY(-8px)
+      translateZ(18px)
+      rotateX(0deg)
+      rotateY(0deg);
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .pageflip-shell__book-wrap,
+  .pageflip-shell__book-wrap::before,
+  .pageflip-shell__book-wrap::after,
+  .pageflip-progress-fill,
+  .mobile-magazine-page,
+  .marquee-track {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 @keyframes mobile-hint-fade {
   0%,
   100% {
@@ -3617,12 +4841,31 @@ body.menu-open {
     aspect-ratio: 510 / 660;
   }
 
-  .pageflip-shell__book-wrap {
-    width: 100%;
-    max-width: min(calc(100vw - 2rem), 23.25rem);
-    transform: none;
-    margin-inline: auto;
-  }
+.pageflip-shell__book-wrap {
+  width: 100%;
+  max-width: min(calc(100vw - 2rem), 23.25rem);
+  margin-inline: auto;
+
+  transform:
+    rotateX(0.5deg)
+    rotateY(-1deg)
+    translateZ(0);
+}
+
+.pageflip-shell__book-wrap:hover {
+  transform:
+    translateY(-3px)
+    translateZ(8px);
+}
+
+.pageflip-shell__book-wrap::before {
+  bottom: -4%;
+  filter: blur(16px);
+}
+
+.pageflip-shell__book-wrap::after {
+  filter: blur(24px);
+}
 
   .pageflip-page-inner {
     padding: 0;
@@ -3686,13 +4929,15 @@ body.menu-open {
 
   .marquee-band {
     padding-inline: 0;
+    /* The band read as a thin hairline on phones; give it real height. */
+    padding-block: 1.05rem;
   }
 
   .marquee-band .marquee-track {
-    gap: 1.5rem;
-    font-size: clamp(0.72rem, 3vw, 0.9rem) !important;
-    letter-spacing: 0.12em;
-    line-height: 1;
+    gap: 1.9rem;
+    font-size: clamp(0.85rem, 3.6vw, 1.02rem) !important;
+    letter-spacing: 0.14em;
+    line-height: 1.15;
   }
 
   .marquee-track__item {
@@ -3891,6 +5136,21 @@ body.menu-open {
   display: none;
 }
 
+/* Dispatch cards all take the height of the tallest card in the row, so a
+   shorter teaser or a one-line byline no longer leaves a card stubby. */
+.read-section .dispatch-track {
+  align-items: stretch;
+}
+
+.read-section .dispatch-track > .shrink-0 {
+  display: flex;
+}
+
+.read-section .dispatch-track > .shrink-0 > .article-card {
+  flex: 1 1 auto;
+  height: 100%;
+}
+
 .dispatch-track .article-card {
   flex: 0 0 100%;
   scroll-snap-align: start;
@@ -3904,16 +5164,93 @@ body.menu-open {
   gap: 0.65rem;
   margin-top: 1.35rem;
 }
-
 .carousel-arrows {
+  position: absolute;
+  top: 50%;
+  left: -2.75rem;
+  right: -2.75rem;
+  z-index: 10;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+/* =========================================================
+   AUTHORS CAROUSEL — KEEP ARROWS OUTSIDE CARDS
+   ========================================================= */
+
+.authors-carousel-arrows {
+  position: absolute;
+  top: 50%;
+  left: -3.25rem;
+  right: 0.75rem;
+  bottom: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  transform: translateY(-50%);
+  z-index: 20;
   pointer-events: none;
 }
 
-.carousel-arrows .carousel-arrow {
+.authors-carousel-arrows .carousel-arrow {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
   pointer-events: auto;
+}
+
+
+/* =========================================================
+   TABLET / MAC
+   ========================================================= */
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .authors-carousel-arrows {
+    left: -2.4rem;
+    right: 0.6rem;
+  }
+
+  .authors-carousel-arrows .carousel-arrow {
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+  .authors-carousel-arrows {
+    left: 0.35rem;
+    right: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .authors-carousel-arrows .carousel-arrow {
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+}
+
+.carousel-arrow-side {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  pointer-events: none;
+}
+
+.carousel-arrow-side .carousel-arrow {
+  pointer-events: auto;
+}
+
+.carousel-arrows .carousel-arrow {
   border-color: rgba(201, 154, 74, 0.72) !important;
   background: rgba(9, 11, 8, 0.94) !important;
   color: #c99a4a !important;
@@ -3943,17 +5280,9 @@ body.menu-open {
   position: relative;
   width: 100%;
   min-width: 0;
+  overflow: visible;
 }
 
-.authors-carousel-arrows,
-.dispatch-carousel-arrows,
-.feedback-carousel-arrows {
-  position: absolute;
-  inset-inline: clamp(0.45rem, 1.2vw, 0.9rem);
-  top: calc(50% - 1rem);
-  z-index: 6;
-  transform: translateY(-50%);
-}
 
 .carousel-dot {
   width: 0.65rem;
@@ -4143,10 +5472,6 @@ body.menu-open {
   margin-top: clamp(1.4rem, 3vw, 2.25rem);
 }
 
-.feedback-carousel-arrows {
-  justify-content: space-between;
-  margin: 0;
-}
 
 .feedback-carousel-arrows .carousel-arrow {
   width: 2.75rem;
@@ -4162,6 +5487,28 @@ body.menu-open {
   border-color: rgba(242, 234, 218, 0.82);
   background: #c99a4a;
   color: #090b08;
+}
+.feedback-carousel-arrows {
+  position: absolute;
+  top: 50%;
+  left: -3.25rem;
+  right: -3.25rem;
+  bottom: auto;
+
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.feedback-carousel-arrows .carousel-arrow {
+  pointer-events: auto;
+  flex: 0 0 auto;
 }
 
 .feedback-carousel-dots {
@@ -4563,9 +5910,11 @@ body.menu-open {
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
-  width: fit-content;
-  min-width: 14rem;
-  height: 3.4rem;
+  /* Sits directly under the email input, so it matches its width and
+     height instead of hanging left at its own intrinsic size. */
+  width: 100%;
+  min-width: 0;
+  height: 3.75rem;
   border: 0;
   border-radius: 0;
   background: #c99a4a;
@@ -4652,11 +6001,6 @@ body.menu-open {
   .reserve-card {
     padding: 1.2rem;
   }
-
-  .reserve-button {
-    width: 100%;
-    min-width: 0;
-  }
 }
 
 .final-button {
@@ -4730,11 +6074,9 @@ body.menu-open {
 
 .site-footer {
   background: linear-gradient(135deg, #090b08, #151a13) !important;
-  border-top-color: rgba(242, 234, 218, 0.9) !important;
-}
-
-.site-footer>div:last-child {
-  border-top-color: rgba(201, 154, 74, 0.42) !important;
+  /* The override here was rgba(242, 234, 218, 0.9) - a near-white rule that
+     read far brighter than every other section divider. The element already
+     carries `border-t border-steel`, so dropping it matches the rest. */
 }
 
 .site-footer a:hover {
@@ -5931,7 +7273,7 @@ body.menu-open {
   display: flex;
   flex-direction: column;
   min-height: 430px;
-  box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.08), 0 18px 45px rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.08);
 }
 
 .article-card a,
@@ -6083,7 +7425,7 @@ body.menu-open {
   align-items: center;
   width: min(100%, 41rem);
   margin: 0 auto;
-  padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 3rem) clamp(2rem, 5vw, 3rem);
+  padding: clamp(1.75rem, 3vw, 2.25rem) clamp(1.25rem, 5vw, 3rem) clamp(1.35rem, 2.5vw, 1.75rem);
   border: 1px solid rgba(201, 154, 74, 0.72);
   background:
     radial-gradient(circle at 50% 0%, rgba(201, 154, 74, 0.1), transparent 22rem),
@@ -6115,19 +7457,28 @@ body.menu-open {
 }
 
 .issue-offer-price span {
-  margin-top: 0.5rem;
+  margin-top: 0.32rem;
   font-family: "Rajdhani", sans-serif;
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-size: clamp(1rem, 2vw, 1.2rem);
   font-weight: 700;
   color: #c99a4a;
 }
 
+/* The cover is the product; the price supports it rather than shouting
+   over it, so this sits well below its old clamp(3.6rem, 12vw, 5.35rem). */
 .issue-offer-price strong {
   font-family: "Rajdhani", sans-serif;
-  font-size: clamp(3.6rem, 12vw, 5.35rem);
+  font-size: clamp(2.4rem, 6.5vw, 3.3rem);
   font-weight: 700;
-  line-height: 0.88;
+  line-height: 0.9;
   letter-spacing: 0;
+}
+
+.issue-offer-cover-frame {
+  border-radius: 2px;
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(201, 154, 74, 0.22);
 }
 
 .issue-offer-card h3 {
@@ -6140,7 +7491,7 @@ body.menu-open {
 }
 
 .issue-offer-subtitle {
-  margin-top: 1.2rem;
+  margin-top: 0.7rem;
   font-family: "Lora", serif;
   font-size: 0.9rem;
   line-height: 1.7;
@@ -6150,10 +7501,10 @@ body.menu-open {
 
 .issue-offer-list {
   display: grid;
-  gap: 1rem;
+  gap: 0.65rem;
   width: min(100%, 31rem);
-  margin-top: clamp(1.8rem, 4vw, 2.6rem);
-  margin-bottom: clamp(1.8rem, 4vw, 2.5rem);
+  margin-top: clamp(1.1rem, 2.4vw, 1.45rem);
+  margin-bottom: clamp(1.1rem, 2.4vw, 1.45rem);
 }
 
 .issue-offer-list li {
@@ -6162,8 +7513,8 @@ body.menu-open {
   gap: 0.8rem;
   align-items: start;
   font-family: "Lora", serif;
-  font-size: 0.92rem;
-  line-height: 1.6;
+  font-size: 0.88rem;
+  line-height: 1.5;
   color: #f2eada;
 }
 
@@ -6180,7 +7531,7 @@ body.menu-open {
 }
 
 .issue-offer-footnote {
-  margin-top: 1.2rem;
+  margin-top: 0.75rem;
   font-family: "IBM Plex Sans", sans-serif;
   font-size: 0.66rem;
   font-weight: 500;
@@ -6217,11 +7568,13 @@ body.menu-open {
     margin: 0;
   }
 
-  .authors-carousel-arrows,
-  .dispatch-carousel-arrows,
-  .feedback-carousel-arrows {
-    inset-inline: 0.65rem;
-  }
+.feedback-carousel-arrows {
+  left: -2.65rem;
+  right: -2.65rem;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
 
   .dispatch-track {
     gap: 0.9rem;
@@ -6236,7 +7589,7 @@ body.menu-open {
     flex-basis: auto;
     min-height: 390px;
     border-radius: 0.85rem;
-    box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.07), 0 14px 34px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.07);
   }
 
   .article-card>.relative {
@@ -6375,18 +7728,19 @@ body.menu-open {
   color: #c99a4a;
 }
 
-.article-reader-meta span + span::before {
-  content: none;
-}
-
 .article-reader-meta span {
   display: inline-flex;
-  min-height: 1.8rem;
   align-items: center;
-  border: 1px solid rgba(201, 154, 74, 0.24);
-  border-radius: 999px;
-  background: rgba(201, 154, 74, 0.075);
-  padding: 0 0.72rem;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+/* A rule and a mid-dot read as a journal standfirst; pills read as UI. */
+.article-reader-meta span + span::before {
+  content: "·";
+  margin: 0 0.6rem;
+  color: rgba(201, 154, 74, 0.6);
 }
 
 .article-reader-hero h1 {
@@ -6433,10 +7787,28 @@ body.menu-open {
 
 .article-reader-layout {
   display: grid;
-  grid-template-columns: minmax(10rem, 14rem) minmax(0, 45rem) minmax(0, 14rem);
-  gap: clamp(1.5rem, 4vw, 3rem);
+  grid-template-columns: minmax(0, 47rem);
+  justify-content: center;
+  column-gap: clamp(2rem, 3.6vw, 3.75rem);
   align-items: start;
-  margin-top: clamp(2.25rem, 5vw, 4rem);
+  margin-top: clamp(2.25rem, 5vw, 3.5rem);
+}
+
+@media (min-width: 1180px) {
+  .article-reader-layout.has-contents {
+    grid-template-columns: minmax(0, 47rem) minmax(0, 21rem);
+  }
+
+  /* Two items, one row: the article column and the rail. Nothing spans
+     rows, so a tall rail can no longer stretch the rows above it. */
+  .article-reader-layout.has-contents > .article-main {
+    grid-column: 1;
+  }
+
+  .article-reader-layout.has-contents > .article-rail {
+    grid-column: 2;
+    align-self: start;
+  }
 }
 
 .article-side-panel {
@@ -6529,8 +7901,8 @@ body.menu-open {
 
 .article-reader-body {
   position: relative;
-  max-width: 45rem;
-  grid-column: 2;
+  max-width: none;
+  grid-column: 1;
   margin-inline: 0;
   margin-top: 0;
   border: 0;
@@ -6546,43 +7918,58 @@ body.menu-open {
 
 .article-reader-body p {
   font-family: "Lora", serif;
-  color: rgba(242, 234, 218, 0.9);
-  font-size: clamp(1.03rem, 1.25vw, 1.13rem);
-  line-height: 1.92;
-  letter-spacing: 0;
+  color: rgba(242, 234, 218, 0.88);
+  font-size: clamp(1.05rem, 1.15vw, 1.15rem);
+  line-height: 1.75;
+  letter-spacing: 0.001em;
 }
 
 .article-reader-body .article-lede {
-  font-size: clamp(1.08rem, 1.35vw, 1.18rem);
-  line-height: 1.92;
+  font-size: clamp(1.1rem, 1.25vw, 1.19rem);
+  line-height: 1.72;
   color: #f2eada;
 }
 
 .article-reader-body .article-lede::first-letter {
   float: left;
-  margin: 0.1rem 0.55rem 0 0;
+  margin: 0.5rem 0.75rem 0 0;
   font-family: "Rajdhani", sans-serif;
-  font-size: 4.4rem;
+  font-size: 3.9rem;
   font-weight: 700;
-  line-height: 0.78;
+  line-height: 0.68;
   color: #c99a4a;
 }
 
 .article-reader-body p + p {
-  margin-top: 1.45rem;
+  margin-top: 1.3rem;
+}
+
+.article-reader-body p,
+.article-reader-body h2 {
+  text-wrap: pretty;
 }
 
 .article-reader-body h2 {
-  margin-top: clamp(2rem, 4vw, 2.8rem);
-  margin-bottom: 0.9rem;
-  border-top: 1px solid rgba(168, 170, 157, 0.18);
-  padding-top: clamp(1.35rem, 3vw, 2rem);
+  margin-top: clamp(2.6rem, 4.5vw, 3.4rem);
+  margin-bottom: 1rem;
+  border-top: 0;
+  padding-top: 0;
   font-family: "Rajdhani", sans-serif;
   color: #f2eada;
-  font-size: clamp(1.55rem, 3vw, 2.1rem);
+  font-size: clamp(1.5rem, 2.4vw, 1.85rem);
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.12;
+  letter-spacing: 0.005em;
   scroll-margin-top: 6rem;
+}
+
+.article-reader-body h2::before {
+  content: "";
+  display: block;
+  width: 2.25rem;
+  height: 2px;
+  margin-bottom: 0.95rem;
+  background: #c99a4a;
 }
 
 .article-reader-figure {
@@ -6596,7 +7983,7 @@ body.menu-open {
 .article-reader-figure img {
   display: block;
   width: 100%;
-  max-height: 36rem;
+  max-height: 40rem;
   object-fit: contain;
   background: rgba(242, 234, 218, 0.92);
   border: 1px solid rgba(168, 170, 157, 0.2);
@@ -7003,3 +8390,1237 @@ body.menu-open {
     transition: none;
   }
 }
+
+/* =========================================================
+   MAGAZINE POPUP
+   ========================================================= */
+
+.magazine-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: clamp(1rem, 3vw, 2rem);
+
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(201, 154, 74, 0.08),
+      transparent 45%
+    ),
+    rgba(3, 5, 3, 0.92);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  animation: magazine-modal-in 0.35s ease both;
+}
+
+.magazine-modal__backdrop {
+  position: absolute;
+  inset: 0;
+
+  background: transparent;
+
+  border: 0;
+  padding: 0;
+
+  cursor: zoom-out;
+}
+
+.magazine-modal__content {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: min(
+    94vw,
+    calc(var(--book-w) + 7rem)
+  );
+
+  max-width: 1200px;
+  max-height: 94vh;
+
+  padding: clamp(1rem, 2vw, 2rem);
+
+  border: 1px solid rgba(242, 234, 218, 0.14);
+  border-radius: 1.5rem;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(201, 154, 74, 0.08),
+      transparent 42%
+    ),
+    rgba(9, 11, 8, 0.82);
+
+  box-shadow:
+    0 35px 100px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  transform-style: preserve-3d;
+  perspective: 1800px;
+
+  animation: magazine-modal-content-in 0.45s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+.magazine-modal__book {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  max-height: calc(94vh - 4rem);
+
+  transform-style: preserve-3d;
+}
+
+.magazine-modal__close {
+  position: absolute;
+
+  top: 0.75rem;
+  right: 0.75rem;
+
+  z-index: 20;
+
+  display: grid;
+  place-items: center;
+
+  width: 2.75rem;
+  height: 2.75rem;
+
+  border: 1px solid rgba(242, 234, 218, 0.16);
+  border-radius: 999px;
+
+  background: rgba(9, 11, 8, 0.78);
+
+  color: #f2eada;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.magazine-modal__close:hover {
+  border-color: rgba(201, 154, 74, 0.6);
+  background: rgba(201, 154, 74, 0.12);
+
+  transform: rotate(90deg);
+}
+
+@keyframes magazine-modal-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes magazine-modal-content-in {
+  from {
+    opacity: 0;
+    transform:
+      translateY(24px)
+      scale(0.94)
+      rotateX(4deg);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1)
+      rotateX(0);
+  }
+}
+
+/* =========================================================
+   RAIL CAROUSEL — FINAL RESPONSIVE ARROW + CARD LAYOUT
+   Keep this block at the very end of index.css so it wins over
+   earlier carousel rules without changing the component markup.
+   ========================================================= */
+
+.rail-carousel {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.carousel-arrows,
+.authors-carousel-arrows,
+.feedback-carousel-arrows {
+  position: absolute !important;
+  top: 50% !important;
+  bottom: auto !important;
+  left: -3.25rem !important;
+  right: -3.25rem !important;
+  z-index: 20 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  transform: translateY(-50%) !important;
+  pointer-events: none !important;
+}
+
+.carousel-arrows .carousel-arrow,
+.authors-carousel-arrows .carousel-arrow,
+.feedback-carousel-arrows .carousel-arrow {
+  flex: 0 0 auto !important;
+  pointer-events: auto !important;
+  box-sizing: border-box;
+}
+
+.carousel-arrows .carousel-arrow,
+.authors-carousel-arrows .carousel-arrow {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+.feedback-carousel-arrows .carousel-arrow {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+}
+
+.carousel-arrows .carousel-arrow,
+.dispatch-carousel-arrows .carousel-arrow,
+.authors-carousel-arrows .carousel-arrow,
+.feedback-carousel-arrows .carousel-arrow {
+  border-color: rgba(201, 154, 74, 0.72) !important;
+  background: rgba(9, 11, 8, 0.94) !important;
+  color: #c99a4a !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42);
+}
+
+.carousel-arrows .carousel-arrow:hover,
+.dispatch-carousel-arrows .carousel-arrow:hover,
+.authors-carousel-arrows .carousel-arrow:hover,
+.feedback-carousel-arrows .carousel-arrow:hover {
+  border-color: rgba(242, 234, 218, 0.82) !important;
+  background: #c99a4a !important;
+  color: #090b08 !important;
+}
+
+.carousel-arrow-spacer {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* ---------------------------------------------------------
+   Laptop / Mac / Tablet
+   Give the carousel track its own side breathing room.
+   This makes the cards slightly narrower and creates a real
+   gap between the card edge and each arrow.
+   --------------------------------------------------------- */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .rail-carousel {
+    padding-inline: 1.5rem;
+  }
+
+  .carousel-arrows,
+  .authors-carousel-arrows,
+  .feedback-carousel-arrows {
+    left: -1.5rem !important;
+    right: -1.5rem !important;
+  }
+
+  .carousel-arrows .carousel-arrow,
+  .authors-carousel-arrows .carousel-arrow {
+    width: 2.35rem !important;
+    height: 2.35rem !important;
+  }
+
+  .feedback-carousel-arrows .carousel-arrow {
+    width: 2.45rem !important;
+    height: 2.45rem !important;
+  }
+
+  .dispatch-track > .shrink-0 {
+    flex-basis: 100% !important;
+    width: 100% !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   Mobile
+   Cards become slightly narrower while arrows stay outside
+   the card instead of sitting on top of its content.
+   --------------------------------------------------------- */
+@media (max-width: 767px) {
+  .rail-carousel {
+    padding-inline: 1.4rem;
+  }
+
+  .carousel-arrows,
+  .authors-carousel-arrows,
+  .feedback-carousel-arrows {
+    left: -1.4rem !important;
+    right: -1.4rem !important;
+  }
+
+  .carousel-arrows .carousel-arrow,
+  .authors-carousel-arrows .carousel-arrow {
+    width: 2.2rem !important;
+    height: 2.2rem !important;
+  }
+
+  .feedback-carousel-arrows .carousel-arrow {
+    width: 2.2rem !important;
+    height: 2.2rem !important;
+    border-radius: 0.5rem;
+  }
+
+  .dispatch-track > .shrink-0 {
+    flex-basis: 100% !important;
+    width: 100% !important;
+  }
+
+  .dispatch-track .article-card {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .authors-carousel-wrap .authors-track {
+    grid-auto-columns: 100% !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   Very small phones
+   Keep a little extra separation without making the card too
+   narrow on 320–360px screens.
+   --------------------------------------------------------- */
+@media (max-width: 380px) {
+  .rail-carousel {
+    padding-inline: 1.15rem;
+  }
+
+  .carousel-arrows,
+  .authors-carousel-arrows,
+  .feedback-carousel-arrows {
+    left: -1.15rem !important;
+    right: -1.15rem !important;
+  }
+
+  .carousel-arrows .carousel-arrow,
+  .authors-carousel-arrows .carousel-arrow,
+  .feedback-carousel-arrows .carousel-arrow {
+    width: 2.05rem !important;
+    height: 2.05rem !important;
+  }
+}
+
+
+/* =========================================================
+   FINAL CAROUSEL FIX — KEEP ARROWS CLEAR OF CARD EDGES
+   ========================================================= */
+
+.rail-carousel {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+/* Desktop: reserve a real gutter around the card rail. */
+@media (min-width: 1200px) {
+  .rail-carousel {
+    padding-inline: 3.5rem;
+  }
+
+  .rail-carousel > .carousel-arrows,
+  .rail-carousel > .authors-carousel-arrows,
+  .rail-carousel > .feedback-carousel-arrows {
+    left: 0 !important;
+    right: 0 !important;
+  }
+}
+
+/* Mac / tablet / laptop */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .rail-carousel {
+    padding-inline: 3rem;
+  }
+
+  .rail-carousel > .carousel-arrows,
+  .rail-carousel > .authors-carousel-arrows,
+  .rail-carousel > .feedback-carousel-arrows {
+    left: 0 !important;
+    right: 0 !important;
+  }
+
+  .rail-carousel .carousel-arrow {
+    width: 2.3rem !important;
+    height: 2.3rem !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .rail-carousel {
+    /*
+     * The important change:
+     * card content gets a genuine left/right gutter instead of
+     * pushing the arrows outside the viewport.
+     */
+    padding-inline: 2.15rem;
+  }
+
+  .rail-carousel > .carousel-arrows,
+  .rail-carousel > .authors-carousel-arrows,
+  .rail-carousel > .feedback-carousel-arrows {
+    left: 0 !important;
+    right: 0 !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .rail-carousel .carousel-arrow {
+    width: 2.15rem !important;
+    height: 2.15rem !important;
+  }
+
+  .rail-carousel .carousel-arrow-spacer {
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+
+  /*
+   * Make the actual article/feedback/author card narrower than the
+   * viewport so the arrow has visible space beside it.
+   */
+  .rail-carousel .dispatch-track > .shrink-0 {
+    flex-basis: 100% !important;
+    width: 100% !important;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .rail-carousel {
+    padding-inline: 1.85rem;
+  }
+
+  .rail-carousel .carousel-arrow {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .rail-carousel .carousel-arrow-spacer {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+/* Phone: the reader-testimonial rail is swiped, not clicked, so the arrows
+   only ate into the card width. Drop them and hand that space to the card. */
+@media (max-width: 767px) {
+  .feedback-section .feedback-carousel-arrows {
+    display: none !important;
+  }
+
+  .feedback-section .rail-carousel {
+    padding-inline: 0;
+  }
+
+  .feedback-track {
+    width: 100%;
+  }
+
+  .feedback-section .feedback-track > div {
+    flex-basis: 100% !important;
+    width: 100% !important;
+  }
+
+  .feedback-section .feedback-card {
+    min-height: 16.5rem;
+  }
+
+  .feedback-section .feedback-card-inner {
+    gap: 1.1rem;
+    padding: 1.4rem 1.3rem;
+  }
+
+  .feedback-section .feedback-quote {
+    max-width: none;
+    font-size: 1.1rem;
+    line-height: 1.55;
+  }
+
+  .feedback-section .feedback-card::before {
+    font-size: 5rem;
+  }
+
+  /* That bottom padding existed to clear the arrows, which are now hidden, so
+     the dots were left floating above ~88px of dead space. */
+  .feedback-section .feedback-carousel-shell {
+    padding-bottom: 0;
+  }
+
+  .feedback-section {
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* Phone: same treatment for the contributors rail — it is swiped, so the
+   arrows only narrowed the card, and py-16 left dead space under the dots. */
+@media (max-width: 767px) {
+  .authors-section .authors-carousel-arrows {
+    display: none !important;
+  }
+
+  .authors-section .rail-carousel {
+    padding-inline: 0;
+  }
+
+  .authors-section {
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* Phone: same treatment for the featured-articles rail — swiped, not
+   clicked, so the arrow only narrowed the card and py-16 left dead space. */
+@media (max-width: 767px) {
+  .read-section .dispatch-carousel-arrows {
+    display: none !important;
+  }
+
+  .read-section .rail-carousel {
+    padding-inline: 0;
+  }
+
+  .read-section {
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* Phone: the two issue offers become a swipe rail instead of a tall stack,
+   matching the other mobile carousels. */
+@media (max-width: 767px) {
+  .issue-offer-grid {
+    display: flex !important;
+    align-items: stretch;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    /* The issue badge hangs half outside the card's top edge and
+       overflow-x would clip it, so the rail carries the difference. */
+    margin-top: 1rem;
+    padding-top: 1.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .issue-offer-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* One full card per view. */
+  .issue-offer-card {
+    flex: 0 0 100%;
+    width: auto;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 !important;
+    scroll-snap-align: center;
+  }
+
+  .issue-offer-dots {
+    margin-top: 1.25rem;
+  }
+}
+
+/* The dots belong to the phone-only swipe rail. Above 767px the cards are
+   laid out directly, so hide them — the `md:hidden` utility loses to
+   `.carousel-dots { display: flex }`, which is defined later. */
+@media (min-width: 768px) {
+  .issue-offer-dots {
+    display: none !important;
+  }
+}
+
+/* =========================================================
+   MAGAZINE POPUP — MOBILE ONLY
+   Desktop / tablet remain unchanged
+   ========================================================= */
+
+@media (max-width: 767px) {
+  /* Popup viewport */
+  .bookflip2-section ~ * {
+    box-sizing: border-box;
+  }
+
+  /* The card fills the overlay rather than floating in it. Pinned to the
+     top (the old flex-start) it left the rest of the full-height backdrop
+     reading as a long empty black box underneath. */
+  [role="dialog"][aria-label="ADITI interactive magazine"] {
+    padding: 0.75rem !important;
+    align-items: center !important;
+    overflow: hidden !important;
+  }
+
+  /* Popup container */
+  [role="dialog"][aria-label="ADITI interactive magazine"]
+    > .relative {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 auto !important;
+    padding: 0.85rem !important;
+    border-radius: 1rem !important;
+    overflow: hidden !important;
+  }
+
+  /* Header */
+  [role="dialog"][aria-label="ADITI interactive magazine"]
+    > .relative
+    > .relative.z-20 {
+    padding-bottom: 0.5rem !important;
+    flex-shrink: 0;
+  }
+
+  /* Flipbook area */
+  [role="dialog"][aria-label="ADITI interactive magazine"]
+    > .relative
+    > .flex.min-h-0 {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Book wrapper */
+  [role="dialog"][aria-label="ADITI interactive magazine"]
+    > .relative
+    > .flex.min-h-0
+    > .relative {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* The book box carries an inline pixel height sized for the desktop
+     flipbook (bookWidth x 1.294). The mobile viewer inside is capped at
+     240px wide, so any surplus showed up as empty black under the page
+     and pushed the popup tall enough to scroll. Let it size to content. */
+  [role="dialog"][aria-label="ADITI interactive magazine"]
+    > .relative
+    > .flex.min-h-0
+    > .relative
+    > .flex {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  /* Mobile book */
+  .mobile-magazine-viewer {
+    width: 100% !important;
+    max-width: min(100%, calc((100dvh - 12rem) * 0.7727)) !important;
+    margin: 0 auto !important;
+  }
+
+  .mobile-magazine-viewer__frame {
+    width: 100% !important;
+    max-width: min(100%, calc((100dvh - 12rem) * 0.7727)) !important;
+    margin: 0 auto !important;
+  }
+
+  .mobile-magazine-page {
+    width: 100% !important;
+    max-width: min(100%, calc((100dvh - 12rem) * 0.7727)) !important;
+    margin: 0 auto !important;
+  }
+
+  .mobile-magazine-page__inner {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1.2941176471 !important;
+  }
+
+  .mobile-magazine-page__image {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  /* Mobile prev/next controls */
+  [role="dialog"][aria-label="ADITI interactive magazine"]
+    > .relative
+    > .flex.items-center.justify-center.gap-3 {
+    flex-shrink: 0;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.25rem !important;
+  }
+
+  /* Progress */
+  [role="dialog"][aria-label="ADITI interactive magazine"]
+    > .relative
+    > .w-full {
+    flex: 0 0 auto;
+  }
+
+  [role="dialog"][aria-label="ADITI interactive magazine"]
+    .pageflip-progress {
+    margin-top: 0 !important;
+  }
+
+  /* End CTA should stay inside popup */
+  [role="dialog"][aria-label="ADITI interactive magazine"]
+    .pageflip-end-cta {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 0.75rem !important;
+  }
+}
+
+/* =========================================================
+   MARQUEE BAND — DESKTOP TRIM
+   The base rule runs to clamp(1.1rem, 3vw, 2rem) padding and a 1.55rem
+   face, which reads as a slab on wide screens. Scoped to >=768px so the
+   phone sizing set earlier is untouched. The base padding carries
+   !important, so this override needs it too.
+   ========================================================= */
+
+@media (min-width: 768px) {
+  .marquee-band {
+    padding-block: clamp(1rem, 1.6vw, 1.3rem) !important;
+  }
+
+  .marquee-band .marquee-track {
+    gap: clamp(1.1rem, 2.2vw, 1.9rem);
+    font-size: clamp(0.95rem, 1.35vw, 1.15rem) !important;
+    letter-spacing: 0.15em;
+  }
+}
+
+/* =========================================================
+   CAROUSEL ARROWS - ONE SHAPE, ONE SIZE
+   Per-section overrides had accumulated across five breakpoints,
+   leaving some arrows circular and some rounded-square at four
+   different sizes (2.05rem - 2.75rem). This block is the single
+   source of truth; it sits last so it wins over all of them.
+   2.75rem is also a comfortable 44px touch target.
+   ========================================================= */
+
+.carousel-arrow,
+.rail-carousel .carousel-arrow,
+.carousel-arrows .carousel-arrow,
+.carousel-arrow-side .carousel-arrow,
+.dispatch-carousel-arrows .carousel-arrow,
+.authors-carousel-arrows .carousel-arrow,
+.feedback-carousel-arrows .carousel-arrow {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  min-width: 2.75rem !important;
+  min-height: 2.75rem !important;
+  flex: 0 0 auto;
+  padding: 0 !important;
+  border-radius: 999px !important;
+}
+
+/* The spacer reserves the arrow's slot, so it has to track the size. */
+.carousel-arrow-spacer,
+.rail-carousel .carousel-arrow-spacer {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+}
+
+.carousel-arrow svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* =========================================================
+   INSIDE THE MAGAZINE - COPY LEFT, BOOK RIGHT
+   The cover used to sit centred under a centred heading, which
+   left a wide empty band either side of it on desktop.
+   ========================================================= */
+
+.showcase-layout {
+  display: grid;
+  column-gap: clamp(2.25rem, 4vw, 4rem);
+  row-gap: 2rem;
+  align-items: center;
+  /* Phones read copy -> book -> button, so the CTA sits directly under
+     the cover it opens. */
+  grid-template-areas:
+    "copy"
+    "book"
+    "cta";
+}
+
+.showcase-copy {
+  grid-area: copy;
+}
+
+.showcase-book {
+  grid-area: book;
+}
+
+.showcase-cta {
+  grid-area: cta;
+}
+
+@media (min-width: 1024px) {
+  .showcase-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* Desktop keeps the button with the copy in the left column. */
+    grid-template-areas:
+      "copy book"
+      "cta  book";
+    align-content: center;
+  }
+
+  .showcase-copy {
+    align-self: end;
+  }
+
+  .showcase-cta {
+    align-self: start;
+  }
+}
+
+.showcase-copy {
+  min-width: 0;
+}
+
+/* Phone: the copy was left-aligned while the cover and its labels were
+   centred, so the column read as two different alignments stacked. Centre
+   the whole column; the split layout only exists from 1024px up. */
+@media (max-width: 1023px) {
+  .showcase-copy {
+    text-align: center;
+  }
+
+  .showcase-copy p {
+    margin-inline: auto;
+  }
+
+  .showcase-cta {
+    text-align: center;
+  }
+}
+
+.showcase-book {
+  min-width: 0;
+}
+
+/* A slow, soft drift - closer to a balloon than a bounce. The rotation is
+   under a degree so the cover never reads as crooked. */
+@keyframes showcase-book-float {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-0.55deg);
+  }
+
+  50% {
+    transform: translate3d(0, -15px, 0) rotate(0.55deg);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-0.55deg);
+  }
+}
+
+.showcase-book-float {
+  animation: showcase-book-float 7.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Hold still while the reader is actually aiming at it. */
+.showcase-book-float:hover {
+  animation-play-state: paused;
+}
+
+/* The open cue used to appear only on hover, so a touch user never saw it.
+   It is always visible now and breathes gently to read as tappable. */
+@keyframes showcase-open-cue-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 154, 74, 0.42);
+  }
+
+  50% {
+    box-shadow: 0 0 0 0.55rem rgba(201, 154, 74, 0);
+  }
+}
+
+.showcase-open-cue {
+  animation: showcase-open-cue-pulse 2.6s ease-out infinite;
+}
+
+.showcase-open-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0 1.6rem;
+  border: 1px solid rgba(201, 154, 74, 0.55);
+  background: rgba(201, 154, 74, 0.12);
+  color: #f2eada;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.showcase-open-button:hover {
+  border-color: #c99a4a;
+  background: rgba(201, 154, 74, 0.2);
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-book-float,
+  .showcase-open-cue {
+    animation: none;
+  }
+}
+
+/* =========================================================
+   FLIPBOOK - SINGLE PAGE VIEW
+   The book runs usePortrait so one page shows at a time; there is no
+   facing-page slot to leave empty. The book-level drop shadow was cast
+   from the whole book box, so depth lives on the page itself.
+   ========================================================= */
+
+[role="dialog"][aria-label="ADITI interactive magazine"] .pageflip-book,
+[role="dialog"][aria-label="ADITI interactive magazine"] .stf__parent,
+[role="dialog"][aria-label="ADITI interactive magazine"] .stf__block,
+[role="dialog"][aria-label="ADITI interactive magazine"] .stf__wrapper {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Depth moves onto the pages themselves, so only real pages cast it. */
+[role="dialog"][aria-label="ADITI interactive magazine"] .pageflip-page {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+    3px 0 0 rgba(0, 0, 0, 0.14),
+    7px 0 0 rgba(0, 0, 0, 0.08),
+    0 22px 50px rgba(0, 0, 0, 0.42);
+}
+
+/* =========================================================
+   ARTICLE MASTHEAD + BANNER
+   The title used to sit on top of the photo, where the sticky nav
+   clipped it and it scrolled away entirely. Text leads now; the
+   photograph follows as a banner. Long-form standard.
+   ========================================================= */
+
+.article-masthead {
+  max-width: none;
+  margin: 0;
+}
+
+.article-masthead .article-reader-meta {
+  margin-bottom: clamp(1rem, 2vw, 1.35rem);
+}
+
+.article-masthead__title {
+  max-width: 24ch;
+  font-family: "Rajdhani", sans-serif;
+  font-size: clamp(2.15rem, 4.1vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: 0;
+  color: #f2eada;
+  text-wrap: balance;
+}
+
+.article-masthead .article-reader-deck {
+  max-width: none;
+  margin-top: clamp(0.9rem, 1.8vw, 1.25rem);
+  font-family: "Lora", serif;
+  font-size: clamp(1.05rem, 1.3vw, 1.2rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.62;
+  color: rgba(242, 234, 218, 0.76);
+}
+
+/* Byline reads as a credit line under a rule, not a floating tag. */
+.article-masthead .article-reader-byline {
+  margin-top: clamp(1.35rem, 2.4vw, 1.85rem);
+  border-left: 0;
+  border-top: 1px solid rgba(168, 170, 157, 0.22);
+  padding-left: 0;
+  padding-top: 0.85rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c99a4a;
+}
+
+.article-banner {
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.article-banner img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 24rem;
+  object-fit: cover;
+  object-position: center;
+  background: transparent;
+  border: 1px solid rgba(168, 170, 157, 0.2);
+}
+
+@media (max-width: 767px) {
+  .article-masthead {
+    padding-inline: 0;
+  }
+
+  .article-masthead__title {
+    max-width: none;
+    font-size: clamp(1.95rem, 8vw, 2.6rem);
+  }
+
+}
+
+/* =========================================================
+   ARTICLE CONTENTS RAIL (right margin)
+   ========================================================= */
+
+.article-contents-panel {
+  border-left: 1px solid rgba(201, 154, 74, 0.28);
+  padding-left: 1rem;
+}
+
+.article-contents-panel .article-toc {
+  display: grid;
+  gap: 0.62rem;
+  border-left: 0;
+  padding-left: 0;
+}
+
+@media (max-width: 1023px) {
+  .article-contents-panel {
+    grid-column: auto;
+    position: static;
+    order: 3;
+    border-left: 0;
+    border-top: 1px solid rgba(201, 154, 74, 0.24);
+    padding-left: 0;
+    padding-top: 1rem;
+  }
+}
+
+/* Back link and share sit with the masthead, so no metadata block floats
+   alone in the left margin repeating what the header already says. */
+.article-masthead .article-side-link {
+  margin-bottom: clamp(1.1rem, 2.2vw, 1.6rem);
+}
+
+.article-masthead__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: clamp(1.35rem, 2.4vw, 1.85rem);
+  border-top: 1px solid rgba(168, 170, 157, 0.22);
+  padding-top: 0.85rem;
+}
+
+.article-masthead__foot .article-reader-byline {
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* =========================================================
+   ARTICLE RIGHT RAIL
+   Related articles read as a "what to read next" rail beside the
+   piece rather than a wide grid buried under it.
+   ========================================================= */
+
+.article-rail {
+  grid-column: 2;
+  position: sticky;
+  top: 6rem;
+  display: grid;
+  gap: clamp(1.75rem, 3vw, 2.5rem);
+  align-content: start;
+}
+
+.article-rail .article-related {
+  max-width: none;
+  margin: 0;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.article-rail .article-related h2 {
+  font-size: 1.4rem;
+  line-height: 1.15;
+}
+
+/* One column: a stacked list, not a three-across grid. */
+.article-rail .article-related-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+/* Stacked cards: a real image, then the label and headline under it.
+   The old 4.75rem thumbnail was too small to read as a photograph. */
+.article-rail .article-related-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 0;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(168, 170, 157, 0.18);
+  border-radius: 0.4rem;
+  background: linear-gradient(180deg, rgba(242, 234, 218, 0.05), rgba(9, 11, 8, 0.4));
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+.article-rail .article-related-card:hover {
+  border-color: rgba(201, 154, 74, 0.55);
+  transform: translateY(-2px);
+}
+
+.article-rail .article-related-card__media {
+  position: relative;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.article-rail .article-related-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The source thumbnails are dark; lift them so the photo reads. */
+  filter: brightness(1.18) saturate(1.05);
+}
+
+.article-rail .article-related-card span {
+  grid-column: 1;
+  margin: 0.85rem 0.9rem 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.article-rail .article-related-card b {
+  grid-column: 1;
+  margin: 0.4rem 0.9rem 0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.22;
+  color: #f2eada;
+}
+
+.article-rail .article-related-card small {
+  display: block;
+  grid-column: 1;
+  margin: 0.45rem 0.9rem 0.9rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(168, 170, 157, 0.7);
+}
+
+.article-rail .article-related-card svg {
+  display: none;
+}
+
+.article-rail .article-related-grid {
+  gap: 1rem;
+}
+
+@media (max-width: 1179px) {
+  .article-rail {
+    grid-column: auto;
+    position: static;
+  }
+
+  .article-rail .article-related-grid {
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+}
+
+.article-main {
+  display: grid;
+  row-gap: clamp(1.85rem, 3vw, 2.6rem);
+  min-width: 0;
+}
+
+/* The card scrim existed to keep text legible when it sat ON the image.
+   In the rail the text sits BELOW the image, so the scrim only dimmed
+   the photograph. */
+.article-rail .article-related-card::before {
+  content: none;
+}
+
+.article-rail .article-related-card__media {
+  background: transparent;
+}
+
+.article-rail .article-related-card__media img {
+  filter: none;
+  transform: none;
+}
+
+.article-rail .article-related-card:hover .article-related-card__media img {
+  filter: none;
+  transform: scale(1.03);
+}
+

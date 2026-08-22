@@ -24,7 +24,7 @@ const ISSUES = [
     id: "issue-2",
     ordinal: "II",
     cover: "/article-banners/aditi-strategy-defence-magazine-issue-2-cover.webp",
-    kicker: `Issue II ${"·"} The Maiden Dispatch`,
+    kicker: "Issue II",
     title: { lead: "Forging the Republic's ", accent: "Power", tail: "" },
     question:
       "How does a republic forge enduring power without losing the principles that give it purpose?",
@@ -36,7 +36,7 @@ const ISSUES = [
     id: "issue-1",
     ordinal: "I",
     cover: "/article-banners/aditi-strategy-defence-magazine-cover.webp",
-    kicker: `Issue I ${"·"} The Maiden Dispatch`,
+    kicker: "Issue I",
     title: { lead: "Cognitive ", accent: "Dissonance", tail: " in Indian Strategy?" },
     question:
       "How does a rising power hold many competing strategic truths at once and still move as one?",
@@ -64,19 +64,36 @@ export default function IssueContentsSection() {
             aria-roledescription="carousel"
             aria-label="ADITI issues"
           >
-            <figure
-              className="issue-contents-cover"
-              aria-label={`ADITI Issue ${issue.ordinal} cover`}
-            >
-              <img
-                key={issue.id}
-                src={issue.cover}
-                alt={`ADITI Strategy and Defence Magazine Issue ${issue.ordinal} cover`}
-                className="issue-contents-cover__image"
-                loading="eager"
-                draggable={false}
-              />
-            </figure>
+        <figure
+  className="issue-contents-book-wrap"
+  aria-label={`ADITI Issue ${issue.ordinal} cover`}
+>
+  <div className="issue-book-3d" key={issue.id}>
+    {/* Book spine */}
+    <div className="issue-book-spine" />
+
+    {/* Book pages */}
+    <div className="issue-book-pages">
+      <span />
+      <span />
+      <span />
+    </div>
+
+    {/* Front cover */}
+    <div className="issue-book-cover">
+      <img
+        src={issue.cover}
+        alt={`ADITI Strategy and Defence Magazine Issue ${issue.ordinal} cover`}
+        className="issue-book-cover__image"
+        loading="eager"
+        draggable={false}
+      />
+    </div>
+
+    {/* Back cover */}
+    <div className="issue-book-back" />
+  </div>
+</figure>
 
             <div className="issue-contents-copy" key={issue.id}>
               <p className="issue-contents-kicker">{issue.kicker}</p>
@@ -119,23 +136,23 @@ export default function IssueContentsSection() {
                 <button
                   type="button"
                   className="issue-contents-nav__button"
-                  aria-label="Show the newer issue"
-                  disabled={!canGoNewer}
-                  onClick={() => setActiveIndex((index) => Math.max(0, index - 1))}
-                >
-                  <ChevronLeft className="size-5" />
-                </button>
-                <p className="issue-contents-nav__status" aria-live="polite">
-                  Issue {issue.ordinal} of {ISSUES[0].ordinal}
-                </p>
-                <button
-                  type="button"
-                  className="issue-contents-nav__button"
                   aria-label="Show the previous issue"
                   disabled={!canGoOlder}
                   onClick={() =>
                     setActiveIndex((index) => Math.min(ISSUES.length - 1, index + 1))
                   }
+                >
+                  <ChevronLeft className="size-5" />
+                </button>
+                <p className="issue-contents-nav__status" aria-live="polite">
+                  {issue.kicker}
+                </p>
+                <button
+                  type="button"
+                  className="issue-contents-nav__button"
+                  aria-label="Show the newer issue"
+                  disabled={!canGoNewer}
+                  onClick={() => setActiveIndex((index) => Math.max(0, index - 1))}
                 >
                   <ChevronRight className="size-5" />
                 </button>

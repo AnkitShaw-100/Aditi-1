@@ -24,7 +24,7 @@ export default function FrameworkSection() {
           >
             <div className="framework-shell">
               <div>
-                <p className="framework-kicker">02 / Brand Framework</p>
+                <p className="framework-kicker">Brand Framework</p>
                 <h2 className="framework-title mt-5 font-rajdhani font-bold text-chalk">
                   Most magazines have a name. Ours is a method.
                 </h2>
@@ -80,7 +80,7 @@ export default function FrameworkSection() {
                       value={lens.id}
                       className="lens-detail mt-6"
                     >
-                      <h3 className="font-rajdhani text-[clamp(2rem,5vw,3.6rem)] font-bold leading-[0.95] text-chalk">
+                      <h3 className="font-rajdhani text-[clamp(1.7rem,2.6vw,2.4rem)] font-bold leading-[1] text-chalk">
                         {lens.title}
                       </h3>
                       <p className="mt-4 max-w-2xl font-plex text-base leading-[1.75] text-ash">

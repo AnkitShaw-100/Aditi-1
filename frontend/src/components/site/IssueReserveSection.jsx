@@ -34,7 +34,7 @@ export default function IssueReserveSection() {
         },
         body: JSON.stringify({
           email: trimmedEmail,
-          issue_slug: "issue-ii-forging-the-republics-power",
+          issue_slug: "issue-iii",
           source: "landing_after_faq",
           website,
         }),
@@ -46,7 +46,7 @@ export default function IssueReserveSection() {
       }
 
       setStatus("success");
-      setMessage(data.message || "Reserved. You will hear first when Issue II opens.");
+      setMessage(data.message || "Reserved. You will hear first when Issue III opens.");
       setEmail("");
     } catch (error) {
       setStatus("error");
@@ -60,21 +60,21 @@ export default function IssueReserveSection() {
         <SectionReveal>
           <div id="reserve-content" className="reserve-layout">
             <div className="reserve-copy">
-              <p className="reserve-kicker">Issue II {"\u00B7"} July 2026</p>
+              <p className="reserve-kicker">Issue III {"\u00B7"} September 2026</p>
               <h2 className="reserve-title font-rajdhani font-bold text-chalk">
-                Forging the Republic&apos;s <span>Power.</span>
+                Issue III arrives in <span>September.</span>
               </h2>
               <p className="reserve-body">
-                India is building industrial depth, self-reliance, doctrine and
-                jointness at the exact moment the old global order frays and
-                technology rewrites how wars are fought. Issue II reads where
-                the Republic is strengthening, and where it must sharpen.
+                The next ADITI issue continues the work: strategy, capability
+                and doctrine read through the same five lenses &mdash;
+                Armament, Doctrine, Initiative, Terrain and Integration. The
+                full contents will be announced closer to release.
               </p>
             </div>
 
             <form className="reserve-card" onSubmit={handleSubmit}>
               <p className="reserve-card__eyebrow">Reserve your copy</p>
-              <h3>Be first to read Issue II.</h3>
+              <h3>Be first to read Issue III.</h3>
               <p>
                 Leave your email and we&apos;ll hold your place. You&apos;ll know
                 the moment it&apos;s live, before it is announced anywhere else.
@@ -130,8 +130,7 @@ export default function IssueReserveSection() {
 
               <p className="reserve-note">No spam. Issue announcements only.</p>
               <p className="reserve-card__footer">
-                Issue II contributors include senior officers, builders, scholars
-                and strategic practitioners.
+                Issue III contributors will be announced closer to release.
               </p>
             </form>
           </div>
