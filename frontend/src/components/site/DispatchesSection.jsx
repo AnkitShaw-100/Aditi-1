@@ -65,6 +65,7 @@ export default function DispatchesSection() {
               <RailCarousel
                 items={visibleDispatches}
                 desktopPageSize={3}
+                tabletPageSize={2}
                 mobilePageSize={1}
                 ariaLabel="Dispatch article carousel"
                 trackClassName="dispatch-track"

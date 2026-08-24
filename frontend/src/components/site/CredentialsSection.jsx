@@ -25,6 +25,7 @@ export default function CredentialsSection() {
         <RailCarousel
           items={FEEDBACKS}
           desktopPageSize={3}
+          tabletPageSize={2}
           ariaLabel="Reader and editor feedback carousel"
           trackClassName="feedback-track"
           itemClassName="basis-full md:basis-[calc((100%_-_2rem)/3)]"

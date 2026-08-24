@@ -22,6 +22,7 @@ export default function ReaderFeedbackSection() {
           <RailCarousel
             items={READER_FEEDBACKS}
             desktopPageSize={3}
+            tabletPageSize={2}
             ariaLabel="Reader feedback carousel"
             trackClassName="feedback-track"
             itemClassName="basis-full md:basis-[calc((100%_-_2rem)/3)] flex"

@@ -18,7 +18,11 @@ export default function AuthorsSection() {
     >
       <div className="mx-auto max-w-7xl">
         <SectionReveal>
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] lg:items-start">
+          {/* The split only earns its keep once the rail column can still give
+              each contributor card ~390px. At 1024px it left them at 241px,
+              which wrapped the longest names and ranks into towers, so tablets
+              stack and hand the rail the full width instead. */}
+          <div className="grid gap-8 xl:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] xl:items-start">
             <div>
               <p className="font-plex text-xs font-medium uppercase tracking-[0.18em] text-ember">
                 Who writes it

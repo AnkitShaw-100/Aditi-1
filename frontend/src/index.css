@@ -1985,7 +1985,11 @@ body.menu-open {
    was shorter than that worst case, so each header sized to its own text
    and the "Highlighted expertise" divider landed at a different height on
    every card. This floor clears the longest pair, so every divider aligns. */
-@media (min-width: 1024px) {
+/* Tracks the grid split in AuthorsSection, which moved from lg to xl: below
+   1280px the section stacks and the rail is full width, so these floors -
+   measured against the two-column card width - would reserve the wrong
+   heights. */
+@media (min-width: 1280px) {
   /* Tighter name/rank type fits the longest credentials in fewer lines, so
      the space the header has to reserve for them drops from 11.5rem to
      8.5rem - same aligned divider, far less empty card. */
@@ -5584,6 +5588,8 @@ body.menu-open {
 }
 
 .feedback-quote {
+  /* Keeps the line length readable on the widest cards - the 2-up tablet card
+     near 1199px. Narrower cards sit under this and are unaffected. */
   max-width: 26rem;
   align-self: start;
   font-size: clamp(1rem, 1.5vw, 1.24rem);
@@ -8659,9 +8665,23 @@ body.menu-open {
     height: 2.45rem !important;
   }
 
+  /*
+   * Card rails step 3 (desktop) -> 2 (tablet) -> 1 (phone). This band is the
+   * middle step; it used to collapse straight to a single card, which left the
+   * testimonial quote stranded in half an 864px box and made every rail feel
+   * emptier here than on a phone.
+   *
+   * The two tracks carry different gaps - .dispatch-track ships gap-5 from the
+   * carousel, .feedback-track overrides it to 1rem - so each subtracts its own.
+   */
   .dispatch-track > .shrink-0 {
-    flex-basis: 100% !important;
-    width: 100% !important;
+    flex-basis: calc((100% - 1.25rem) / 2) !important;
+    width: auto !important;
+  }
+
+  .feedback-track > .shrink-0 {
+    flex-basis: calc((100% - 1rem) / 2) !important;
+    width: auto !important;
   }
 }
 

@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { addMagazineToCart } from "@/lib/cart";
 
 export function RadarCursor() {
@@ -161,9 +161,22 @@ export function RailCarousel({
   showArrows = false,
   arrowsClassName = "",
   wrapArrows = false,
+  tabletPageSize,
 }) {
   const isMobile = useIsMobile();
-  const pageSize = isMobile ? mobilePageSize : desktopPageSize;
+  const isTablet = useIsTablet();
+
+  /*
+   * Card rails show 3 across on desktop, 2 between 768px and 1199px, and 1 on
+   * a phone. The page size has to track that or the arrows scroll past cards
+   * the reader never saw and the dots count pages that do not exist, so rails
+   * whose visible count changes on tablet pass tabletPageSize to match.
+   */
+  const pageSize = isMobile
+    ? mobilePageSize
+    : isTablet
+      ? tabletPageSize ?? desktopPageSize
+      : desktopPageSize;
   const trackRef = useRef(null);
   const itemRefs = useRef([]);
   const activePageRef = useRef(0);
