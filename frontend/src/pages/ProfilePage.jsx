@@ -45,10 +45,35 @@ const statusRank = {
   refunded: 4,
 };
 
+// A Razorpay order writes its rows as "pending" BEFORE any money moves, so a
+// reader who closes the payment popup leaves them behind for good. Showing
+// those forever makes it look like they owe for something they never bought.
+// We keep recent ones, because that is exactly when "Verify Payment" matters
+// (money captured but verification failed), and hide the older, clearly
+// abandoned ones.
+const PENDING_VISIBLE_HOURS = 24;
+
+function isStalePending(purchase) {
+  if (String(purchase.status ?? "").toLowerCase() !== "pending") {
+    return false;
+  }
+
+  const startedAt = Date.parse(
+    (purchase.ordered_at ?? purchase.purchased_at ?? "").replace(" ", "T")
+  );
+
+  // No usable timestamp: keep it visible rather than hide a recoverable payment.
+  if (Number.isNaN(startedAt)) {
+    return false;
+  }
+
+  return Date.now() - startedAt > PENDING_VISIBLE_HOURS * 60 * 60 * 1000;
+}
+
 function uniqueMagazinesByBestStatus(purchases = []) {
   const bestByMagazine = new Map();
 
-  purchases.forEach((purchase) => {
+  purchases.filter((purchase) => !isStalePending(purchase)).forEach((purchase) => {
     const key = purchase.slug || purchase.id || purchase.razorpay_order_id;
     const current = bestByMagazine.get(key);
     const purchaseRank = statusRank[purchase.status] ?? 9;
