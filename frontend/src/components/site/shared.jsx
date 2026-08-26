@@ -477,7 +477,7 @@ export function ArticleCard({ article }) {
             {article.author ? `by ${article.author}` : article.readTime}
           </span>
           <span className="flex items-center gap-3">
-            <b className="font-plex text-xs font-light text-fog">
+            <b className="font-plex text-sm font-bold tracking-wide text-chalk">
               {article.priceLabel}
             </b>
             {isPremium ? (

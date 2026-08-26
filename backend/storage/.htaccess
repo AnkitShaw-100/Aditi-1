@@ -1,0 +1,13 @@
+# Defence in depth: backend/.htaccess already denies this whole tree, but the
+# paid PDFs live here, so deny again in case that file is lost in a deploy.
+# PDFs must only ever leave through /api/magazines/<slug>/download, which
+# checks that the signed-in user has a paid row for that exact slug.
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

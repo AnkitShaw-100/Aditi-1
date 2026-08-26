@@ -119,7 +119,8 @@ final class UserRepository
 
         $statement = $this->pdo->prepare(
             'SELECT m.id, m.sku, m.slug, m.title, m.price_paise, m.currency, um.status,
-                    um.razorpay_order_id, um.razorpay_payment_id, um.purchased_at
+                    um.razorpay_order_id, um.razorpay_payment_id, um.purchased_at,
+                    um.created_at AS ordered_at
              FROM user_magazines um
              INNER JOIN magazines m ON m.id = um.magazine_id
              WHERE um.user_id = :user_id

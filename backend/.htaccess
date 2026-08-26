@@ -1,0 +1,22 @@
+# The deployed layout places this directory INSIDE the web root: the frontend
+# .htaccess rewrites /api to backend/public/index.php, which only resolves if
+# backend/ sits under the document root.
+#
+# That would otherwise expose everything here as static files - most seriously
+# .env and .env.production, which have no PHP handler and would be served as
+# plain text (DB, Clerk, and Razorpay secrets), plus storage/magazines, which
+# holds the paid issue and article PDFs.
+#
+# So: deny this directory by default. backend/public/.htaccess grants itself
+# back, and it is the only entry point that should answer over HTTP.
+
+<IfModule mod_authz_core.c>
+    # Apache 2.4
+    Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    # Apache 2.2
+    Order allow,deny
+    Deny from all
+</IfModule>

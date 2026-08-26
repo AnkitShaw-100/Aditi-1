@@ -65,6 +65,9 @@ function contributorImageIssueTwo(matchText) {
 export const PREMIUM_MAGAZINE_PRICE_RUPEES = "350";
 export const PREMIUM_MAGAZINE_PRICE_LABEL = `₹${PREMIUM_MAGAZINE_PRICE_RUPEES}`;
 
+export const PREMIUM_ARTICLE_PRICE_RUPEES = "50";
+export const PREMIUM_ARTICLE_PRICE_LABEL = `₹${PREMIUM_ARTICLE_PRICE_RUPEES}`;
+
 export const SECTION_IDS = [
   "intro",
   "mission",
@@ -496,6 +499,107 @@ export const DISPATCH_FILTERS = [
   { label: "Premium", value: "premium" },
 ];
 
+/* ============================================================
+   PREMIUM ARTICLES
+   Single articles sold individually at ₹50 and delivered as a
+   PDF, using the same catalogue/cart/download path as the
+   magazine issues. Each slug must match a row in `magazines`
+   (backend/database/migrations/012_add_premium_articles.sql).
+   ============================================================ */
+
+export const PREMIUM_ARTICLES = [
+  {
+    sku: "ADITI-ART-001",
+    slug: "india-and-the-indian-ocean-potential-and-predominance",
+    tag: "Maritime",
+    title:
+      "India and the Indian Ocean: Between Potential and Predominance",
+    shortTitle: "India and the Indian Ocean",
+    author:
+      "Professor (Dr) Commander Bhushan Dewan (Retd.)",
+    teaser:
+      "The map has not changed since 1947. What must change with greater urgency is India’s ability to translate geography into sustained maritime dominance.",
+    readTime: "9 min read",
+    cover:
+      "/article-banners/india-and-the-indian-ocean-potential-and-predominance-card.jpg",
+  },
+  {
+    sku: "ADITI-ART-002",
+    slug: "india-infrastructure-development-military-preparedness",
+    tag: "Infrastructure",
+    title:
+      "India’s Infrastructure Development for Military Preparedness: An Overview",
+    shortTitle: "Infrastructure for Military Preparedness",
+    author:
+      "Major General Brajesh Kumar (Retd), AVSM, VSM",
+    teaser:
+      "All major civil infrastructure development within the country supports the military directly or indirectly by boosting the supply chain and supporting the security matrix.",
+    readTime: "11 min read",
+    cover:
+      "/article-banners/india-infrastructure-development-military-preparedness-card.png",
+  },
+  {
+    sku: "ADITI-ART-003",
+    slug: "nuclearisation-deterrent-peace-south-asia",
+    tag: "Deterrence",
+    title:
+      "Nuclearisation: A Deterrent to Maintain Peace in South Asia",
+    shortTitle: "Nuclearisation and Peace in South Asia",
+    author: "Professor (Dr) Sukhwant S. Bindra",
+    teaser:
+      "It is generally assumed that the decision of one nation to develop and strengthen nuclear capability encourages its neighbours, in particular, to go for nuclearisation.",
+    readTime: "15 min read",
+    cover:
+      "/article-banners/nuclearisation-deterrent-peace-south-asia-card.jpg",
+  },
+  {
+    sku: "ADITI-ART-004",
+    slug: "indian-joint-special-operations-command-ijsoc",
+    tag: "Special Operations",
+    title:
+      "Indian Joint Special Operations Command (IJSOC): Imperative to Integrated Theatre Doctrine",
+    shortTitle: "The Case for an Indian Joint SOC",
+    author:
+      "Lieutenant General (Dr) Sunil Kumar Gadeock, AVSM (Retd)",
+    teaser:
+      "The need for a unified special operations command arises from the rapidly evolving character of dynamic warfare and the increasing prominence of hybrid threats across information, cyber, and cognitive domains.",
+    readTime: "16 min read",
+    cover:
+      "/article-banners/indian-joint-special-operations-command-ijsoc-card.jpg",
+  },
+  {
+    sku: "ADITI-ART-005",
+    slug: "challenge-of-time-defence-capability-capacity-building",
+    tag: "Capability",
+    title:
+      "The Challenge of Time in India’s Defence Capability and Capacity Building",
+    shortTitle: "The Challenge of Time",
+    author: "Lieutenant General Vijay Singh (Retd)",
+    teaser:
+      "Private sector R&D is nascent and profit driven, while government-owned defence R&D and production institutions retain considerable scope for improvements in efficiency, accountability, and outcomes.",
+    readTime: "10 min read",
+    cover:
+      "/article-banners/challenge-of-time-defence-capability-capacity-building-card.png",
+  },
+  {
+    sku: "ADITI-ART-006",
+    slug: "indian-navy-evolving-order-of-battle",
+    tag: "Naval Power",
+    title: "The Indian Navy’s Evolving Order of Battle",
+    shortTitle: "The Navy’s Evolving Order of Battle",
+    author: "Mr. Adithya Krishna Menon",
+    teaser:
+      "Amidst global tensions and delayed procurement, self-reliance is a key objective. With an eye on global advancements, the Navy is looking to accelerate the induction of uncrewed systems.",
+    readTime: "9 min read",
+    cover:
+      "/article-banners/indian-navy-evolving-order-of-battle-card.jpg",
+  },
+].map((article) => ({
+  ...article,
+  label: "Premium Article",
+  priceLabel: PREMIUM_ARTICLE_PRICE_LABEL,
+}));
+
 export const DISPATCHES = [
   // ============================================================
   // INDIAN MISSILES — NEW
@@ -762,24 +866,23 @@ export const DISPATCHES = [
       "Read Biotechnology – One Bet, Several Wins",
   },
 
-  {
+  // ============================================================
+  // PREMIUM SINGLE ARTICLES — ₹50 each
+  // ============================================================
+  ...PREMIUM_ARTICLES.map((article) => ({
     type: "premium",
-    href: "/checkout",
-    slug: "aditi-strategy-defence-volume-1-issue-1",
-    image:
-      "/article-banners/aditi-strategy-defence-magazine-mockup.webp",
-    tag: "Premium Magazine",
-    title:
-      "ADITI Strategy & Defence Magazine - Volume 1, Issue 1: Cognitive Dissonance in Indian Strategy",
-    teaser:
-      "The inaugural ADITI issue on cognitive dissonance in Indian strategy, featuring strategic essays, interviews, procurement analysis, drone affairs, air power, and book reviews.",
-    author: "ADITI Editorial",
-    readTime: "Magazine issue",
+    href: `/checkout?add=${article.slug}`,
+    slug: article.slug,
+    image: article.cover,
+    tag: article.tag,
+    title: article.title,
+    teaser: article.teaser,
+    author: article.author,
+    readTime: article.readTime,
     cta: "Buy Now",
-    priceLabel: PREMIUM_MAGAZINE_PRICE_LABEL,
-    ariaLabel:
-      "Buy ADITI Strategy and Defence Magazine Volume 1 Issue 1",
-  },
+    priceLabel: article.priceLabel,
+    ariaLabel: `Buy ${article.title}`,
+  })),
 
   {
     type: "premium",
@@ -798,6 +901,25 @@ export const DISPATCHES = [
     priceLabel: PREMIUM_MAGAZINE_PRICE_LABEL,
     ariaLabel:
       "Buy ADITI Strategy and Defence Magazine Volume 1 Issue 2",
+  },
+
+  {
+    type: "premium",
+    href: "/checkout",
+    slug: "aditi-strategy-defence-volume-1-issue-1",
+    image:
+      "/article-banners/aditi-strategy-defence-magazine-mockup.webp",
+    tag: "Premium Magazine",
+    title:
+      "ADITI Strategy & Defence Magazine - Volume 1, Issue 1: Cognitive Dissonance in Indian Strategy",
+    teaser:
+      "The inaugural ADITI issue on cognitive dissonance in Indian strategy, featuring strategic essays, interviews, procurement analysis, drone affairs, air power, and book reviews.",
+    author: "ADITI Editorial",
+    readTime: "Magazine issue",
+    cta: "Buy Now",
+    priceLabel: PREMIUM_MAGAZINE_PRICE_LABEL,
+    ariaLabel:
+      "Buy ADITI Strategy and Defence Magazine Volume 1 Issue 1",
   },
 ];
 
@@ -829,6 +951,20 @@ export const MAGAZINE_ISSUES = [
 }));
 
 export const LATEST_MAGAZINE_ISSUE = MAGAZINE_ISSUES[0];
+
+// Every catalogue row a reader can buy, in one place, so the cart, the
+// checkout picker, and the download library all describe an item the
+// same way whether it is a full issue or a single premium article.
+export const PURCHASABLE_PRODUCTS = [
+  ...MAGAZINE_ISSUES,
+  ...PREMIUM_ARTICLES,
+];
+
+export function productForSlug(slug) {
+  return PURCHASABLE_PRODUCTS.find(
+    (product) => product.slug === slug
+  );
+}
 
 export function magazineForIssue(ordinal) {
   const issue = MAGAZINE_ISSUES.find(
@@ -969,12 +1105,12 @@ export const EDITION_STATS = [
       "Four releases each year — each edition built as a complete strategic argument, not a news cycle reaction.",
   },
   {
-    value: PREMIUM_MAGAZINE_PRICE_RUPEES,
+    value: PREMIUM_ARTICLE_PRICE_RUPEES,
     prefix: "₹",
     label: "Per Dispatch",
-    tagline: "Pay per essay, not per month",
+    tagline: "Pay per article, not per month",
     description:
-      `Buy individual premium dispatches at ${PREMIUM_MAGAZINE_PRICE_LABEL} each. No recurring subscription, no paywall maze.`,
+      `Buy individual premium articles at ${PREMIUM_ARTICLE_PRICE_LABEL} each, or a full issue for ${PREMIUM_MAGAZINE_PRICE_LABEL}. No recurring subscription, no paywall maze.`,
   },
   {
     value: "5",

@@ -1,5 +1,19 @@
+# backend/.htaccess denies the whole backend tree because it is deployed inside
+# the web root. Access control is inherited by subdirectories, so this - the one
+# public entry point - has to grant itself back explicitly.
+
+<IfModule mod_authz_core.c>
+    # Apache 2.4
+    Require all granted
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    # Apache 2.2
+    Order allow,deny
+    Allow from all
+</IfModule>
+
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
-

@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { apiRequest, downloadProtectedFile, formatRupees } from "@/lib/api";
-import { MAGAZINE_ISSUES } from "@/data/siteContent";
+import { productForSlug } from "@/data/siteContent";
 
 export default function PaymentSuccessPage() {
   const location = useLocation();
@@ -196,9 +196,7 @@ function PaymentSuccessPanel() {
               <p className="font-plex text-sm text-ash">Preparing downloads...</p>
             ) : purchases.length ? (
               purchases.map((magazine) => {
-                const issue = MAGAZINE_ISSUES.find(
-                  (entry) => entry.slug === magazine.slug
-                );
+                const issue = productForSlug(magazine.slug);
 
                 const isDownloading = downloadingSlug === magazine.slug;
 

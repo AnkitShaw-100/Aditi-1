@@ -3,7 +3,11 @@ import { useMemo, useState } from "react";
 import { ArticleCard, RailCarousel } from "@/components/site/shared";
 import SectionReveal from "@/components/site/SectionReveal";
 import { cn } from "@/lib/utils";
-import { DISPATCHES, DISPATCH_FILTERS } from "@/data/siteContent";
+import {
+  DISPATCHES,
+  DISPATCH_FILTERS,
+  PREMIUM_ARTICLE_PRICE_LABEL,
+} from "@/data/siteContent";
 
 export default function DispatchesSection() {
   const [dispatchFilter, setDispatchFilter] = useState("all");
@@ -28,10 +32,11 @@ export default function DispatchesSection() {
               Featured Articles
             </p>
             <h2 className="mt-3 font-rajdhani text-[clamp(1.8rem,6vw,3rem)] font-bold leading-[1.1] text-chalk">
-              Free articles and the inaugural premium magazine.
+              Free and {PREMIUM_ARTICLE_PRICE_LABEL} premium articles, plus
+              full issues.
             </h2>
             <p className="mt-3 font-plex text-base font-light text-fog">
-              Browse open access pieces or add the ADITI Strategy & Defence Magazine to your cart.
+              Browse open access pieces, buy a single premium article, or add a full ADITI Strategy & Defence issue to your cart.
             </p>
           </div>
 

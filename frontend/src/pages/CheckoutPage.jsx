@@ -6,7 +6,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { apiRequest, formatRupees } from "@/lib/api";
 import { addMagazineToCart } from "@/lib/cart";
-import { MAGAZINE_ISSUES } from "@/data/siteContent";
+import { MAGAZINE_ISSUES, PURCHASABLE_PRODUCTS } from "@/data/siteContent";
 
 export default function CheckoutPage() {
   useLayoutEffect(() => {
@@ -53,7 +53,9 @@ function CheckoutPanel() {
   const [paymentStatus, setPaymentStatus] = useState("idle");
   const [message, setMessage] = useState("");
   const autoPaymentStartedRef = useRef(false);
+  const autoAddStartedRef = useRef(false);
   const autoPayRequested = searchParams.get("pay") === "1";
+  const requestedSlug = searchParams.get("add");
 
   const loadCheckout = useCallback(async () => {
     setStatus("loading");
@@ -94,12 +96,15 @@ function CheckoutPanel() {
     );
   }, [profile]);
 
-  // Issues the reader can still add: not in the cart, not already paid for.
-  const availableIssues = MAGAZINE_ISSUES.filter(
-    (issue) => !cartSlugs.has(issue.slug) && !ownedSlugs.has(issue.slug)
+  // Products the reader can still add: not in the cart, not already paid for.
+  const availableProducts = PURCHASABLE_PRODUCTS.filter(
+    (item) => !cartSlugs.has(item.slug) && !ownedSlugs.has(item.slug)
+  );
+  const availableIssues = availableProducts.filter((item) =>
+    MAGAZINE_ISSUES.some((issue) => issue.slug === item.slug)
   );
 
-  async function addIssues(slugs) {
+  async function addProducts(slugs) {
     setMessage("");
 
     try {
@@ -238,6 +243,44 @@ function CheckoutPanel() {
     status,
   ]);
 
+  // A premium card links to /checkout?add=<slug>, so the item the reader
+  // clicked lands in the cart without them hunting for it in the picker.
+  useEffect(() => {
+    if (!requestedSlug || autoAddStartedRef.current || status !== "ready") {
+      return;
+    }
+
+    autoAddStartedRef.current = true;
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("add");
+    setSearchParams(nextParams, { replace: true });
+
+    const isPurchasable = PURCHASABLE_PRODUCTS.some(
+      (item) => item.slug === requestedSlug
+    );
+
+    if (
+      !isPurchasable ||
+      cartSlugs.has(requestedSlug) ||
+      ownedSlugs.has(requestedSlug)
+    ) {
+      return;
+    }
+
+    addMagazineToCart({ getToken, magazineSlug: requestedSlug })
+      .then((data) => setCart(data?.cart ?? []))
+      .catch((error) => setMessage(error.message));
+  }, [
+    cartSlugs,
+    getToken,
+    ownedSlugs,
+    requestedSlug,
+    searchParams,
+    setSearchParams,
+    status,
+  ]);
+
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
       <div className="account-panel p-5 md:p-7">
@@ -257,21 +300,23 @@ function CheckoutPanel() {
             <p className="font-plex text-sm text-ash">Loading cart...</p>
           ) : cart.length ? (
             cart.map((item) => {
-              const issue = MAGAZINE_ISSUES.find((entry) => entry.slug === item.slug);
+              const product = PURCHASABLE_PRODUCTS.find(
+                (entry) => entry.slug === item.slug
+              );
 
               return (
                 <article key={item.cart_item_id} className="cart-row">
-                  {issue ? (
+                  {product ? (
                     <img
-                      src={issue.cover}
-                      alt={`ADITI ${issue.label} cover`}
+                      src={product.cover}
+                      alt={`${product.label} cover`}
                       className="cart-row__cover"
                       loading="lazy"
                     />
                   ) : null}
                   <div className="cart-row-copy">
-                    <p className="cart-row__issue">{issue?.label ?? item.sku}</p>
-                    <p className="cart-row-title">{issue?.shortTitle ?? item.title}</p>
+                    <p className="cart-row__issue">{product?.label ?? item.sku}</p>
+                    <p className="cart-row-title">{product?.shortTitle ?? item.title}</p>
                     <p className="cart-row-price">{formatRupees(item.price_paise)}</p>
                   </div>
                   <Button
@@ -279,7 +324,7 @@ function CheckoutPanel() {
                     variant="ghost"
                     size="icon"
                     className="cart-row__remove h-10 w-10 shrink-0 rounded-none border border-steel/60 text-fog hover:border-ember hover:bg-plate hover:text-chalk"
-                    aria-label={`Remove ${issue?.label ?? item.title}`}
+                    aria-label={`Remove ${product?.shortTitle ?? item.title}`}
                     onClick={() => removeItem(item.cart_item_id)}
                   >
                     <Trash2 className="size-4" />
@@ -295,41 +340,43 @@ function CheckoutPanel() {
           {message ? <p className="font-plex text-sm text-ember">{message}</p> : null}
         </div>
 
-        {status === "ready" && availableIssues.length ? (
+        {status === "ready" && availableProducts.length ? (
           <div className="issue-picker">
             <div className="issue-picker__head">
               <p className="issue-picker__label">
-                {cart.length ? "Complete your set" : "Choose your issues"}
+                {cart.length ? "Complete your set" : "Choose your reading"}
               </p>
               {availableIssues.length > 1 ? (
                 <Button
                   type="button"
                   className="final-button issue-picker__all h-10 rounded-none px-5 font-rajdhani text-sm font-bold"
-                  onClick={() => addIssues(availableIssues.map((issue) => issue.slug))}
+                  onClick={() => addProducts(availableIssues.map((issue) => issue.slug))}
                 >
-                  Add both issues
+                  {availableIssues.length === 2
+                    ? "Add both issues"
+                    : "Add all issues"}
                 </Button>
               ) : null}
             </div>
 
             <div className="issue-picker__grid">
-              {availableIssues.map((issue) => (
-                <article className="issue-picker__card" key={issue.slug}>
+              {availableProducts.map((item) => (
+                <article className="issue-picker__card" key={item.slug}>
                   <img
-                    src={issue.cover}
-                    alt={`ADITI ${issue.label} cover`}
+                    src={item.cover}
+                    alt={`${item.label} cover`}
                     className="issue-picker__cover"
                     loading="lazy"
                   />
                   <div className="issue-picker__copy">
-                    <p className="issue-picker__issue">{issue.label}</p>
-                    <p className="issue-picker__title">{issue.shortTitle}</p>
-                    <p className="issue-picker__price">{issue.priceLabel}</p>
+                    <p className="issue-picker__issue">{item.label}</p>
+                    <p className="issue-picker__title">{item.shortTitle}</p>
+                    <p className="issue-picker__price">{item.priceLabel}</p>
                   </div>
                   <Button
                     type="button"
                     className="issue-picker__add h-10 rounded-none px-5 font-rajdhani text-sm font-bold"
-                    onClick={() => addIssues([issue.slug])}
+                    onClick={() => addProducts([item.slug])}
                   >
                     Add
                   </Button>
