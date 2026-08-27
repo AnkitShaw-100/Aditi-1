@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { addMagazineToCart } from "@/lib/cart";
+import { usePremiumPurchase } from "@/components/site/premiumPurchaseContext";
 
 export function RadarCursor() {
   const canvasRef = useRef(null);
@@ -408,6 +409,17 @@ export function AuthorCard({ author }) {
 export function ArticleCard({ article }) {
   const isPremium = article.type === "premium";
   const navigate = useNavigate();
+  const premiumPurchase = usePremiumPurchase();
+
+  // Premium cards open the purchase popup; free ones go to the article.
+  function openArticle() {
+    if (isPremium && premiumPurchase) {
+      premiumPurchase.openPremiumPopup(article);
+      return;
+    }
+
+    navigate(article.href);
+  }
   const media = (
     <>
       <img
@@ -430,17 +442,17 @@ export function ArticleCard({ article }) {
       role="link"
       tabIndex={0}
       aria-label={article.ariaLabel}
-      className="article-card mx-auto w-full max-w-[30rem] overflow-hidden rounded-xl border border-steel/80 bg-bunker p-0 py-0 ring-0 transition-all duration-300 hover:-translate-y-1 hover:border-ember/60 focus-visible:border-ember focus-visible:outline-none"
+      className="article-card mx-auto w-full max-w-[30rem] overflow-hidden rounded-xl border border-steel/80 bg-bunker p-0 py-0 ring-0 focus-visible:border-ember focus-visible:outline-none"
       onClick={(event) => {
         if (event.target.closest("a, button")) {
           return;
         }
-        navigate(article.href);
+        openArticle();
       }}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          navigate(article.href);
+          openArticle();
         }
       }}
     >
@@ -481,7 +493,7 @@ export function ArticleCard({ article }) {
               {article.priceLabel}
             </b>
             {isPremium ? (
-              <AddToCartButton article={article} />
+              <AddToCartButton article={article}>View</AddToCartButton>
             ) : (
               <Button
                 asChild
@@ -514,6 +526,7 @@ export function AddToCartButton({
 }) {
   const { getToken, isSignedIn } = useAuth();
   const navigate = useNavigate();
+  const premiumPurchase = usePremiumPurchase();
   const [status, setStatus] = useState("idle");
 
   const authUrl = preselect
@@ -525,6 +538,14 @@ export function AddToCartButton({
 
     if (stopPropagation) {
       event?.stopPropagation();
+    }
+
+    // CTAs tied to one issue open the purchase popup so the reader can add it
+    // to the cart without leaving the page. `preselect={false}` CTAs are not
+    // tied to a specific issue, so they still go straight to checkout.
+    if (preselect && premiumPurchase) {
+      premiumPurchase.openPremiumPopup(article);
+      return;
     }
 
     if (!isSignedIn) {

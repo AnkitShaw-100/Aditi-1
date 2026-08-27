@@ -7282,6 +7282,68 @@ body.menu-open {
   box-shadow: inset 0 0 0 1px rgba(201, 154, 74, 0.08);
 }
 
+/*
+ * Card hover. The card itself never moves: shifting a 430px block on hover
+ * costs a layout-adjacent repaint on every pointer pass across a rail of
+ * them, and it made the rail feel unsteady. Instead the card lights up in
+ * place. Only compositor-cheap properties animate, and the one transform is
+ * on the image, which is already isolated inside an overflow-hidden box.
+ */
+.article-card {
+  transition:
+    border-color 260ms ease,
+    box-shadow 260ms ease,
+    background-color 260ms ease;
+}
+
+.article-card:hover,
+.article-card:focus-visible {
+  border-color: rgba(201, 154, 74, 0.62);
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 154, 74, 0.3),
+    0 0 0 1px rgba(201, 154, 74, 0.12),
+    0 1.1rem 2.4rem rgba(0, 0, 0, 0.4);
+}
+
+/* A slow, contained push-in on the artwork reads as depth without motion. */
+.article-card > .relative img,
+.article-card > a img {
+  transition: transform 520ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: auto;
+}
+
+.article-card:hover > .relative img,
+.article-card:hover > a img {
+  transform: scale(1.035);
+}
+
+/* The gradient scrim deepens so the tag chip and title separate from it. */
+.article-card > .relative::after {
+  transition: opacity 260ms ease;
+}
+
+.article-card:hover .article-title {
+  color: #ddb255;
+}
+
+.article-card .article-title {
+  transition: color 260ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .article-card,
+  .article-card > .relative img,
+  .article-card > a img,
+  .article-card .article-title {
+    transition: none;
+  }
+
+  .article-card:hover > .relative img,
+  .article-card:hover > a img {
+    transform: none;
+  }
+}
+
 .article-card a,
 .article-card button {
   touch-action: manipulation;
@@ -9644,3 +9706,414 @@ body.menu-open {
   transform: scale(1.03);
 }
 
+/* =========================
+   PREMIUM ITEM POPUP
+
+   The purchase dialog for a paid article or magazine issue. It borrows the
+   .purchase-popup shell for its chrome, then overrides the parts that matter
+   when the reader is looking at one specific item they are about to buy: the
+   cover is shown whole as a product shot rather than cropped as a texture,
+   and the panel grows on tablet, where the shared shell left it marooned in
+   the middle of a wide screen.
+
+   Everything here is scoped to .item-popup so the timed PurchaseNudgePopup
+   keeps its own smaller treatment.
+========================== */
+
+.item-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 69;
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(201, 154, 74, 0.09),
+      rgba(4, 6, 4, 0) 58%
+    ),
+    rgba(4, 6, 4, 0.78);
+  backdrop-filter: blur(7px) saturate(0.9);
+  animation: item-popup-overlay-in 200ms ease-out both;
+}
+
+.item-popup {
+  z-index: 70;
+  grid-template-columns: minmax(11.5rem, 0.44fr) minmax(0, 0.56fr);
+  width: min(calc(100vw - 3rem), 43rem);
+  min-height: 23rem;
+  border-color: rgba(201, 154, 74, 0.34);
+  border-radius: 1.15rem;
+  background: rgba(7, 9, 7, 0.9);
+  box-shadow:
+    0 2.4rem 6.5rem rgba(0, 0, 0, 0.66),
+    0 0 0 1px rgba(201, 154, 74, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Cover panel ------------------------------------------------------ */
+
+.item-popup__media {
+  background:
+    radial-gradient(
+      ellipse at 50% 46%,
+      rgba(201, 154, 74, 0.16),
+      rgba(9, 11, 8, 0) 68%
+    ),
+    linear-gradient(160deg, rgba(242, 234, 218, 0.07), rgba(9, 11, 8, 0.5));
+  border-right-color: rgba(201, 154, 74, 0.2);
+}
+
+.item-popup__media::after {
+  background: none;
+}
+
+/*
+ * The reader is buying this object, so show all of it. `contain` plus a cast
+ * shadow reads as a cover standing on a surface, not a cropped backdrop.
+ */
+.item-popup__media img {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  padding: clamp(1.35rem, 3vw, 2.1rem);
+  object-fit: contain;
+  object-position: center;
+  filter: saturate(1.04) contrast(1.04)
+    drop-shadow(0 1.1rem 1.6rem rgba(0, 0, 0, 0.62));
+  transform: none;
+  transition: transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.item-popup:hover .item-popup__media img {
+  transform: translateY(-0.2rem) scale(1.025);
+}
+
+/*
+ * Reticle brackets, the same gold framing device the radar cursor draws. They
+ * mark the cover as the thing under consideration.
+ */
+.item-popup__media::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0.85rem;
+  border: 1px solid rgba(201, 154, 74, 0.42);
+  /* Corners only: the middle of each edge is masked away. */
+  -webkit-mask-image:
+    linear-gradient(to right, #000 0 1.6rem, transparent 1.6rem calc(100% - 1.6rem), #000 calc(100% - 1.6rem) 100%),
+    linear-gradient(to bottom, #000 0 1.6rem, transparent 1.6rem calc(100% - 1.6rem), #000 calc(100% - 1.6rem) 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, #000 0 1.6rem, transparent 1.6rem calc(100% - 1.6rem), #000 calc(100% - 1.6rem) 100%),
+    linear-gradient(to bottom, #000 0 1.6rem, transparent 1.6rem calc(100% - 1.6rem), #000 calc(100% - 1.6rem) 100%);
+  mask-composite: intersect;
+  pointer-events: none;
+}
+
+/*
+ * A wide banner has no silhouette worth preserving, so it fills the panel and
+ * gets a gradient scrim instead of a cast shadow.
+ */
+.item-popup__media--cover img {
+  padding: 0;
+  object-fit: cover;
+  filter: saturate(1.04) contrast(1.04);
+}
+
+.item-popup__media--cover::after {
+  background: linear-gradient(
+    to right,
+    rgba(7, 9, 7, 0.12),
+    rgba(7, 9, 7, 0.42)
+  );
+}
+
+/* ---- Text panel ------------------------------------------------------- */
+
+.item-popup__content {
+  justify-content: center;
+  padding: clamp(1.35rem, 2.4vw, 1.85rem) clamp(1.35rem, 2.4vw, 1.85rem)
+    clamp(1.2rem, 2.2vw, 1.6rem);
+  background: rgba(7, 9, 7, 0.42);
+}
+
+/* A hairline that runs from the eyebrow out to the panel edge. */
+.item-popup__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.63rem;
+  letter-spacing: 0.24em;
+}
+
+.item-popup__eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(201, 154, 74, 0.5),
+    rgba(201, 154, 74, 0)
+  );
+}
+
+.item-popup h2 {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 0.6rem;
+  max-width: none;
+  font-size: clamp(1.28rem, 1.9vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.12;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  text-wrap: pretty;
+}
+
+.item-popup__content > p:not(.item-popup__eyebrow) {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 0.6rem;
+  max-width: none;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: rgba(216, 210, 192, 0.74);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+/* ---- Footer ----------------------------------------------------------- */
+
+.item-popup__footer {
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 1.15rem;
+  border-top-color: rgba(201, 154, 74, 0.2);
+  padding-top: 1rem;
+}
+
+.item-popup__price {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.7rem;
+  line-height: 1;
+}
+
+.item-popup__price span {
+  font-family: "Rajdhani", sans-serif;
+  font-size: clamp(1.42rem, 2.1vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1;
+  color: #ddb255;
+}
+
+.item-popup__price small {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.63rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  color: rgba(216, 210, 192, 0.5);
+}
+
+.item-popup__actions {
+  display: flex;
+  align-items: stretch;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.item-popup__actions > * {
+  flex: 1 1 0;
+  min-width: 0 !important;
+}
+
+.item-popup__secondary {
+  min-height: 2.75rem;
+  border: 1px solid rgba(201, 154, 74, 0.4);
+  border-radius: 0;
+  padding-inline: 0.9rem;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #ddb255;
+  transition:
+    border-color 200ms ease,
+    background 200ms ease,
+    color 200ms ease;
+}
+
+.item-popup__secondary:hover:not(:disabled) {
+  border-color: rgba(201, 154, 74, 0.75);
+  background: rgba(201, 154, 74, 0.14);
+  color: #f2eada;
+}
+
+.item-popup__secondary:disabled {
+  opacity: 0.8;
+}
+
+.item-popup__secondary svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.item-popup__primary {
+  min-height: 2.75rem;
+  padding-inline: 0.9rem !important;
+  letter-spacing: 0.03em;
+}
+
+.item-popup :is(button, a):focus-visible {
+  outline: 2px solid #ddb255;
+  outline-offset: 2px;
+}
+
+@keyframes item-popup-overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- Tablet ----------------------------------------------------------- */
+
+/*
+ * Between 768px and 1199px the shared shell left the panel at its desktop
+ * width, which reads as a postage stamp on a tablet. Give it the room the
+ * screen actually has.
+ */
+@media (min-width: 48rem) and (max-width: 74.9375rem) {
+  .item-popup {
+    grid-template-columns: minmax(14rem, 0.46fr) minmax(0, 0.54fr);
+    width: min(calc(100vw - 4rem), 47rem);
+    min-height: clamp(26rem, 34vw, 30rem);
+    border-radius: 1.4rem;
+  }
+
+  .item-popup__media::before {
+    inset: 1.1rem;
+  }
+
+  .item-popup__content {
+    padding: 2.1rem 2rem 1.85rem;
+  }
+
+  .item-popup__eyebrow {
+    font-size: 0.7rem;
+  }
+
+  .item-popup h2 {
+    font-size: 1.85rem;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
+
+  .item-popup__content > p:not(.item-popup__eyebrow) {
+    font-size: 0.95rem;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
+
+  .item-popup__footer {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+  }
+
+  .item-popup__price span {
+    font-size: 2rem;
+  }
+
+  .item-popup__price small {
+    font-size: 0.68rem;
+  }
+
+  .item-popup__secondary,
+  .item-popup__primary {
+    min-height: 3rem;
+    font-size: 1.02rem;
+  }
+}
+
+/* ---- Phone and small tablet portrait ---------------------------------- */
+
+@media (max-width: 47.9375rem) {
+  .item-popup {
+    grid-template-columns: 1fr;
+    width: min(calc(100vw - 2rem), 26rem);
+    min-height: 0;
+    border-radius: 1.1rem;
+  }
+
+  .item-popup__media {
+    height: clamp(11rem, 42vw, 15rem);
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid rgba(201, 154, 74, 0.2);
+  }
+
+  .item-popup__media img {
+    padding: 1rem;
+    transform: none;
+  }
+
+  .item-popup__media::before {
+    inset: 0.7rem;
+  }
+
+  .item-popup__content {
+    align-items: flex-start;
+    padding: 1.3rem 1.25rem 1.35rem;
+    text-align: left;
+  }
+
+  .item-popup h2 {
+    max-width: none;
+    font-size: 1.32rem;
+  }
+
+  .item-popup__content > p:not(.item-popup__eyebrow) {
+    font-size: 0.82rem;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .item-popup__footer {
+    margin-top: 1rem;
+    padding-top: 0.95rem;
+    text-align: left;
+  }
+
+  .item-popup__secondary,
+  .item-popup__primary {
+    min-height: 2.85rem;
+    padding-inline: 0.7rem !important;
+    font-size: 0.92rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-popup-overlay,
+  .item-popup {
+    animation: none;
+  }
+
+  .item-popup__media img,
+  .item-popup:hover .item-popup__media img {
+    transform: none;
+    transition: none;
+  }
+}
