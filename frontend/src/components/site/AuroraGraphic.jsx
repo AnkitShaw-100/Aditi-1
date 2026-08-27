@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { Color, Mesh, Program, Renderer, Triangle } from "ogl";
 
+import { createLoopGate } from "@/lib/loopGate";
+
 const vertexShader = `#version 300 es
 in vec2 position;
 
@@ -184,9 +186,16 @@ export default function AuroraGraphic({
       renderer.render({ scene: mesh });
     };
 
-    frameId = window.requestAnimationFrame(render);
+    // The shader only needs to run while the Mission section is on screen.
+    const releaseGate = createLoopGate(container, {
+      start: () => {
+        frameId = window.requestAnimationFrame(render);
+      },
+      stop: () => window.cancelAnimationFrame(frameId),
+    });
 
     return () => {
+      releaseGate();
       window.cancelAnimationFrame(frameId);
       observer.disconnect();
 

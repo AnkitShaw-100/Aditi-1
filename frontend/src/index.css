@@ -10117,3 +10117,47 @@ body.menu-open {
     transition: none;
   }
 }
+
+/* =========================
+   SHOWCASE SKELETON
+
+   Holds the showcase section's height open while ShowcaseStrip lazy-loads,
+   so the sections below it do not jump when the real one arrives.
+
+   The width below mirrors the bookWidth calculation in ShowcaseStrip.jsx,
+   which sizes the cover from the viewport width and then applies
+   BOOK_PAGE_FRAME_RATIO (1.2941176471) for the height. If that calculation
+   changes, change this to match.
+========================== */
+
+.showcase-book-skeleton {
+  width: clamp(300px, 37vw, 456px);
+  aspect-ratio: 1 / 1.2941176471;
+  border: 1px solid rgba(201, 154, 74, 0.16);
+  border-radius: 0.25rem;
+  background: linear-gradient(
+    160deg,
+    rgba(242, 234, 218, 0.05),
+    rgba(9, 11, 8, 0.35)
+  );
+}
+
+/* Under 768px ShowcaseStrip hands over to its mobile viewer, which sizes the
+   cover from the stage width less its 28px of gutters. */
+@media (max-width: 767px) {
+  .showcase-book-skeleton {
+    width: clamp(190px, calc((100vw - 28px) * 0.6), 240px);
+  }
+}
+
+/* Stands in for the real CTA so the copy column reserves its full height. */
+.showcase-open-button--skeleton {
+  display: block;
+  width: 15rem;
+  /* Matches .showcase-open-button's min-height so the CTA row reserves the
+     same height it will have once the real button renders. */
+  height: 3rem;
+  border: 1px solid rgba(201, 154, 74, 0.16);
+  background: rgba(242, 234, 218, 0.03);
+  pointer-events: none;
+}

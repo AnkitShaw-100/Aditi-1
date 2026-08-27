@@ -1,5 +1,7 @@
 import { useEffect, useRef, memo } from "react";
 
+import { createLoopGate } from "@/lib/loopGate";
+
 import "./DotField.css";
 
 const TWO_PI = Math.PI * 2;
@@ -386,7 +388,13 @@ const DotField = memo(
         observer.observe(canvas.parentElement);
       }
 
-      rafRef.current = window.requestAnimationFrame(tick);
+      // The grid only needs to animate while its section is on screen.
+      const releaseGate = createLoopGate(canvas.parentElement, {
+        start: () => {
+          rafRef.current = window.requestAnimationFrame(tick);
+        },
+        stop: () => window.cancelAnimationFrame(rafRef.current),
+      });
 
       rebuildRef.current = () => {
         const { w, h } = sizeRef.current;
@@ -397,6 +405,7 @@ const DotField = memo(
       };
 
       return () => {
+        releaseGate();
         window.cancelAnimationFrame(rafRef.current);
         window.clearInterval(speedInterval);
         window.clearTimeout(resizeTimer);

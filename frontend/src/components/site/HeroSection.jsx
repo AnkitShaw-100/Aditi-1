@@ -69,6 +69,49 @@ export default function HeroSection() {
     return () => mediaQuery.removeEventListener("change", syncHeroVideo);
   }, []);
 
+  /*
+   * A full-screen looping video keeps decoding frames while the reader is
+   * halfway down the page, which costs a decode and a composite per frame for
+   * something nobody can see. Pause it once the hero scrolls away, and pick
+   * it back up on return. Sound stays off on resume so the video never starts
+   * talking behind the reader's back.
+   */
+  useEffect(() => {
+    const video = heroVideoRef.current;
+
+    if (!video || typeof IntersectionObserver === "undefined") {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.some((entry) => entry.isIntersecting);
+
+        if (visible) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(video);
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        video.pause();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [activeHeroVideo]);
+
   const toggleVideoSound = () => {
     const video = heroVideoRef.current;
     if (!video) {
@@ -94,7 +137,7 @@ export default function HeroSection() {
     >
       <video
         ref={heroVideoRef}
-        className="absolute inset-0 z-0 h-screen min-h-screen w-full object-cover opacity-100 saturate-110 contrast-105"
+        className="absolute inset-0 z-0 h-screen min-h-screen w-full object-cover opacity-100"
         autoPlay
         muted={isMuted}
         loop

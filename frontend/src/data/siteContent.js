@@ -536,7 +536,7 @@ export const PREMIUM_ARTICLES = [
       "All major civil infrastructure development within the country supports the military directly or indirectly by boosting the supply chain and supporting the security matrix.",
     readTime: "11 min read",
     cover:
-      "/article-banners/india-infrastructure-development-military-preparedness-card.png",
+      "/article-banners/india-infrastructure-development-military-preparedness-card.webp",
   },
   {
     sku: "ADITI-ART-003",
@@ -550,7 +550,7 @@ export const PREMIUM_ARTICLES = [
       "It is generally assumed that the decision of one nation to develop and strengthen nuclear capability encourages its neighbours, in particular, to go for nuclearisation.",
     readTime: "15 min read",
     cover:
-      "/article-banners/nuclearisation-deterrent-peace-south-asia-card.jpg",
+      "/article-banners/nuclearisation-deterrent-peace-south-asia-card.webp",
   },
   {
     sku: "ADITI-ART-004",
@@ -565,7 +565,7 @@ export const PREMIUM_ARTICLES = [
       "The need for a unified special operations command arises from the rapidly evolving character of dynamic warfare and the increasing prominence of hybrid threats across information, cyber, and cognitive domains.",
     readTime: "16 min read",
     cover:
-      "/article-banners/indian-joint-special-operations-command-ijsoc-card.jpg",
+      "/article-banners/indian-joint-special-operations-command-ijsoc-card.webp",
   },
   {
     sku: "ADITI-ART-005",
@@ -579,7 +579,7 @@ export const PREMIUM_ARTICLES = [
       "Private sector R&D is nascent and profit driven, while government-owned defence R&D and production institutions retain considerable scope for improvements in efficiency, accountability, and outcomes.",
     readTime: "10 min read",
     cover:
-      "/article-banners/challenge-of-time-defence-capability-capacity-building-card.png",
+      "/article-banners/challenge-of-time-defence-capability-capacity-building-card.webp",
   },
   {
     sku: "ADITI-ART-006",
@@ -592,7 +592,7 @@ export const PREMIUM_ARTICLES = [
       "Amidst global tensions and delayed procurement, self-reliance is a key objective. With an eye on global advancements, the Navy is looking to accelerate the induction of uncrewed systems.",
     readTime: "9 min read",
     cover:
-      "/article-banners/indian-navy-evolving-order-of-battle-card.jpg",
+      "/article-banners/indian-navy-evolving-order-of-battle-card.webp",
   },
 ].map((article) => ({
   ...article,
@@ -711,7 +711,7 @@ export const DISPATCHES = [
     contentPath:
       "/articles/builders-psyche-atmanirbharta-defence.txt",
     image:
-      "/article-banners/builders-psyche-atmanirbharta-defence-banner.png",
+      "/article-banners/builders-psyche-atmanirbharta-defence-banner.webp",
     tag: "Initiative",
     title:
       "The Need for a Builder's Psyche in the Pursuit of Atmanirbharta in Defence",
@@ -732,7 +732,7 @@ export const DISPATCHES = [
     contentPath:
       "/articles/china-western-theatre-command-evolving-posture.txt",
     image:
-      "/article-banners/china-western-theatre-command-evolving-posture-banner.png",
+      "/article-banners/china-western-theatre-command-evolving-posture-banner.webp",
     tag: "Armament",
     title:
       "China's Western Theatre Command and PLA's Evolving Posture",
@@ -753,7 +753,7 @@ export const DISPATCHES = [
     contentPath:
       "/articles/challenges-of-atmanirbharta-in-naval-aviation.txt",
     image:
-      "/article-banners/challenges-of-atmanirbharta-in-naval-aviation-banner.png",
+      "/article-banners/challenges-of-atmanirbharta-in-naval-aviation-banner.webp",
     tag: "Armament",
     title:
       "Challenges of Atmanirbharta in Naval Aviation",
@@ -802,7 +802,7 @@ export const DISPATCHES = [
     contentPath:
       "/articles/control-of-air-future-regional-dynamics.txt",
     image:
-      "/article-banners/control-of-air-future-regional-dynamics-card.png",
+      "/article-banners/control-of-air-future-regional-dynamics-card.webp",
     tag: "Armament",
     title: "Control of Air: Future Regional Dynamics",
     teaser:
@@ -828,7 +828,7 @@ export const DISPATCHES = [
     contentPath:
       "/articles/geospatial-intelligence-india-future-defence-edge.txt",
     image:
-      "/article-banners/geospatial-intelligence-india-future-defence-edge.jpg",
+      "/article-banners/geospatial-intelligence-india-future-defence-edge.webp",
     tag: "Terrain",
     title:
       "Geospatial Intelligence and India's Future Defence Edge",

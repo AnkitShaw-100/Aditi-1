@@ -23,21 +23,34 @@ export function RadarCursor() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return undefined;
 
+    /*
+     * The cursor holds one form everywhere on the page. It used to grow over
+     * cards, fill in over links and drop its trailing dot over buttons, which
+     * made it restless to read against; it now only follows the pointer.
+     */
+    const RADIUS = 14;
+    const TICK_LENGTH = 14;
+    const DOT_RADIUS = 3;
+
     const state = {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
       dotX: window.innerWidth / 2,
       dotY: window.innerHeight / 2,
-      radius: 14,
-      targetRadius: 14,
       angle: 0,
-      hoverCard: false,
-      hoverButton: false,
     };
 
     let frameId = 0;
-    const controls = Array.from(document.querySelectorAll("a, button, summary"));
-    const cards = Array.from(document.querySelectorAll(".article-card"));
+
+    /*
+     * Only the two small boxes the cursor actually occupies are cleared each
+     * frame. Clearing the whole viewport instead made the browser repaint and
+     * re-upload a full-screen layer sixty times a second to draw a 14px
+     * circle, which is what made the entire site feel heavy on desktop.
+     */
+    const RING_BOX = RADIUS + 6;
+    const DOT_BOX = 10;
+    let painted = null;
 
     const resize = () => {
       const ratio = window.devicePixelRatio || 1;
@@ -46,16 +59,35 @@ export function RadarCursor() {
       canvas.style.width = `${window.innerWidth}px`;
       canvas.style.height = `${window.innerHeight}px`;
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      // Resizing the backing store clears it, so there is nothing stale left.
+      painted = null;
+    };
+
+    const clearPainted = () => {
+      if (!painted) {
+        return;
+      }
+
+      ctx.clearRect(
+        painted.x - RING_BOX,
+        painted.y - RING_BOX,
+        RING_BOX * 2,
+        RING_BOX * 2
+      );
+      ctx.clearRect(
+        painted.dotX - DOT_BOX,
+        painted.dotY - DOT_BOX,
+        DOT_BOX * 2,
+        DOT_BOX * 2
+      );
     };
 
     const draw = () => {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      clearPainted();
 
-      state.radius += (state.targetRadius - state.radius) * 0.2;
       state.dotX += (state.x - state.dotX) * 0.14;
       state.dotY += (state.y - state.dotY) * 0.14;
-
-      if (!state.hoverCard) state.angle += 2;
+      state.angle += 2;
 
       ctx.save();
       ctx.translate(state.x, state.y);
@@ -63,30 +95,24 @@ export function RadarCursor() {
       ctx.strokeStyle = "#C99A4A";
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.arc(0, 0, state.radius, 0, Math.PI * 2);
-
-      if (state.hoverButton) {
-        ctx.fillStyle = "rgba(201, 154, 74, 0.15)";
-        ctx.fill();
-      }
-
+      ctx.arc(0, 0, RADIUS, 0, Math.PI * 2);
       ctx.stroke();
 
-      ctx.rotate(((state.hoverCard ? 0 : state.angle) * Math.PI) / 180);
+      ctx.rotate((state.angle * Math.PI) / 180);
       ctx.strokeStyle = "rgba(201, 154, 74, 0.7)";
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.lineTo(0, -14);
+      ctx.lineTo(0, -TICK_LENGTH);
       ctx.stroke();
 
       ctx.restore();
 
-      if (!state.hoverButton) {
-        ctx.fillStyle = "#C99A4A";
-        ctx.beginPath();
-        ctx.arc(state.dotX, state.dotY, 3, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      ctx.fillStyle = "#C99A4A";
+      ctx.beginPath();
+      ctx.arc(state.dotX, state.dotY, DOT_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+
+      painted = { x: state.x, y: state.y, dotX: state.dotX, dotY: state.dotY };
 
       frameId = requestAnimationFrame(draw);
     };
@@ -96,53 +122,39 @@ export function RadarCursor() {
       state.y = event.clientY;
     };
 
-    const handleCardEnter = () => {
-      state.hoverCard = true;
-      state.targetRadius = 25;
+    const stop = () => {
+      cancelAnimationFrame(frameId);
+      frameId = 0;
     };
 
-    const handleCardLeave = () => {
-      state.hoverCard = false;
-      state.targetRadius = 14;
+    const start = () => {
+      if (!frameId) {
+        frameId = requestAnimationFrame(draw);
+      }
     };
 
-    const handleControlEnter = () => {
-      state.hoverButton = true;
-    };
-
-    const handleControlLeave = () => {
-      state.hoverButton = false;
+    // Nothing to animate while the tab is in the background.
+    const handleVisibility = () => {
+      if (document.hidden) {
+        stop();
+      } else {
+        start();
+      }
     };
 
     document.body.classList.add("cursor-ready");
     window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", handleMouseMove);
-
-    cards.forEach((card) => {
-      card.addEventListener("mouseenter", handleCardEnter);
-      card.addEventListener("mouseleave", handleCardLeave);
-    });
-
-    controls.forEach((control) => {
-      control.addEventListener("mouseenter", handleControlEnter);
-      control.addEventListener("mouseleave", handleControlLeave);
-    });
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    document.addEventListener("visibilitychange", handleVisibility);
 
     resize();
-    draw();
+    start();
 
     return () => {
-      cancelAnimationFrame(frameId);
+      stop();
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
-      cards.forEach((card) => {
-        card.removeEventListener("mouseenter", handleCardEnter);
-        card.removeEventListener("mouseleave", handleCardLeave);
-      });
-      controls.forEach((control) => {
-        control.removeEventListener("mouseenter", handleControlEnter);
-        control.removeEventListener("mouseleave", handleControlLeave);
-      });
+      document.removeEventListener("visibilitychange", handleVisibility);
       document.body.classList.remove("cursor-ready");
     };
   }, []);

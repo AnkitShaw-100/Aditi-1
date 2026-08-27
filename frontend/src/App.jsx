@@ -15,6 +15,21 @@ import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import { ADMIN_DASHBOARD_PATH, ADMIN_ENTRY_PATH } from "@/lib/adminRoutes";
 import { PremiumPurchaseProvider } from "@/components/site/PremiumPurchaseProvider";
 
+const HEADER_OFFSET = 96;
+
+/*
+ * Anchor scrolling has to survive the page growing underneath it. The landing
+ * page lazy-loads its showcase strip behind an empty placeholder, and images
+ * and webfonts land later still, so a target measured once on click is stale
+ * a few hundred milliseconds later - which is how "Articles" used to leave
+ * the reader parked on the section above it.
+ *
+ * So rather than measuring once, keep watching the target's document position
+ * for a couple of seconds and re-aim whenever something above it changes
+ * size. Any real scroll input from the reader ends it immediately.
+ */
+const SETTLE_WINDOW_MS = 2500;
+
 function HashScroll() {
   const { hash, pathname } = useLocation();
 
@@ -23,25 +38,58 @@ function HashScroll() {
       return undefined;
     }
 
-    const targetId = hash.slice(1);
-    const timerId = window.setTimeout(() => {
-      const target = document.getElementById(targetId);
+    const targetId = decodeURIComponent(hash.slice(1));
+    const deadline = performance.now() + SETTLE_WINDOW_MS;
+    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      if (!target) {
+    let frameId = 0;
+    let cancelled = false;
+    let lastTop = null;
+
+    const stop = () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frameId);
+    };
+
+    const step = () => {
+      if (cancelled) {
         return;
       }
 
-      const headerOffset = 96;
-      const targetTop =
-        target.getBoundingClientRect().top + window.scrollY - headerOffset;
+      const target = document.getElementById(targetId);
 
-      window.scrollTo({
-        top: Math.max(0, targetTop),
-        behavior: "smooth",
-      });
-    }, 0);
+      if (target) {
+        // Document-space, so this only moves when layout above the target
+        // changes - never merely because the page is scrolling.
+        const top = Math.max(
+          0,
+          target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET
+        );
 
-    return () => window.clearTimeout(timerId);
+        if (lastTop === null || Math.abs(top - lastTop) > 1) {
+          window.scrollTo({ top, behavior: smooth ? "smooth" : "auto" });
+          lastTop = top;
+        }
+      }
+
+      if (performance.now() < deadline) {
+        frameId = window.requestAnimationFrame(step);
+      }
+    };
+
+    frameId = window.requestAnimationFrame(step);
+
+    // The reader taking over always wins.
+    window.addEventListener("wheel", stop, { passive: true });
+    window.addEventListener("touchstart", stop, { passive: true });
+    window.addEventListener("keydown", stop);
+
+    return () => {
+      stop();
+      window.removeEventListener("wheel", stop);
+      window.removeEventListener("touchstart", stop);
+      window.removeEventListener("keydown", stop);
+    };
   }, [hash, pathname]);
 
   return null;
