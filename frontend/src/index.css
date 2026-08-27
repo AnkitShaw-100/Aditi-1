@@ -7059,14 +7059,18 @@ body.menu-open {
   padding: clamp(1rem, 3vw, 1.25rem);
 }
 
+/*
+ * This card is the one thing standing between the reader and paying, so it
+ * should read as the next step - but it had a 2px border, a gold outer glow
+ * and an infinite pulse all at once, which turned "do this next" into an
+ * alarm. One device is enough: a slightly warmer border than the ready state,
+ * and the PROFILE REQUIRED chip. The pulse is gone, which also stops a large
+ * element repainting forever.
+ */
 .checkout-profile-gate {
   position: relative;
-  border-width: 2px;
-  border-color: rgba(221, 178, 85, 0.82);
-  box-shadow:
-    0 0 0 1px rgba(201, 154, 74, 0.18),
-    0 1.1rem 2.6rem rgba(201, 154, 74, 0.18);
-  animation: checkout-attention 1.8s ease-in-out infinite;
+  border-color: rgba(221, 178, 85, 0.5);
+  box-shadow: 0 0.9rem 2rem rgba(0, 0, 0, 0.3);
 }
 
 .checkout-payment-ready {
@@ -7090,15 +7094,15 @@ body.menu-open {
 .checkout-gate-label {
   width: fit-content;
   margin-bottom: 0.45rem;
-  border: 1px solid rgba(221, 178, 85, 0.56);
-  background: rgba(221, 178, 85, 0.16);
+  border: 1px solid rgba(221, 178, 85, 0.38);
+  background: rgba(221, 178, 85, 0.1);
   padding: 0.26rem 0.5rem;
   font-family: "IBM Plex Sans", sans-serif;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #f2eada;
+  color: rgba(242, 234, 218, 0.88);
 }
 
 .checkout-payment-ready .checkout-status-icon {
@@ -7141,21 +7145,6 @@ body.menu-open {
 .profile-redirect-notice svg {
   flex: 0 0 auto;
   color: #c99a4a;
-}
-
-@keyframes checkout-attention {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 1px rgba(201, 154, 74, 0.16),
-      0 1.1rem 2.6rem rgba(201, 154, 74, 0.14);
-  }
-
-  50% {
-    box-shadow:
-      0 0 0 4px rgba(201, 154, 74, 0.18),
-      0 1.35rem 3rem rgba(201, 154, 74, 0.26);
-  }
 }
 
 .admin-table {

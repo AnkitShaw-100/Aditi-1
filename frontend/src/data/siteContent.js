@@ -82,22 +82,22 @@ export const SECTION_IDS = [
 
 export const NAV_ITEMS = [
   { id: "intro", label: "Home", index: "01" },
-  { id: "authors", label: "Authors", index: "02" },
-  { id: "read", label: "Articles", index: "03" },
-  { id: "feedback", label: "Testimonials", index: "04" },
+  { id: "feedback", label: "Testimonials", index: "02" },
+  { id: "authors", label: "Authors", index: "03" },
+  { id: "read", label: "Articles", index: "04" },
 ];
 
 export const MENU_ITEMS = [
   { id: "intro", title: "Home", index: "01", meta: "Hero video" },
-  { id: "mission", title: "Mission", index: "02", meta: "About the brand" },
-  { id: "authors", title: "Authors", index: "03", meta: "Ranks and roles" },
-  { id: "read", title: "Articles", index: "04", meta: "Free and premium" },
   {
     id: "feedback",
     title: "Testimonials",
-    index: "05",
+    index: "02",
     meta: "Reader trust",
   },
+  { id: "mission", title: "Mission", index: "03", meta: "About the brand" },
+  { id: "authors", title: "Authors", index: "04", meta: "Ranks and roles" },
+  { id: "read", title: "Articles", index: "05", meta: "Free and premium" },
   { id: "faq", title: "FAQ", index: "06", meta: "Terms and access" },
 ];
 
