@@ -3,7 +3,7 @@ import { Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { AddToCartButton } from "@/components/site/shared";
-import { DISPATCHES, heroMobileVideo, heroVideo } from "@/data/siteContent";
+import { LATEST_PREMIUM_MAGAZINE, heroMobileVideo, heroVideo } from "@/data/siteContent";
 
 const DESKTOP_HERO_VIDEO_QUERY = "(min-width: 768px)";
 
@@ -22,7 +22,7 @@ export default function HeroSection() {
   const [activeHeroVideo, setActiveHeroVideo] = useState(getInitialHeroVideo);
   const heroVideoRef = useRef(null);
   const activeHeroVideoRef = useRef(activeHeroVideo);
-  const premiumMagazine = DISPATCHES.find((item) => item.type === "premium");
+  const premiumMagazine = LATEST_PREMIUM_MAGAZINE;
 
   useEffect(() => {
     const video = heroVideoRef.current;

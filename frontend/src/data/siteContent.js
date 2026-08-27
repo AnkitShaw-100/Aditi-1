@@ -952,6 +952,17 @@ export const MAGAZINE_ISSUES = [
 
 export const LATEST_MAGAZINE_ISSUE = MAGAZINE_ISSUES[0];
 
+/**
+ * The DISPATCHES row for the newest issue.
+ *
+ * Magazines and premium articles both carry type: "premium", and the articles
+ * are listed first - so `DISPATCHES.find(item => item.type === "premium")`
+ * returns a 50 rupee article, not the 350 rupee issue. Anything advertising
+ * the magazine, especially anything printing its price, must use this.
+ */
+export const LATEST_PREMIUM_MAGAZINE =
+  DISPATCHES.find((item) => item.slug === LATEST_MAGAZINE_ISSUE.slug) ?? null;
+
 // Every catalogue row a reader can buy, in one place, so the cart, the
 // checkout picker, and the download library all describe an item the
 // same way whether it is a full issue or a single premium article.
