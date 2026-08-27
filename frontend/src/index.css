@@ -10161,3 +10161,120 @@ body.menu-open {
   background: rgba(242, 234, 218, 0.03);
   pointer-events: none;
 }
+
+/* =========================
+   CONTRIBUTOR CODE FIELD
+
+   Sits under the pay button on checkout. Deliberately quieter than the
+   payment CTA: most readers are paying, and only contributors have a code.
+========================== */
+
+.checkout-coupon {
+  border-top: 1px solid rgba(242, 234, 218, 0.1);
+  padding-top: 1.15rem;
+}
+
+.checkout-coupon__label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(216, 210, 192, 0.66);
+}
+
+.checkout-coupon__row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.checkout-coupon__input {
+  min-width: 0;
+  flex: 1 1 auto;
+  border: 1px solid rgba(242, 234, 218, 0.16);
+  background: rgba(9, 11, 8, 0.5);
+  padding: 0 0.75rem;
+  height: 2.6rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.86rem;
+  letter-spacing: 0.08em;
+  color: #f2eada;
+  transition: border-color 200ms ease;
+}
+
+.checkout-coupon__input::placeholder {
+  color: rgba(216, 210, 192, 0.3);
+  letter-spacing: 0.06em;
+}
+
+.checkout-coupon__input:focus {
+  border-color: rgba(201, 154, 74, 0.6);
+  outline: none;
+}
+
+.checkout-coupon__button {
+  flex: 0 0 auto;
+  height: 2.6rem;
+  border: 1px solid rgba(201, 154, 74, 0.4);
+  border-radius: 0;
+  padding-inline: 1.1rem;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #ddb255;
+}
+
+.checkout-coupon__button:hover:not(:disabled) {
+  background: rgba(201, 154, 74, 0.14);
+  color: #f2eada;
+}
+
+.checkout-coupon__hint,
+.checkout-coupon__error {
+  margin-top: 0.55rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.checkout-coupon__hint {
+  color: rgba(216, 210, 192, 0.46);
+}
+
+.checkout-coupon__error {
+  color: #e07a5f;
+}
+
+/* Coupon status pills in the admin dashboard. */
+.coupon-status {
+  display: inline-block;
+  border: 1px solid currentColor;
+  padding: 0.1rem 0.5rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.coupon-status--active {
+  color: #7fa66a;
+}
+
+.coupon-status--redeemed {
+  color: #ddb255;
+}
+
+.coupon-status--revoked {
+  color: rgba(216, 210, 192, 0.42);
+}
+
+.coupon-code {
+  font-family: "IBM Plex Mono", "IBM Plex Sans", monospace;
+  letter-spacing: 0.06em;
+  color: #f2eada;
+}

@@ -9,6 +9,7 @@ use App\Http\Request;
 use App\Http\Response;
 use App\Mail\Mailer;
 use App\Repository\AdminRepository;
+use App\Repository\CouponRepository;
 use App\Repository\UserRepository;
 use App\Support\Database;
 
@@ -54,6 +55,7 @@ if ($route === 'GET /api/health') {
 $pdo = Database::connect($config['database']);
 $admins = new AdminRepository($pdo);
 $users = new UserRepository($pdo);
+$coupons = new CouponRepository($pdo);
 $mailer = new Mailer($config['mail']);
 
 if ($route === 'POST /api/issue-reservations') {
@@ -143,6 +145,15 @@ if ($route === 'GET /api/admin/payments') {
     Response::json([
         'orders' => $admins->listPaymentOrders(),
         'events' => $admins->listPaymentEvents(),
+    ]);
+}
+
+if ($route === 'GET /api/admin/coupons') {
+    requireAdmin($request, $admins);
+
+    Response::json([
+        'coupons' => $coupons->listAll(),
+        'summary' => $coupons->summary(),
     ]);
 }
 
@@ -457,6 +468,71 @@ if ($request->method() === 'DELETE' && preg_match('#^/api/cart/(\d+)$#', $reques
     Response::json([
         'message' => 'Removed from cart',
         'cart' => $users->removeCartItem((string) $claims['sub'], (int) $matches[1]),
+    ]);
+}
+
+if ($route === 'POST /api/coupons/redeem') {
+    $claims = requireClaimsWithLocalUser($request, $verifier, $clerkUsers, $users);
+    $clerkUserId = (string) $claims['sub'];
+    $code = $request->body()['code'] ?? null;
+
+    if (!is_string($code) || trim($code) === '') {
+        Response::json(['error' => 'Enter your contributor code.'], 422);
+    }
+
+    $userId = $users->userIdForClerkId($clerkUserId);
+
+    if ($userId === null) {
+        Response::json(['error' => 'User profile not found.'], 404);
+    }
+
+    $cart = $users->getCart($clerkUserId);
+    $result = $coupons->redeem($code, ['id' => $userId], $cart);
+
+    if ($result['ok'] !== true) {
+        recordPaymentEventSafe(
+            $users,
+            $userId,
+            null,
+            null,
+            'coupon',
+            'coupon_redeem',
+            'failed',
+            'Coupon redemption rejected: ' . $result['error'],
+            ['code' => $coupons->normalise($code), 'reason' => $result['error']]
+        );
+
+        Response::json(
+            ['error' => couponRejectionMessage($result), 'reason' => $result['error']],
+            422
+        );
+    }
+
+    recordPaymentEventSafe(
+        $users,
+        $userId,
+        null,
+        null,
+        'coupon',
+        'coupon_redeem',
+        'paid',
+        'Coupon redeemed and item granted at no cost.',
+        [
+            'code' => $result['coupon']['code'],
+            'tier' => $result['coupon']['tier'],
+            'value_paise' => (int) $result['coupon']['value_paise'],
+            'magazine_slug' => $result['item']['slug'] ?? null,
+        ]
+    );
+
+    Response::json([
+        'message' => 'Coupon redeemed',
+        'item' => [
+            'slug' => $result['item']['slug'] ?? null,
+            'title' => $result['item']['title'] ?? null,
+        ],
+        'cart' => $users->getCart($clerkUserId),
+        'purchases' => $users->findProfileByClerkId($clerkUserId)['magazines_bought'] ?? [],
     ]);
 }
 
@@ -811,6 +887,42 @@ function firstNonEmptyString(mixed ...$values): ?string
     }
 
     return null;
+}
+
+/**
+ * Turns a rejected redemption into something a contributor can act on.
+ *
+ * The person hitting these cannot see the database, so each reason gets its
+ * own sentence naming what to do next rather than a shared "invalid code".
+ */
+function couponRejectionMessage(array $result): string
+{
+    $tierWord = static fn (?string $tier): string =>
+        $tier === 'article' ? 'premium article' : 'magazine issue';
+
+    $couponTier = $result['coupon']['tier'] ?? null;
+
+    return match ($result['error']) {
+        CouponRepository::ERROR_UNKNOWN_CODE =>
+            'That code was not recognised. Check for typos and try again.',
+        CouponRepository::ERROR_ALREADY_USED =>
+            'This code has already been used.',
+        CouponRepository::ERROR_REVOKED =>
+            'This code is no longer active.',
+        CouponRepository::ERROR_EMPTY_CART =>
+            'Your cart is empty. Add the ' . $tierWord($couponTier)
+            . ' you want, then enter your code.',
+        CouponRepository::ERROR_MULTIPLE_ITEMS =>
+            'This code covers one ' . $tierWord($couponTier)
+            . '. Remove the other items from your cart to use it.',
+        CouponRepository::ERROR_TIER_MISMATCH =>
+            'This code covers a ' . $tierWord($couponTier)
+            . '. Swap your cart for one to use it.',
+        CouponRepository::ERROR_ALREADY_OWNED =>
+            'You already own this, so there is nothing to redeem. It is in your profile.',
+        default =>
+            'That code could not be redeemed.',
+    };
 }
 
 function recordPaymentEventSafe(

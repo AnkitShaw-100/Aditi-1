@@ -12,6 +12,7 @@ require_once __DIR__ . '/src/Auth/SvixWebhookVerifier.php';
 require_once __DIR__ . '/src/Mail/Mailer.php';
 require_once __DIR__ . '/src/Repository/AdminRepository.php';
 require_once __DIR__ . '/src/Repository/UserRepository.php';
+require_once __DIR__ . '/src/Repository/CouponRepository.php';
 
 App\Support\Env::load(__DIR__ . '/.env');
 

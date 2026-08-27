@@ -52,6 +52,9 @@ function CheckoutPanel() {
   const [status, setStatus] = useState("loading");
   const [paymentStatus, setPaymentStatus] = useState("idle");
   const [message, setMessage] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponStatus, setCouponStatus] = useState("idle");
+  const [couponError, setCouponError] = useState("");
   const autoPaymentStartedRef = useRef(false);
   const autoAddStartedRef = useRef(false);
   const autoPayRequested = searchParams.get("pay") === "1";
@@ -117,6 +120,41 @@ function CheckoutPanel() {
       setCart(latestCart?.cart ?? []);
     } catch (error) {
       setMessage(error.message);
+    }
+  }
+
+  /*
+   * Contributor codes cover an item outright. Razorpay cannot raise an order
+   * for zero, so this never opens the payment sheet - the server grants the
+   * item and we go straight to the success page.
+   */
+  async function redeemCoupon(event) {
+    event?.preventDefault();
+
+    const code = couponCode.trim();
+
+    if (!code) {
+      setCouponError("Enter your contributor code.");
+      return;
+    }
+
+    setCouponStatus("redeeming");
+    setCouponError("");
+
+    try {
+      const data = await apiRequest(getToken, "/api/coupons/redeem", {
+        method: "POST",
+        body: JSON.stringify({ code }),
+      });
+
+      setCouponStatus("redeemed");
+      setCart(data.cart ?? []);
+      navigate("/payment-success?coupon=1", {
+        state: { couponItem: data.item ?? null },
+      });
+    } catch (error) {
+      setCouponStatus("idle");
+      setCouponError(error.message || "That code could not be redeemed.");
     }
   }
 
@@ -402,6 +440,47 @@ function CheckoutPanel() {
           </div>
         </div>
 
+        <form className="checkout-coupon mt-5" onSubmit={redeemCoupon}>
+          <label className="checkout-coupon__label" htmlFor="contributor-code">
+            Contributor code
+          </label>
+          <div className="checkout-coupon__row">
+            <input
+              id="contributor-code"
+              className="checkout-coupon__input"
+              type="text"
+              inputMode="text"
+              autoCapitalize="characters"
+              autoComplete="off"
+              spellCheck="false"
+              placeholder="ADITI-MAG-XXXXXX"
+              value={couponCode}
+              disabled={couponStatus === "redeeming"}
+              onChange={(event) => {
+                setCouponCode(event.target.value.toUpperCase());
+                setCouponError("");
+              }}
+            />
+            <Button
+              type="submit"
+              variant="ghost"
+              className="checkout-coupon__button"
+              disabled={couponStatus === "redeeming" || !cart.length}
+            >
+              {couponStatus === "redeeming" ? "Checking" : "Apply"}
+            </Button>
+          </div>
+          {couponError ? (
+            <p className="checkout-coupon__error" role="alert">
+              {couponError}
+            </p>
+          ) : (
+            <p className="checkout-coupon__hint">
+              Covers one item at no cost. Keep just that item in your cart.
+            </p>
+          )}
+        </form>
+
         {!profileComplete ? (
           <div className="checkout-profile-gate mt-5">
             <div className="checkout-status-icon" aria-hidden="true">
@@ -449,6 +528,7 @@ function CheckoutPanel() {
             </Button>
           </div>
         )}
+
         <p className="checkout-secure-note mt-3 font-plex text-xs leading-5 text-fog">
           <ShieldCheck className="size-4" />
           Secure payment opens through Razorpay. After successful verification, you will be taken to your download page and the receipt will be emailed.

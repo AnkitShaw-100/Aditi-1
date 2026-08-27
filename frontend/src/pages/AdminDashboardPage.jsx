@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CreditCard, LogOut, MailCheck, RefreshCw, Users as UsersIcon } from "lucide-react";
+import { CreditCard, LogOut, MailCheck, RefreshCw, Ticket, Users as UsersIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,12 @@ const tabs = {
     icon: CreditCard,
     path: "/api/admin/payments",
   },
+  coupons: {
+    label: "Coupons",
+    description: "Contributor codes",
+    icon: Ticket,
+    path: "/api/admin/coupons",
+  },
 };
 
 export default function AdminDashboardPage() {
@@ -36,6 +42,8 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState([]);
   const [paymentOrders, setPaymentOrders] = useState([]);
   const [issueReservations, setIssueReservations] = useState([]);
+  const [coupons, setCoupons] = useState([]);
+  const [couponSummary, setCouponSummary] = useState({});
   const [status, setStatus] = useState("idle");
   const [recoveringOrderId, setRecoveringOrderId] = useState("");
   const [message, setMessage] = useState("");
@@ -45,8 +53,9 @@ export default function AdminDashboardPage() {
       newsletter: issueReservations.length,
       users: users.length,
       payments: paymentOrders.length,
+      coupons: coupons.length,
     }),
-    [issueReservations, paymentOrders, users]
+    [coupons, issueReservations, paymentOrders, users]
   );
 
   const loadTab = useCallback(
@@ -83,6 +92,11 @@ export default function AdminDashboardPage() {
           if (data.error) {
             setMessage(data.error);
           }
+        }
+
+        if (tabName === "coupons") {
+          setCoupons(data.coupons ?? []);
+          setCouponSummary(data.summary ?? {});
         }
 
         if (tabName === "payments") {
@@ -197,7 +211,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="mt-7 grid gap-3 md:grid-cols-3" role="tablist" aria-label="Admin data sources">
+          <div className="mt-7 grid gap-3 md:grid-cols-2 lg:grid-cols-4" role="tablist" aria-label="Admin data sources">
             {Object.entries(tabs).map(([tabName, tab]) => (
               <AdminTabButton
                 key={tabName}
@@ -232,6 +246,14 @@ export default function AdminDashboardPage() {
               orders={paymentOrders}
               recoveringOrderId={recoveringOrderId}
               onRecover={recoverPayment}
+            />
+          ) : null}
+
+          {activeTab === "coupons" ? (
+            <CouponsTable
+              loading={status === "loading"}
+              coupons={coupons}
+              summary={couponSummary}
             />
           ) : null}
         </div>
@@ -359,6 +381,97 @@ function UsersTable({ loading, users }) {
         </table>
       ) : (
         <EmptyState loading={loading} loadingText="Loading Clerk users..." emptyText="No Clerk users found." />
+      )}
+    </AdminSection>
+  );
+}
+
+function CouponsTable({ loading, coupons, summary }) {
+  /*
+   * "6 of 20 left" is the number that actually matters when handing codes
+   * out, and it is tedious to work out from a list of fifty rows.
+   */
+  const remaining = (tier) => {
+    const counts = summary?.[tier] ?? {};
+    const active = counts.active ?? 0;
+    const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
+
+    return { active, total };
+  };
+
+  const magazine = remaining("magazine");
+  const article = remaining("article");
+
+  return (
+    <AdminSection
+      icon={Ticket}
+      title="Coupons"
+      description="Contributor codes. Each covers one item outright and works once."
+    >
+      <div className="mb-5 grid gap-3 sm:grid-cols-2">
+        <div className="account-mini-row">
+          <span>Magazine codes unused</span>
+          <b>
+            {magazine.active} of {magazine.total}
+          </b>
+        </div>
+        <div className="account-mini-row">
+          <span>Article codes unused</span>
+          <b>
+            {article.active} of {article.total}
+          </b>
+        </div>
+      </div>
+
+      {coupons.length ? (
+        <table className="admin-table w-full min-w-[56rem]">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Tier</th>
+              <th>Status</th>
+              <th>Redeemed by</th>
+              <th>Item</th>
+              <th>Redeemed</th>
+              <th>Batch</th>
+            </tr>
+          </thead>
+          <tbody>
+            {coupons.map((coupon) => (
+              <tr key={coupon.id}>
+                <td>
+                  <b className="coupon-code">{coupon.code}</b>
+                </td>
+                <td>
+                  <b>{coupon.tier === "article" ? "Article" : "Magazine"}</b>
+                </td>
+                <td>
+                  <b className={`coupon-status coupon-status--${coupon.status}`}>
+                    {coupon.status}
+                  </b>
+                </td>
+                <td>
+                  <b>{coupon.redeemed_by_email || coupon.redeemed_by_username || "—"}</b>
+                </td>
+                <td>
+                  <b>{coupon.redeemed_magazine_title || "—"}</b>
+                </td>
+                <td>
+                  <b>{coupon.redeemed_at || "—"}</b>
+                </td>
+                <td>
+                  <b>{coupon.batch || "—"}</b>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <EmptyState
+          loading={loading}
+          loadingText="Loading coupons..."
+          emptyText="No coupons yet. Run scripts/generate_coupons.php to mint a batch."
+        />
       )}
     </AdminSection>
   );
